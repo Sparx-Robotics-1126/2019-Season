@@ -55,13 +55,16 @@ public class Drives extends GenericSubsystem{
         leftMtrs = new MotorGroup(leftMtr1, leftMtr2);
         rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
         rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
-        rightEncoder = new EncoderData(rawRight, 1);
-        leftEncoder = new EncoderData(rawLeft, 1);
+        rightEncoder = new EncoderData(rawRight, 0.033860431);
+        leftEncoder = new EncoderData(rawLeft, -0.033860431);
+        rightMtrs.setInverted(true);
     }
 
     public void execute(){
         leftMtrs.set(0.2);
         rightMtrs.set(0.2);
+        System.out.println("Right Encoder: " + rightEncoder.getDistance());
+        System.out.println("Left Encoder: " + leftEncoder.getDistance());
     }
 
     public void debug(){
