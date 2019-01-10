@@ -8,6 +8,8 @@
 package frc.subsystem;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.IO;
 import frc.sensors.EncoderData;
@@ -42,6 +44,10 @@ public class Drives extends GenericSubsystem{
 
     private MotorGroup leftMtrs;
 
+    private DigitalOutput led;
+
+    private DigitalOutput led2;
+
     public Drives(){
         super("Drives");
     }
@@ -57,12 +63,16 @@ public class Drives extends GenericSubsystem{
         rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
         rightEncoder = new EncoderData(rawRight, 0.033860431);
         leftEncoder = new EncoderData(rawLeft, -0.033860431);
+        rightEncoder.reset();
+        leftEncoder.reset();
         rightMtrs.setInverted(true);
     }
 
     public void execute(){
-        leftMtrs.set(0.2);
-        rightMtrs.set(0.2);
+        // leftMtrs.set(0.2);
+        // rightMtrs.set(0.2);
+        rightEncoder.calculateSpeed();
+        leftEncoder.calculateSpeed();
         System.out.println("Right Encoder: " + rightEncoder.getDistance());
         System.out.println("Left Encoder: " + leftEncoder.getDistance());
     }
