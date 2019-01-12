@@ -7,8 +7,8 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.RobotState;
 import frc.controls.Controls;
+import frc.controls.TeleOP;
 import frc.subsystem.Drives;
 
 /**
@@ -37,8 +37,8 @@ public class RobotSystem extends Thread{
     }
 
     public void teleop() {
-        currentState = 
-        currentControl = teleop;
+    	currentControl = teleop;
+        currentState = RobotState.TELE;
     }
     
     public void init(){

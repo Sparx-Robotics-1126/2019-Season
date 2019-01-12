@@ -40,9 +40,12 @@ public class Robot extends TimedRobot {
     system.init();
     system.start();
     System.out.println("***INIT ROBOT COMPLETE***");
-
   }
-
+  
+  public void teleopInit() {
+	  system.teleop();
+  }
+  
   /**
    * This function is called every robot packet, no matter the mode. Use
    * this for items like diagnostics that you want ran during disabled,

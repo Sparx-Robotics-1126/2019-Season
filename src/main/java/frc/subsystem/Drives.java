@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.sensors.EncoderData;
 import frc.util.MotorGroup;
@@ -87,10 +88,10 @@ public class Drives extends GenericSubsystem{
         rightEncoder.reset();
         leftEncoder.reset();
         rightMtrs.setInverted(true);
-        gyro = new AHRS();
+//        gyro = new AHRS();
         lastAngle = 0;
-        rightSpeed = 0;
-        leftSpeed = 0;
+        speedLeft = 0;
+        speedRight = 0;
     }
 
     //does all the code for drives
