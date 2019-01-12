@@ -17,14 +17,16 @@ import frc.subsystem.Drives;
 public class RobotSystem extends Thread{
 
     private RobotState currentState;
+    private Controls teleop;
     private Controls currentControl; 
     private Drives drives;
 
     public RobotSystem(){
         drives = new Drives();
         drives.init();
+        teleop = new TeleOP(drives);
         currentState = RobotState.STANDBY;
-
+        currentControl = teleop;
     }
 
     
@@ -32,6 +34,11 @@ public class RobotSystem extends Thread{
 		STANDBY,
 		AUTO,
 		TELE;
+    }
+
+    public void teleop() {
+        currentState = 
+        currentControl = teleop;
     }
     
     public void init(){

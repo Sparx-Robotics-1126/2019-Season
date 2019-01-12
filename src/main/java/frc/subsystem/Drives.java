@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Solenoid;
 import frc.robot.IO;
 import frc.sensors.EncoderData;
 import frc.util.MotorGroup;
@@ -22,13 +23,19 @@ import com.kauailabs.navx.frc.AHRS;
  */
 public class Drives extends GenericSubsystem{
 
+    //----------------------------------------Motors/Sensors----------------------------------------
+
     private WPI_TalonSRX rightMtr1;
 
     private WPI_TalonSRX rightMtr2;
 
+    //private WPI_TalonSRX rightMtr3;
+
     private WPI_TalonSRX leftMtr1;
 
     private WPI_TalonSRX leftMtr2;
+
+    //private WPI_TalonSRX leftMtr3;
 
     private Encoder rawRight;
 
@@ -38,20 +45,34 @@ public class Drives extends GenericSubsystem{
 
     private EncoderData leftEncoder;
 
-   //private AHRS gyro;
+    private AHRS gyro;
 
     private MotorGroup rightMtrs;
 
     private MotorGroup leftMtrs;
 
-    private DigitalOutput led;
+    //private Solenoid drivesPTO;
 
-    private DigitalOutput led2;
+    //----------------------------------------Variable----------------------------------------
 
+    private double lastAngle;
+
+    private double speedRight;
+
+    private double speedLeft;
+
+    //----------------------------------------Constants----------------------------------------
+
+    private final double ANGLE_OFF_BY = .1;
+
+    private final double SPEED_PERCENTAGE = .8;
+
+    //create a drives object
     public Drives(){
         super("Drives");
     }
 
+    //initialized all the variable in drives
     public void init(){
         rightMtr1 = new WPI_TalonSRX(IO.rightDriveCIM1);
         rightMtr2 = new WPI_TalonSRX(IO.rightDriveCIM2);
@@ -61,36 +82,84 @@ public class Drives extends GenericSubsystem{
         leftMtrs = new MotorGroup(leftMtr1, leftMtr2);
         rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
         rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
-        rightEncoder = new EncoderData(rawRight, 0.033860431);
         leftEncoder = new EncoderData(rawLeft, -0.033860431);
+        rightEncoder = new EncoderData(rawRight, -0.033860431);
         rightEncoder.reset();
         leftEncoder.reset();
         rightMtrs.setInverted(true);
+        gyro = new AHRS();
+        lastAngle = 0;
+        rightSpeed = 0;
+        leftSpeed = 0;
     }
 
+    //does all the code for drives
     public void execute(){
-        // leftMtrs.set(0.2);
-        // rightMtrs.set(0.2);
-        rightEncoder.calculateSpeed();
-        leftEncoder.calculateSpeed();
-        System.out.println("Right Encoder: " + rightEncoder.getDistance());
-        System.out.println("Left Encoder: " + leftEncoder.getDistance());
+        // move(0.1, 100);
+        // rightEncoder.calculateSpeed();
+        // leftEncoder.calculateSpeed();
+        // System.out.println("Right Encoder: " + leftEncoder.getDistance());
+        // System.out.println("Left Encoder: " + rightEncoder.getDistance());
     }
 
+    //debugs all the possible problems in drives
     public void debug(){
 
     }
 
+    //checks if drives is done with its autonomous code
     public boolean isDone(){
         return false;
     }
 
+    //the time in milliseconds between each call to execute
     public long sleepTime(){
         return 20;
     }
 
+    //move the robot at a given speed and distance
+    private void move(double speed, double dist){
+        if(getDistance() > dist){
+            rightMtrs.stopMotors();
+            leftMtrs.stopMotors();
+        }else{
+            rightMtrs.set(speed);
+            leftMtrs.set(speed);
+        }
+    }
 
+    public void joystickLeft(double speed) {
+        leftMtrs.set(speed);
+    }
 
+    public void joystickRight(double speed) {
+        rightMtrs.set(speed);
+    }
 
+    //straightens the robot
+    private void straightenForward(){
+        if(getAngle() > ANGLE_OFF_BY){
+            speedRight *= SPEED_PERCENTAGE; 
+        }else if(getAngle() < ANGLE_OFF_BY){
+            speedLeft *= SPEED_PERCENTAGE;
+        }
+    }
 
+    //gets the distance the robot has travelled since the last time the encoders were reset
+    private double getDistance() {
+		rightEncoder.calculateSpeed();
+		leftEncoder.calculateSpeed();
+		return (rightEncoder.getDistance() + leftEncoder.getDistance())/2;
+    }
+
+    //gets the angle the robot has turned since the last time the gyro was reset 
+    private double getAngle(){
+        return gyro.getAngle() - lastAngle;
+    }
+
+    //resets the gyro
+    private void resetGyroAngle(){
+        lastAngle = gyro.getAngle();
+    }
+    
 }

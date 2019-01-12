@@ -62,7 +62,16 @@ public class TeleOP implements Controls{
 
     @Override
     public void execute(){
-
+		if(isOffZeroAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
+			drives.joystickRight(getAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS));
+		} else {
+			drives.joystickRight(0);
+		}
+		if(isOffZeroAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
+			drives.joystickLeft(getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
+		} else {
+			drives.joystickLeft(0);
+		}
     }
 
     /**
@@ -140,5 +149,52 @@ public class TeleOP implements Controls{
 	 */
 	public boolean isOffZeroAxis(int joy, int axis) {
 		return getAxis(joy, axis) > CtrlMap.DEADBAND || getAxis(joy, axis) < -CtrlMap.DEADBAND;
+	}
+
+	/**
+	 * Updates the previous joystick states to what they currently are now.
+	 */
+	public void setJoystickStates() {
+		for(boolean buttons[]: buttonStates) {
+			buttons[1] = buttons[0];
+		}
+//		for(boolean povs[]: povStates) {
+//			povs[1] = povs[0];
+//		}
+		buttonStates[0][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_LEFT);
+		buttonStates[1][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_MIDDLE);
+		buttonStates[2][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_RIGHT);
+//		buttonStates[3][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_TRIGGER);
+//		buttonStates[4][0] = isPressedButton(CtrlMap.LEFTJOYSTICK2, CtrlMap.JOY_LEFT);
+		buttonStates[5][0] = isPressedButton(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_MIDDLE);
+//		buttonStates[6][0] = isPressedButton(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_RIGHT);
+//		buttonStates[7][0] = isPressedButton(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_TRIGGER);
+		
+//		buttonStates[8][0] =  isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_A);
+//		buttonStates[9][0] =  isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B);
+		buttonStates[10][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X);
+//		buttonStates[11][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y);
+		
+		buttonStates[12][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L1);
+		buttonStates[13][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1);
+//		buttonStates[14][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_BACK);
+//		buttonStates[15][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_START);
+		buttonStates[16][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L2);
+		buttonStates[17][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R2);
+//		buttonStates[18][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L3);
+//		buttonStates[19][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R3);
+//
+//		povStates[0][0] = isPressedPOV(CtrlMap.RIGHTJOYSTICK, CtrlMap.POV_UP);
+//		povStates[1][0] = isPressedPOV(CtrlMap.RIGHTJOYSTICK, CtrlMap.POV_RIGHT);
+//		povStates[2][0] = isPressedPOV(CtrlMap.RIGHTJOYSTICK, CtrlMap.POV_DOWN);
+//		povStates[3][0] = isPressedPOV(CtrlMap.RIGHTJOYSTICK, CtrlMap.POV_LEFT);
+//		povStates[4][0] = isPressedPOV(CtrlMap.LEFTJOYSTICK, CtrlMap.POV_UP);
+//		povStates[5][0] = isPressedPOV(CtrlMap.LEFTJOYSTICK, CtrlMap.POV_RIGHT);
+//		povStates[6][0] = isPressedPOV(CtrlMap.LEFTJOYSTICK, CtrlMap.POV_DOWN);
+//		povStates[7][0] = isPressedPOV(CtrlMap.LEFTJOYSTICK, CtrlMap.POV_LEFT);
+		povStates[8][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_UP);
+		povStates[9][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_RIGHT);
+		povStates[10][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_DOWN);
+		povStates[11][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_LEFT);
 	}
 }
