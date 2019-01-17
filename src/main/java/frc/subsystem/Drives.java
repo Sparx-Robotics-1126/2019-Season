@@ -137,6 +137,7 @@ public class Drives extends GenericSubsystem{
                 if(getDistance() > moveDist){
                     rightMtrs.stopMotors();
                     leftMtrs.stopMotors();
+                    changeState(DriveState.STANDBY);
                 }else{
                     rightMtrs.set(speedRight);
                     leftMtrs.set(speedLeft);
@@ -146,6 +147,7 @@ public class Drives extends GenericSubsystem{
                 if(getDistance() < moveDist){
                     rightMtrs.stopMotors();
                     leftMtrs.stopMotors();
+                    changeState(DriveState.STANDBY);
                 }else{
                     rightMtrs.set(-speedRight);
                     leftMtrs.set(-speedLeft);
@@ -155,6 +157,7 @@ public class Drives extends GenericSubsystem{
                 if(getAngle() > turnAngle){
                     rightMtrs.stopMotors();
                     leftMtrs.stopMotors();
+                    changeState(DriveState.STANDBY);
                 }else{
                     rightMtrs.set(speedRight);
                     leftMtrs.set(-speedLeft);
@@ -164,6 +167,7 @@ public class Drives extends GenericSubsystem{
                 if(getAngle() < turnAngle){
                     rightMtrs.stopMotors();
                     leftMtrs.stopMotors();
+                    changeState(DriveState.STANDBY);
                 }else{
                     rightMtrs.set(-speedRight);
                     leftMtrs.set(speedLeft);
