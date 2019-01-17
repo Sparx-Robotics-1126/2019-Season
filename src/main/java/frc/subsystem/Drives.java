@@ -70,6 +70,10 @@ public class Drives extends GenericSubsystem{
 
     private double turnSpeed;
 
+    private double moveSpeed;
+
+    private double moveDist;
+
     private DriveState state;
 
     //----------------------------------------Constants----------------------------------------
@@ -103,6 +107,10 @@ public class Drives extends GenericSubsystem{
         speedLeft = 0;
         speedRight = 0;
         resetGyroAngle();
+        moveDist = 0;
+        moveSpeed = 0;
+        turnAngle = 0;
+        turnSpeed = 0;
     }
 
     public enum DriveState{
@@ -118,6 +126,51 @@ public class Drives extends GenericSubsystem{
     public void execute(){
         //move(0.8, 150);
         turn(0.5, 90);
+        switch(state){
+            case STANDBY:
+                break;
+            case TELEOP:
+                rightMtrs.set(speedRight);
+                leftMtrs.set(speedLeft);
+                break;
+            case MOVE_FORWARD:
+                if(getDistance() > moveDist){
+                    rightMtrs.stopMotors();
+                    leftMtrs.stopMotors();
+                }else{
+                    rightMtrs.set(speedRight);
+                    leftMtrs.set(speedLeft);
+                }
+                break;
+            case MOVE_BACKWARD:
+                if(getDistance() < moveDist){
+                    rightMtrs.stopMotors();
+                    leftMtrs.stopMotors();
+                }else{
+                    rightMtrs.set(-speedRight);
+                    leftMtrs.set(-speedLeft);
+                }
+                break;
+            case TURN_RIGHT:
+                if(getAngle() > turnAngle){
+                    rightMtrs.stopMotors();
+                    leftMtrs.stopMotors();
+                }else{
+                    rightMtrs.set(speedRight);
+                    leftMtrs.set(-speedLeft);
+                }
+                break;
+            case TURN_LEFT:
+                if(getAngle() < turnAngle){
+                    rightMtrs.stopMotors();
+                    leftMtrs.stopMotors();
+                }else{
+                    rightMtrs.set(-speedRight);
+                    leftMtrs.set(speedLeft);
+                }
+                break;
+
+        }
         System.out.println("Right Encoder: " + leftEncoder.getDistance());
         System.out.println("Left Encoder: " + rightEncoder.getDistance());
     }
@@ -139,21 +192,23 @@ public class Drives extends GenericSubsystem{
 
     //move the robot at a given speed and distance
     private void move(double speed, double dist){
-        if(getDistance() > dist){
-            rightMtrs.stopMotors();
-            leftMtrs.stopMotors();
+        moveSpeed = speed;
+        moveDist = dist;
+        speedRight = moveSpeed;
+        speedLeft = moveSpeed;
+        if(moveDist > 0){
+            changeState(DriveState.MOVE_FORWARD);
         }else{
-            rightMtrs.set(speed);
-            leftMtrs.set(speed);
+            changeState(DriveState.MOVE_BACKWARD);
         }
     }
 
     public void joystickLeft(double speed) {
-        leftMtrs.set(speed);
+        speedLeft = speed;
     }
 
     public void joystickRight(double speed) {
-        rightMtrs.set(speed);
+        speedRight = speed;
     }
 
     //straightens the robot
@@ -187,13 +242,7 @@ public class Drives extends GenericSubsystem{
         turnAngle = angle;
         turnSpeed = speed;
         if(angle > 0){
-           if(getAngle() > angle){
-               rightMtrs.stopMotors();
-               leftMtrs.stopMotors();
-           }else{
-               rightMtrs.set(speed);
-               leftMtrs.set(-speed);
-           }
+          changeState(DriveState.TURN_RIGHT);
         }else{
             if(getAngle() < angle){
                 rightMtrs.stopMotors();
