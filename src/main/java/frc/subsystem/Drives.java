@@ -9,6 +9,7 @@ package frc.subsystem;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -18,6 +19,7 @@ import frc.sensors.EncoderData;
 import frc.util.MotorGroup;
 
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SerialPort;
 
 /**
  * Add your docs here.
@@ -54,6 +56,8 @@ public class Drives extends GenericSubsystem{
 
     //private Solenoid drivesPTO;
 
+    private CameraServer delete;
+
     //----------------------------------------Variable----------------------------------------
 
     private double lastAngle;
@@ -61,6 +65,12 @@ public class Drives extends GenericSubsystem{
     private double speedRight;
 
     private double speedLeft;
+
+    private double turnAngle;
+
+    private double turnSpeed;
+
+    private DriveState state;
 
     //----------------------------------------Constants----------------------------------------
 
@@ -83,24 +93,33 @@ public class Drives extends GenericSubsystem{
         leftMtrs = new MotorGroup(leftMtr1, leftMtr2);
         rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
         rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
-        leftEncoder = new EncoderData(rawLeft, -0.033860431);
-        rightEncoder = new EncoderData(rawRight, -0.033860431);
+        leftEncoder = new EncoderData(rawLeft, 0.033860431);
+        rightEncoder = new EncoderData(rawRight, 0.033860431);
         rightEncoder.reset();
         leftEncoder.reset();
-        rightMtrs.setInverted(true);
-//        gyro = new AHRS();
+        leftMtrs.setInverted(true);
+        gyro = new AHRS(SerialPort.Port.kUSB);
         lastAngle = 0;
         speedLeft = 0;
         speedRight = 0;
+        resetGyroAngle();
+    }
+
+    public enum DriveState{
+        STANDBY,
+        TELEOP,
+        MOVE_FORWARD,
+        MOVE_BACKWARD,
+        TURN_RIGHT,
+        TURN_LEFT;
     }
 
     //does all the code for drives
     public void execute(){
-        // move(0.1, 100);
-        // rightEncoder.calculateSpeed();
-        // leftEncoder.calculateSpeed();
-        // System.out.println("Right Encoder: " + leftEncoder.getDistance());
-        // System.out.println("Left Encoder: " + rightEncoder.getDistance());
+        //move(0.8, 150);
+        turn(0.5, 90);
+        System.out.println("Right Encoder: " + leftEncoder.getDistance());
+        System.out.println("Left Encoder: " + rightEncoder.getDistance());
     }
 
     //debugs all the possible problems in drives
@@ -158,9 +177,37 @@ public class Drives extends GenericSubsystem{
         return gyro.getAngle() - lastAngle;
     }
 
-    //resets the gyro
+    //resets the gyro's angle so the robot turns to the angle from where the robot is currently facing
     private void resetGyroAngle(){
         lastAngle = gyro.getAngle();
+    }
+
+    //turns the robot a specified angle 
+    private void turn(double speed, double angle){
+        turnAngle = angle;
+        turnSpeed = speed;
+        if(angle > 0){
+           if(getAngle() > angle){
+               rightMtrs.stopMotors();
+               leftMtrs.stopMotors();
+           }else{
+               rightMtrs.set(speed);
+               leftMtrs.set(-speed);
+           }
+        }else{
+            if(getAngle() < angle){
+                rightMtrs.stopMotors();
+                leftMtrs.stopMotors();
+            }else{
+                rightMtrs.set(-speed);
+                leftMtrs.set(speed);
+            }
+        }
+
+    }
+
+    private void changeState(DriveState st){
+        state = st;
     }
     
 }
