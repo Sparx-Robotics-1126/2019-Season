@@ -72,6 +72,11 @@ public class TeleOP implements Controls{
 		} else {
 			drives.joystickLeft(0);
 		}
+		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)){
+			drives.buttonB(true);
+		}else{
+			drives.buttonB(false);
+		}
     }
 
     /**

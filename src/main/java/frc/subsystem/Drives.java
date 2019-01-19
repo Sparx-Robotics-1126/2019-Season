@@ -54,7 +54,7 @@ public class Drives extends GenericSubsystem{
 
     private MotorGroup leftMtrs;
 
-    //private Solenoid drivesPTO;
+    private Solenoid drivesPTO;
 
     private CameraServer delete;
 
@@ -111,6 +111,7 @@ public class Drives extends GenericSubsystem{
         moveSpeed = 0;
         turnAngle = 0;
         turnSpeed = 0;
+        drivesPTO = new Solenoid(1);
     }
 
     public enum DriveState{
@@ -119,13 +120,16 @@ public class Drives extends GenericSubsystem{
         MOVE_FORWARD,
         MOVE_BACKWARD,
         TURN_RIGHT,
-        TURN_LEFT;
+        TURN_LEFT,
+        SENSOR_LEFT,
+        SENSOR_MID,
+        SENSOR_RIGHT;
     }
 
     //does all the code for drives
     public void execute(){
         //move(0.8, 150);
-        turn(0.5, 90);
+        //turn(0.5, 90);
         switch(state){
             case STANDBY:
                 break;
@@ -173,6 +177,18 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.set(speedLeft);
                 }
                 break;
+            case SENSOR_LEFT:
+                leftMtrs.stopMotors();
+                rightMtrs.set(0.4);
+                break;
+            case SENSOR_MID:
+                leftMtrs.set(0.4);
+                rightMtrs.set(0.4);
+                break;
+            case SENSOR_RIGHT:
+                leftMtrs.set(0.4);
+                rightMtrs.stopMotors();
+                break;
 
         }
         System.out.println("Right Encoder: " + leftEncoder.getDistance());
@@ -195,7 +211,7 @@ public class Drives extends GenericSubsystem{
     }
 
     //move the robot at a given speed and distance
-    private void move(double speed, double dist){
+    public void move(double speed, double dist){
         moveSpeed = speed;
         moveDist = dist;
         speedRight = moveSpeed;
@@ -213,6 +229,10 @@ public class Drives extends GenericSubsystem{
 
     public void joystickRight(double speed) {
         speedRight = speed;
+    }
+
+    public void buttonB(boolean a){
+        drivesPTO.set(a);
     }
 
     //straightens the robot
@@ -242,7 +262,7 @@ public class Drives extends GenericSubsystem{
     }
 
     //turns the robot a specified angle 
-    private void turn(double speed, double angle){
+    public void turn(double speed, double angle){
         turnAngle = angle;
         turnSpeed = speed;
         if(angle > 0){
@@ -259,8 +279,25 @@ public class Drives extends GenericSubsystem{
 
     }
 
+    //changes the state of the robot to what is given as a parameter
     private void changeState(DriveState st){
         state = st;
     }
+
+    //used by RobotSystem to put the robot in the teleop state
+    public void toTeleop(){
+        changeState(DriveState.TELEOP);
+    }
+
+    // public void visionSenses(DriveState st){
+    //     if(){
+
+    //     }else if(){
+
+    //     }else{
+
+    //     }
+    //     changeState(st);
+    // }
     
 }
