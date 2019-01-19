@@ -289,15 +289,17 @@ public class Drives extends GenericSubsystem{
         changeState(DriveState.TELEOP);
     }
 
-    // public void visionSenses(DriveState st){
-    //     if(){
-
-    //     }else if(){
-
-    //     }else{
-
-    //     }
-    //     changeState(st);
-    // }
+    //vision call this class to tell the robot what to do when it hits the line
+    public void visionSenses(int st){
+        if(st == -1){
+            changeState(DriveState.SENSOR_LEFT);
+        }else if(st == 0){
+            changeState(DriveState.SENSOR_MID);
+        }else if(st == 1){
+            changeState(DriveState.SENSOR_RIGHT);
+        }else{
+            changeState(DriveState.STANDBY);
+        }
+    }
     
 }
