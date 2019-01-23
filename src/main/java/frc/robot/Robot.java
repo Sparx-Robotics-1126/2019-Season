@@ -40,7 +40,7 @@ public class Robot extends TimedRobot {
     system = new RobotSystem();
     system.init();
     system.start();
-    CameraServer.getInstance().startAutomaticCapture();
+  //  CameraServer.getInstance().startAutomaticCapture();
     System.out.println("***INIT ROBOT COMPLETE***");
   }
   

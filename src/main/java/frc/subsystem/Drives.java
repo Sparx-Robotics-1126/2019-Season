@@ -56,8 +56,6 @@ public class Drives extends GenericSubsystem{
 
     private Solenoid drivesPTO;
 
-    private CameraServer delete;
-
     //----------------------------------------Variable----------------------------------------
 
     private double lastAngle;
@@ -111,7 +109,7 @@ public class Drives extends GenericSubsystem{
         moveSpeed = 0;
         turnAngle = 0;
         turnSpeed = 0;
-        drivesPTO = new Solenoid(1);
+        drivesPTO = new Solenoid(0);
     }
 
     public enum DriveState{
@@ -134,6 +132,7 @@ public class Drives extends GenericSubsystem{
             case STANDBY:
                 break;
             case TELEOP:
+                System.out.println("Drives SpeedRight: " + speedRight + " speedLeft: " + speedLeft);
                 rightMtrs.set(speedRight);
                 leftMtrs.set(speedLeft);
                 break;
@@ -191,6 +190,7 @@ public class Drives extends GenericSubsystem{
                 break;
 
         }
+      //  System.out.println("State: " + )
         System.out.println("Right Encoder: " + leftEncoder.getDistance());
         System.out.println("Left Encoder: " + rightEncoder.getDistance());
     }
@@ -224,11 +224,13 @@ public class Drives extends GenericSubsystem{
     }
 
     public void joystickLeft(double speed) {
-        speedLeft = speed;
+      //  speedLeft = speed;
+      leftMtrs.set(speed);
     }
 
     public void joystickRight(double speed) {
-        speedRight = speed;
+        //speedRight = speed;
+        rightMtrs.set(speed);
     }
 
     public void buttonB(boolean a){

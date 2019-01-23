@@ -10,6 +10,7 @@ package frc.robot;
 import frc.controls.Controls;
 import frc.controls.TeleOP;
 import frc.subsystem.Drives;
+import edu.wpi.first.wpilibj.Compressor;
 
 /**
  * Add your docs here.
@@ -27,6 +28,8 @@ public class RobotSystem extends Thread{
         teleop = new TeleOP(drives);
         currentState = RobotState.STANDBY;
         currentControl = teleop;
+        Compressor compress = new Compressor(IO.compressor);
+        compress.setClosedLoopControl(true);
     }
 
     

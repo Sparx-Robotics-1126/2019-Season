@@ -20,6 +20,5 @@ public class IO {
     public static final int rightDrivesEncoderChannel2 =                     11; //1
     public static final int leftDrivesEncoderChannel1 =                      12; //2
     public static final int leftDrivesEncoderChannel2 =                      13; //3
-   // public static final int led = 0;
-   // public static final int led2 = 1;
+    public static final int compressor =                                      0;
 }
