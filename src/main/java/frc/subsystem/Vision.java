@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 /**
  * Add your docs here.
  */
-public class Vision extends GenericSubsystem {
+public class Vision{
 
     private directions direction;
 
@@ -29,13 +29,7 @@ public class Vision extends GenericSubsystem {
 
     private Drives drives;
 
-    public Vision(Drives drives)
-    {
-        super("Vision");
-        this.drives = drives;
-    }
-
-    public void init()
+    public Vision()
     {
         leftIR = new DigitalInput(0);
         centerIR = new DigitalInput(1);
@@ -50,39 +44,23 @@ public class Vision extends GenericSubsystem {
         RIGHT
     }
 
-    @Override
-    public void execute() 
+    public directions getDirection() 
     {
-        if(leftIR.get() && !centerIR.get() && !rightIR.get() && firstHit == -1)
-            firstHit = 0;
-        else if(rightIR.get() && !centerIR.get() && !leftIR.get() && firstHit == -1)
-            firstHit = 2;
-        else if(!rightIR.get() && !centerIR.get() && !leftIR.get())
-            firstHit = -1;
-
-        if(firstHit == 0)
-            direction = directions.LEFT;
-        else if(firstHit == 2)
+        if(leftIR.get() && !rightIR.get())
             direction = directions.RIGHT;
+        else if(rightIR.get() && !leftIR.get())
+            direction = directions.LEFT;
         else
             direction = directions.STANDBY;
-        drives.visionSenses(direction);
+
+        // if(firstHit == 0)
+        //     direction = directions.LEFT;
+        // else if(firstHit == 2)
+        //     direction = directions.RIGHT;
+        // else
+        //     direction = directions.STANDBY;
         System.out.println(direction);
-    }
-
-    @Override
-    public void debug() {
-
-    }
-
-    @Override
-    public boolean isDone() {
-        return false;
-    }
-
-    @Override
-    public long sleepTime() {
-        return 0;
+        return direction;
     }
 
 }

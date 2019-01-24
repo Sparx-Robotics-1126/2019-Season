@@ -77,21 +77,21 @@ public class TeleOP implements Controls{
 		// }else{
 		// 	drives.buttonB(false);
 		// }
-		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1)){
-			drives.buttonB(true);
-		}else{
-			drives.buttonB(false);
-		}
-		if(isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y)){
-			drives.joystickLeft(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y));
-		}else{
-			drives.joystickLeft(0);
-		}
-		if(isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y)){
-			drives.joystickRight(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y));
-		}else{
-			drives.joystickRight(0);
-		}
+		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1)){
+		// 	drives.buttonB(true);
+		// }else{
+		// 	drives.buttonB(false);
+		// }
+		// if(isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y)){
+		// 	drives.joystickLeft(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y));
+		// }else{
+		// 	drives.joystickLeft(0);
+		// }
+		// if(isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y)){
+		// 	drives.joystickRight(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y));
+		// }else{
+		// 	drives.joystickRight(0);
+		// }
     }
 
     /**

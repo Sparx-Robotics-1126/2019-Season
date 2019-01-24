@@ -75,6 +75,8 @@ public class Drives extends GenericSubsystem{
 
     private DriveState state;
 
+    private Vision vision;
+
     //----------------------------------------Constants----------------------------------------
 
     private final double ANGLE_OFF_BY = .1;
@@ -111,6 +113,7 @@ public class Drives extends GenericSubsystem{
         turnAngle = 0;
         turnSpeed = 0;
         drivesPTO = new Solenoid(0);
+        vision = new Vision();
         //state = state.STANDBY;
     }
 
@@ -121,15 +124,14 @@ public class Drives extends GenericSubsystem{
         MOVE_BACKWARD,
         TURN_RIGHT,
         TURN_LEFT,
-        SENSOR_LEFT,
-        SENSOR_MID,
-        SENSOR_RIGHT;
+        LINE_FOLLOWER;
     }
 
     //does all the code for drives
     public void execute(){
         //move(0.8, 150);
         //turn(0.5, 90);
+        changeState(DriveState.LINE_FOLLOWER);
         switch(state){
             case STANDBY:
                 break;
@@ -178,22 +180,18 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.set(speedLeft);
                 }
                 break;
-            case SENSOR_LEFT:
-                leftMtrs.stopMotors();
-                rightMtrs.set(0.2);
-                System.out.println("Sensor Left");
-                break;
-            case SENSOR_MID:
-                leftMtrs.set(0.2);
-                rightMtrs.set(0.2);
-                System.out.println("Sensor Mid");
-                break;
-            case SENSOR_RIGHT:
-                leftMtrs.set(0.2);
-                rightMtrs.stopMotors();
-                System.out.println("Sensor Right");
-                break;
-
+            case LINE_FOLLOWER:
+                directions st = vision.getDirection();
+                if(st == directions.LEFT){
+                    leftMtrs.set(-0.3);
+                    rightMtrs.set(0.3);
+                }else if(st == directions.RIGHT){
+                    leftMtrs.set(0.3);
+                    rightMtrs.set(-0.3);
+                }else if(st == directions.STANDBY){
+                    leftMtrs.set(0.2);
+                    rightMtrs.set(0.2);
+                }
         }
       //  System.out.println("State: " + )
         System.out.println("Right Encoder: " + leftEncoder.getDistance());
@@ -296,13 +294,4 @@ public class Drives extends GenericSubsystem{
         changeState(DriveState.TELEOP);
     }
 
-    //vision call this class to tell the robot what to do when it hits the line
-    public void visionSenses(directions st){
-        if(st == directions.LEFT){
-            changeState(DriveState.SENSOR_LEFT);
-        }else if(st == directions.RIGHT){
-            changeState(DriveState.SENSOR_RIGHT);
-        }
-    }
-    
 }

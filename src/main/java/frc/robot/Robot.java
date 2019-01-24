@@ -30,8 +30,6 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private RobotSystem system;
 
-  
-  Spark brmotor = new Spark(0);
 
   /**
    * This function is run when the robot is first started up and should be
