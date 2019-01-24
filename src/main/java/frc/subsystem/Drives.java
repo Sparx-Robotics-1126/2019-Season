@@ -178,15 +178,18 @@ public class Drives extends GenericSubsystem{
                 break;
             case SENSOR_LEFT:
                 leftMtrs.stopMotors();
-                rightMtrs.set(0.4);
+                rightMtrs.set(0.2);
+                System.out.println("Sensor Left");
                 break;
             case SENSOR_MID:
-                leftMtrs.set(0.4);
-                rightMtrs.set(0.4);
+                leftMtrs.set(0.2);
+                rightMtrs.set(0.2);
+                System.out.println("Sensor Mid");
                 break;
             case SENSOR_RIGHT:
-                leftMtrs.set(0.4);
+                leftMtrs.set(0.2);
                 rightMtrs.stopMotors();
+                System.out.println("Sensor Right");
                 break;
 
         }
@@ -225,12 +228,12 @@ public class Drives extends GenericSubsystem{
 
     public void joystickLeft(double speed) {
       //  speedLeft = speed;
-      leftMtrs.set(speed);
+      leftMtrs.set(-speed);
     }
 
     public void joystickRight(double speed) {
         //speedRight = speed;
-        rightMtrs.set(speed);
+        rightMtrs.set(-speed);
     }
 
     public void buttonB(boolean a){

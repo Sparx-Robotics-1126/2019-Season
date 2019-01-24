@@ -28,8 +28,8 @@ public class RobotSystem extends Thread{
         teleop = new TeleOP(drives);
         currentState = RobotState.STANDBY;
         currentControl = teleop;
-        Compressor compress = new Compressor(IO.compressor);
-        compress.setClosedLoopControl(true);
+        //Compressor compress = new Compressor(IO.compressor);
+        //compress.setClosedLoopControl(true);
     }
 
     
