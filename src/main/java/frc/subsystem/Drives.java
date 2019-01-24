@@ -110,6 +110,7 @@ public class Drives extends GenericSubsystem{
         turnAngle = 0;
         turnSpeed = 0;
         drivesPTO = new Solenoid(0);
+        //state = state.STANDBY;
     }
 
     public enum DriveState{
@@ -228,12 +229,12 @@ public class Drives extends GenericSubsystem{
 
     public void joystickLeft(double speed) {
       //  speedLeft = speed;
-      leftMtrs.set(-speed);
+      leftMtrs.set(speed);
     }
 
     public void joystickRight(double speed) {
         //speedRight = speed;
-        rightMtrs.set(-speed);
+        rightMtrs.set(speed);
     }
 
     public void buttonB(boolean a){
