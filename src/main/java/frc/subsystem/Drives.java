@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.sensors.EncoderData;
+import frc.subsystem.Vision.directions;
 import frc.util.MotorGroup;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -296,15 +297,11 @@ public class Drives extends GenericSubsystem{
     }
 
     //vision call this class to tell the robot what to do when it hits the line
-    public void visionSenses(int st){
-        if(st == -1){
+    public void visionSenses(directions st){
+        if(st == directions.LEFT){
             changeState(DriveState.SENSOR_LEFT);
-        }else if(st == 0){
-            changeState(DriveState.SENSOR_MID);
-        }else if(st == 1){
+        }else if(st == directions.RIGHT){
             changeState(DriveState.SENSOR_RIGHT);
-        }else{
-            changeState(DriveState.STANDBY);
         }
     }
     

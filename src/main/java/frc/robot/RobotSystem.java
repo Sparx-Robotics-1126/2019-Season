@@ -10,6 +10,7 @@ package frc.robot;
 import frc.controls.Controls;
 import frc.controls.TeleOP;
 import frc.subsystem.Drives;
+import frc.subsystem.Vision;
 import edu.wpi.first.wpilibj.Compressor;
 
 /**
@@ -21,10 +22,13 @@ public class RobotSystem extends Thread{
     private Controls teleop;
     private Controls currentControl; 
     private Drives drives;
+    private Vision vision;
 
     public RobotSystem(){
         drives = new Drives();
         drives.init();
+        vision = new Vision(drives);
+        vision.init();
         teleop = new TeleOP(drives);
         currentState = RobotState.STANDBY;
         currentControl = teleop;

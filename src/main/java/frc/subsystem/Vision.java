@@ -27,9 +27,12 @@ public class Vision extends GenericSubsystem {
 
     int firstHit;
 
-    public Vision()
+    private Drives drives;
+
+    public Vision(Drives drives)
     {
         super("Vision");
+        this.drives = drives;
     }
 
     public void init()
@@ -37,13 +40,14 @@ public class Vision extends GenericSubsystem {
         leftIR = new DigitalInput(0);
         centerIR = new DigitalInput(1);
         rightIR = new DigitalInput(2);
+        direction  = directions.STANDBY;
     }
 
     public enum directions
     {
         LEFT,
         STANDBY,
-        RIGHT    
+        RIGHT
     }
 
     @Override
@@ -62,6 +66,7 @@ public class Vision extends GenericSubsystem {
             direction = directions.RIGHT;
         else
             direction = directions.STANDBY;
+        drives.visionSenses(direction);
         System.out.println(direction);
     }
 
