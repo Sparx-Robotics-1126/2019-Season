@@ -10,6 +10,7 @@ package frc.subsystem;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -87,6 +88,10 @@ public class Drives extends GenericSubsystem{
     public Drives(){
         super("Drives");
     }
+    public void resetVision()
+    {
+        vision.reset();
+    }
 
     //initialized all the variable in drives
     public void init(){
@@ -109,12 +114,12 @@ public class Drives extends GenericSubsystem{
         speedRight = 0;
         resetGyroAngle();
         moveDist = 0;
-        moveSpeed = 0;
+        moveSpeed = 0; 
         turnAngle = 0;
         turnSpeed = 0;
         drivesPTO = new Solenoid(0);
         vision = new Vision();
-        //state = state.STANDBY;
+        state = state.STANDBY;
     }
 
     public enum DriveState{
@@ -131,14 +136,20 @@ public class Drives extends GenericSubsystem{
     public void execute(){
         //move(0.8, 150);
         //turn(0.5, 90);
-        changeState(DriveState.LINE_FOLLOWER);
+        //changeState(DriveState.LINE_FOLLOWER);
         switch(state){
             case STANDBY:
                 break;
             case TELEOP:
-                System.out.println("Drives SpeedRight: " + speedRight + " speedLeft: " + speedLeft);
-                rightMtrs.set(speedRight);
-                leftMtrs.set(speedLeft);
+                //System.out.println("Drives SpeedRight: " + speedRight + " speedLeft: " + speedLeft);
+                vision.getDirection();
+                if(!vision.triggered()){
+                    rightMtrs.set(speedRight);
+                    leftMtrs.set(speedLeft);
+                }else{
+                    changeState(DriveState.LINE_FOLLOWER);
+                }
+               
                 break;
             case MOVE_FORWARD:
                 if(getDistance() > moveDist){
@@ -180,18 +191,37 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.set(speedLeft);
                 }
                 break;
-            case LINE_FOLLOWER:
+            case LINE_FOLLOWER:  
+
+            
                 directions st = vision.getDirection();
+
+                
+                // System.out.println("Left motor power = " + leftMtr1.getBusVoltage());
+                //System.out.println("right motor power = " + rightMtr1.getBusVoltage());
                 if(st == directions.LEFT){
-                    leftMtrs.set(-0.3);
-                    rightMtrs.set(0.3);
+                    leftMtrs.set(-0.5);
+                    rightMtrs.set(0.5);
                 }else if(st == directions.RIGHT){
+                    leftMtrs.set(0.5);
+                    rightMtrs.set(-0.5);
+                }else if(st == directions.FORWARD){
                     leftMtrs.set(0.3);
-                    rightMtrs.set(-0.3);
-                }else if(st == directions.STANDBY){
-                    leftMtrs.set(0.2);
-                    rightMtrs.set(0.2);
+                    rightMtrs.set(0.3);
+                }else if(st == directions.SLIGHTLEFT){
+                    leftMtrs.set(0.00);
+                    rightMtrs.set(0.30);
+                }else if(st == directions.SLIGHTRIGHT){
+                    leftMtrs.set(0.30);
+                    rightMtrs.set(0.10);
                 }
+                else if(st == directions.STANDBY)
+                {
+                    leftMtrs.set(0);
+                    rightMtrs.set(0);
+                }
+                
+                
         }
       //  System.out.println("State: " + )
         System.out.println("Right Encoder: " + leftEncoder.getDistance());
@@ -227,13 +257,13 @@ public class Drives extends GenericSubsystem{
     }
 
     public void joystickLeft(double speed) {
-      //  speedLeft = speed;
-      leftMtrs.set(speed);
+        speedLeft = speed;
+     // leftMtrs.set(speed);
     }
 
     public void joystickRight(double speed) {
-        //speedRight = speed;
-        rightMtrs.set(speed);
+        speedRight = speed;
+     //   rightMtrs.set(speed);
     }
 
     public void buttonB(boolean a){

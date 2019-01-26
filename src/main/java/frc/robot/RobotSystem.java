@@ -41,6 +41,11 @@ public class RobotSystem extends Thread{
 		TELE;
     }
 
+    public void resetVision()
+    {
+        drives.resetVision();
+    }
+
     public void teleop() {
     	currentControl = teleop;
         currentState = RobotState.TELE;
