@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.sensors.EncoderData;
@@ -22,6 +23,7 @@ import frc.util.MotorGroup;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.Servo;
 
 /**
  * Add your docs here.
@@ -56,7 +58,11 @@ public class Drives extends GenericSubsystem{
 
     private MotorGroup leftMtrs;
 
-    private Solenoid drivesPTO;
+    private Solenoid hatchPTO;
+
+    private Servo rightServo;
+
+    private Servo leftServo;
 
     //----------------------------------------Variable----------------------------------------
 
@@ -77,6 +83,18 @@ public class Drives extends GenericSubsystem{
     private DriveState state;
 
     private Vision vision;
+
+    private double timeLow;
+
+    private double timeNeutral;
+
+    private double timeHigh;
+
+    private boolean shiftedToLow;
+
+    private boolean shiftedToHigh;
+
+    private boolean servoEnabled;
 
     //----------------------------------------Constants----------------------------------------
 
@@ -109,6 +127,8 @@ public class Drives extends GenericSubsystem{
         leftEncoder.reset();
         leftMtrs.setInverted(true);
         gyro = new AHRS(SerialPort.Port.kUSB);
+        rightServo = new Servo(0);
+        leftServo = new Servo(1);
         lastAngle = 0;
         speedLeft = 0;
         speedRight = 0;
@@ -117,9 +137,13 @@ public class Drives extends GenericSubsystem{
         moveSpeed = 0; 
         turnAngle = 0;
         turnSpeed = 0;
-        drivesPTO = new Solenoid(0);
+        hatchPTO = new Solenoid(0);
         vision = new Vision();
         state = state.STANDBY;
+        timeLow = 0;
+        shiftedToLow = false;
+        shiftedToHigh = false;
+        servoEnabled = false;
     }
 
     public enum DriveState{
@@ -129,6 +153,9 @@ public class Drives extends GenericSubsystem{
         MOVE_BACKWARD,
         TURN_RIGHT,
         TURN_LEFT,
+        SHIFT_LOW,
+        SHIFT_HIGH,
+        SHIFT_NEUTRAL,
         LINE_FOLLOWER;
     }
 
@@ -220,6 +247,37 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.set(0);
                     rightMtrs.set(0);
                 }
+            case SHIFT_LOW:
+                leftMtrs.set(0.2);
+                rightMtrs.set(0.2);
+                shiftedToLow = false;
+                if(timeLow + .2 < Timer.getFPGATimestamp()){
+                    leftMtrs.set(speedLeft);
+                    rightMtrs.set(speedLeft);
+                    shiftedToLow = true;
+                    changeState(DriveState.SHIFT_NEUTRAL);
+                }
+            case SHIFT_NEUTRAL:
+                if(!shiftedToLow){
+                    lowShift();
+                }
+                if(!servoEnabled){
+                    enableServo();
+                }
+                if(!shiftedToHigh){
+                    highShift();
+                }
+            case SHIFT_HIGH:
+                leftMtrs.set(0.2);
+                rightMtrs.set(0.2);
+                shiftedToHigh = false;
+                if(timeHigh + .2 < Timer.getFPGATimestamp()){
+                    leftMtrs.set(speedLeft);
+                    rightMtrs.set(speedRight);
+                    shiftedToHigh = true;
+                    changeState(DriveState.SHIFT_NEUTRAL);
+                }
+                
                 
                 
         }
@@ -267,7 +325,23 @@ public class Drives extends GenericSubsystem{
     }
 
     public void buttonB(boolean a){
-        drivesPTO.set(a);
+        hatchPTO.set(a);
+    }
+
+    private void lowShift(){
+        timeLow = Timer.getFPGATimestamp();
+        changeState(DriveState.SHIFT_LOW);
+    }
+
+    private void highShift(){
+        timeHigh = Timer.getFPGATimestamp();
+        changeState(DriveState.SHIFT_HIGH);
+    }
+
+    private void enableServo(){
+        rightServo.set(1);
+        leftServo.set(1);
+        servoEnabled = true;
     }
 
     //straightens the robot
