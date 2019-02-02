@@ -66,10 +66,11 @@ public class HAB extends GenericSubsystem{
                 }
                 break;
             case HOME:
-                if(!bottomSensor.get()){
+                if(bottomSensor.get()){
                     leadScrewMtr.set(0.3); 
                 }else{
                     leadScrewMtr.set(0.0);
+                    state = LeadScrewState.STANDBY;
                 }
                 break;
         }
