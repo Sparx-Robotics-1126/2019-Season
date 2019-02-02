@@ -156,6 +156,7 @@ public class Drives extends GenericSubsystem{
         SHIFT_LOW,
         SHIFT_HIGH,
         SHIFT_NEUTRAL,
+        ARMS,
         LINE_FOLLOWER;
     }
 
@@ -218,12 +219,8 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.set(speedLeft);
                 }
                 break;
-            case LINE_FOLLOWER:  
-
-            
+            case LINE_FOLLOWER: 
                 directions st = vision.getDirection();
-
-                
                 // System.out.println("Left motor power = " + leftMtr1.getBusVoltage());
                 //System.out.println("right motor power = " + rightMtr1.getBusVoltage());
                 if(st == directions.LEFT){
@@ -277,6 +274,7 @@ public class Drives extends GenericSubsystem{
                     shiftedToHigh = true;
                     changeState(DriveState.SHIFT_NEUTRAL);
                 }
+            case ARMS:
                 
                 
                 
