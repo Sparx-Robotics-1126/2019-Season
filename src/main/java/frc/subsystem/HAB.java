@@ -21,6 +21,7 @@ public class HAB extends GenericSubsystem{
 
     private WPI_TalonSRX leadScrewMtr;
     private Encoder leadScrewEncRaw;
+    private boolean isDone = false;
 
     public HAB(){
         super("Hab");
@@ -36,7 +37,11 @@ public class HAB extends GenericSubsystem{
    
     @Override
     public void execute(){
-        leadScrewDown();
+        if(isDone){
+            leadScrewUp();
+        }else{
+            leadScrewDown();
+        }
         System.out.println("HAB Encoder Value:" + leadScrewEncRaw.getDistance());
     }
 
@@ -60,6 +65,7 @@ public class HAB extends GenericSubsystem{
             leadScrewMtr.set(-0.3); //gav
         }else{
             leadScrewMtr.set(0.0);
+            isDone = true;
         }
     }
 
