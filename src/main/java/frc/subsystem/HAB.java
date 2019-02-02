@@ -70,10 +70,19 @@ public class HAB extends GenericSubsystem{
                     leadScrewMtr.set(0.3); 
                 }else{
                     leadScrewMtr.set(0.0);
+                    leadScrewEncRaw.reset();
                 }
                 break;
         }
-        System.out.println("HAB Encoder Value:" + leadScrewEncRaw.getDistance());
+       // System.out.println("HAB Encoder Value:" + leadScrewEncRaw.getDistance());
+    }
+
+    public void ctrlDown(){
+        state = LeadScrewState.DOWN;
+    }
+
+    public void ctrlUP(){
+        state = LeadScrewState.UP;
     }
 
     @Override

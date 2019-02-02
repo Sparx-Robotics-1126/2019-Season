@@ -9,6 +9,7 @@ package frc.controls;
 
 import edu.wpi.first.wpilibj.Joystick;
 import frc.subsystem.Drives;
+import frc.subsystem.HAB;
 
 /**
  * Add your docs here.
@@ -17,7 +18,9 @@ public class TeleOP implements Controls{
 
     private Joystick[] joysticks;
 
-    private Drives drives;
+	private Drives drives;
+	
+	private HAB hab;
 
     private boolean[][] buttonStates =
 		{{false, false}, //LEFTJOY_LEFT
@@ -55,8 +58,9 @@ public class TeleOP implements Controls{
 				{false, false},  //XBOX_DOWN
                 {false, false}};  //XBOX_LEFT
                 
-    public TeleOP(Drives drives){
-        this.drives = drives;
+    public TeleOP(Drives drives, HAB hab){
+		this.drives = drives;
+		this.hab = hab;
         joysticks = new Joystick[] {new Joystick(CtrlMap.RIGHTJOYSTICK), new Joystick(CtrlMap.LEFTJOYSTICK), new Joystick(CtrlMap.XBOXCONTROLLER)};
     }
 
@@ -76,6 +80,14 @@ public class TeleOP implements Controls{
 			drives.buttonB(true);
 		}else{
 			drives.buttonB(false);
+		}
+		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)){
+			hab.ctrlDown();
+			System.out.println("Y button pressed");
+		}
+		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X)){
+			hab.ctrlUP();
+			System.out.println("X button pressed");
 		}
     }
 

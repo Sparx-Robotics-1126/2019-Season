@@ -26,11 +26,11 @@ public class RobotSystem extends Thread{
     public RobotSystem(){
         drives = new Drives();
         drives.init();
-        teleop = new TeleOP(drives);
-        currentState = RobotState.STANDBY;
-        currentControl = teleop;
         hab = new HAB();
         hab.init();
+        teleop = new TeleOP(drives, hab);
+        currentState = RobotState.STANDBY;
+        currentControl = teleop;
     }
 
     
