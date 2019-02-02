@@ -11,6 +11,7 @@ import frc.controls.Controls;
 import frc.controls.TeleOP;
 import frc.subsystem.Drives;
 import frc.subsystem.HAB;
+import frc.subsystem.Hatch;
 
 /**
  * Add your docs here.
@@ -22,13 +23,16 @@ public class RobotSystem extends Thread{
     private Controls currentControl; 
     private Drives drives;
     private HAB hab;
+    private Hatch hatch;
 
     public RobotSystem(){
         drives = new Drives();
         drives.init();
         hab = new HAB();
         hab.init();
-        teleop = new TeleOP(drives, hab);
+        hatch = new Hatch();
+        hatch.init();
+        teleop = new TeleOP(drives, hab, hatch);
         currentState = RobotState.STANDBY;
         currentControl = teleop;
     }
@@ -48,7 +52,8 @@ public class RobotSystem extends Thread{
     
     public void init(){
         //drives.start();
-        hab.start();
+        //hab.start();
+        hatch.start();
     }
 
     @Override

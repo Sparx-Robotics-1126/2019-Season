@@ -10,6 +10,7 @@ package frc.controls;
 import edu.wpi.first.wpilibj.Joystick;
 import frc.subsystem.Drives;
 import frc.subsystem.HAB;
+import frc.subsystem.Hatch;
 
 /**
  * Add your docs here.
@@ -21,6 +22,8 @@ public class TeleOP implements Controls{
 	private Drives drives;
 	
 	private HAB hab;
+
+	private Hatch hatch;
 
     private boolean[][] buttonStates =
 		{{false, false}, //LEFTJOY_LEFT
@@ -58,9 +61,10 @@ public class TeleOP implements Controls{
 				{false, false},  //XBOX_DOWN
                 {false, false}};  //XBOX_LEFT
                 
-    public TeleOP(Drives drives, HAB hab){
+    public TeleOP(Drives drives, HAB hab, Hatch hatch){
 		this.drives = drives;
 		this.hab = hab;
+		this.hatch = hatch;
         joysticks = new Joystick[] {new Joystick(CtrlMap.RIGHTJOYSTICK), new Joystick(CtrlMap.LEFTJOYSTICK), new Joystick(CtrlMap.XBOXCONTROLLER)};
     }
 
@@ -76,18 +80,22 @@ public class TeleOP implements Controls{
 		} else {
 			drives.joystickLeft(0);
 		}
-		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)){
-			drives.buttonB(true);
-		}else{
-			drives.buttonB(false);
-		}
+		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)){
+		// 	hatch.flipperButton(true);
+		// }else{
+		// 	hatch.flipperButton(false);
+		// }
 		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)){
-			hab.ctrlDown();
+			hatch.flipperButton(true);
 			System.out.println("Y button pressed");
+		}else{
+			hatch.flipperButton(false);
 		}
 		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X)){
-			hab.ctrlUP();
+			hatch.shooterButton(true);
 			System.out.println("X button pressed");
+		}else{
+			hatch.shooterButton(false);
 		}
     }
 
