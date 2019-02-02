@@ -7,11 +7,9 @@
 
 package frc.subsystem;
 
+import frc.robot.IO;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Solenoid;
-import frc.sensors.EncoderData;
-import frc.robot.IO;
 
 /**
  * Add your docs here.
@@ -20,13 +18,12 @@ public class HAB extends GenericSubsystem{
 
     //----------------------------------------Motors/Sensors----------------------------------------
 
-    private Solenoid armsPTO;
     private WPI_TalonSRX leadScrewMtr;
-    private Encoder leadScrewEnc;
-    private WPI_TalonSRX leftArmWheelMtr;
-    private WPI_TalonSRX rightArmWheelMtr;
-    private Encoder leftArmWheelEnc;
-    private Encoder rightArmWheelEnc;
+    private Encoder leadScrewEncRaw;
+    // private WPI_TalonSRX leftArmWheelMtr;
+    // private WPI_TalonSRX rightArmWheelMtr;
+    // private Encoder leftArmWheelEnc;
+    // private Encoder rightArmWheelEnc;
 
     public HAB(){
         super("Hab");
@@ -34,16 +31,17 @@ public class HAB extends GenericSubsystem{
 
     @Override
     public void init(){
-        armsPTO = new Solonoid(1);//gav
-        armsPTO.set(false);
+        leadScrewMtr = new WPI_TalonSRX(9);
+        leadScrewEncRaw = new Encoder(22, 23);
+        leadScrewEncRaw.setDistancePerPulse(0.03103);
+        leadScrewEncRaw.reset();
     }
    
     @Override
     public void execute(){
-        ptoActivator();
-        runDrives();
         leadScrewDown();
-        armWheels();
+        System.out.println("HAB Encoder Value:" + leadScrewEncRaw.getDistance());
+//        armWheels();
     }
 
     @Override
@@ -53,41 +51,33 @@ public class HAB extends GenericSubsystem{
  
     @Override
     public boolean isDone(){
-
+        return false;
     }
   
     @Override
     public long sleepTime(){
-
-    }
- 
-    public void ptoActivator(){
-        armsPTO.set(true);
-    }
-
-    public void runDrives(){
-        
+        return 20;
     }
 
     public void leadScrewDown(){
-        if(leadScrewEnc.getDistance()< 5){ //gav
-            leadScrewMtr.set(1.0); //gav
+        if(leadScrewEncRaw.getDistance()< 24){ //gav
+            leadScrewMtr.set(0.2); //gav
         }else{
             leadScrewMtr.set(0.0);
         }
     }
 
-    public void armWheels(){
-        if(leftArmWheelEnc.getDistance()< 5){ //gav
-            leftArmWheelMtr.set(1.0); //gav
-        }else{
-            leftArmWheelMtr.set(0.0);
-        }
-        if(rightArmWheelEnc.getDistance()< 5){ //gav
-            rightArmWheelMtr.set(1.0); //gav
-        }else{
-            rightArmWheelMtr.set(0.0);
-        }
-    }
+    // public void armWheels(){
+    //     if(leftArmWheelEnc.getDistance()< 5){ //gav
+    //         leftArmWheelMtr.set(1.0); //gav
+    //     }else{
+    //         leftArmWheelMtr.set(0.0);
+    //     }
+    //     if(rightArmWheelEnc.getDistance()< 5){ //gav
+    //         rightArmWheelMtr.set(1.0); //gav
+    //     }else{
+    //         rightArmWheelMtr.set(0.0);
+    //     }
+    // }
     
 }

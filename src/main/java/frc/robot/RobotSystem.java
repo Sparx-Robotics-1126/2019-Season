@@ -10,6 +10,7 @@ package frc.robot;
 import frc.controls.Controls;
 import frc.controls.TeleOP;
 import frc.subsystem.Drives;
+import frc.subsystem.HAB;
 
 /**
  * Add your docs here.
@@ -20,6 +21,7 @@ public class RobotSystem extends Thread{
     private Controls teleop;
     private Controls currentControl; 
     private Drives drives;
+    private HAB hab;
 
     public RobotSystem(){
         drives = new Drives();
@@ -27,6 +29,7 @@ public class RobotSystem extends Thread{
         teleop = new TeleOP(drives);
         currentState = RobotState.STANDBY;
         currentControl = teleop;
+        hab = new HAB();
     }
 
     
@@ -44,6 +47,7 @@ public class RobotSystem extends Thread{
     
     public void init(){
         drives.start();
+        hab.start();
     }
 
     @Override
