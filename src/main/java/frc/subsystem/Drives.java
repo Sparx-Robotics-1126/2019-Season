@@ -58,6 +58,8 @@ public class Drives extends GenericSubsystem{
 
     private CameraServer delete;
 
+    private Arms arms;
+
     //----------------------------------------Variable----------------------------------------
 
     private double lastAngle;
@@ -95,8 +97,8 @@ public class Drives extends GenericSubsystem{
         leftMtr2 = new WPI_TalonSRX(IO.leftDriveCIM2);
         rightMtrs = new MotorGroup(rightMtr1, rightMtr2);
         leftMtrs = new MotorGroup(leftMtr1, leftMtr2);
-        rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
-        rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
+        // rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
+        // rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
         leftEncoder = new EncoderData(rawLeft, 0.033860431);
         rightEncoder = new EncoderData(rawRight, 0.033860431);
         rightEncoder.reset();
@@ -112,6 +114,7 @@ public class Drives extends GenericSubsystem{
         turnAngle = 0;
         turnSpeed = 0;
         drivesPTO = new Solenoid(1);
+        arms = new Arms(rightMtrs, leftMtrs);
     }
 
     public enum DriveState{
@@ -130,8 +133,10 @@ public class Drives extends GenericSubsystem{
     public void execute(){
         //move(0.8, 150);
         //turn(0.5, 90);
+        changeState(DriveState.STANDBY);
         switch(state){
             case STANDBY:
+
                 break;
             case TELEOP:
                 rightMtrs.set(speedRight);
