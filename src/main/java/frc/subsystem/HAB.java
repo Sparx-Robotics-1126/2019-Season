@@ -12,6 +12,7 @@ import frc.robot.IO;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.DigitalInput;
+import frc.util.MotorGroup;
 
 /**
  * Add your docs here.
@@ -22,8 +23,22 @@ public class HAB extends GenericSubsystem{
 
     private WPI_TalonSRX leadScrewMtr;
     private Encoder leadScrewEncRaw;
+    private Encoder rightArmEnc;
+    private Encoder leftArmEnc;
     private LeadScrewState state;
     private DigitalInput bottomSensor;
+
+    //----------------------------------------Variables---------------------------------------------
+
+    double actualDegree = 0;
+    double leftSpeed;
+    double rightSpeed;
+    double armOffset;
+
+    //----------------------------------------Constants---------------------------------------------
+
+    final double wantedDegree = 0.0; 
+    final double wantedSpeed = 10; //gav
 
     public HAB(){
         super("Hab");
@@ -32,6 +47,8 @@ public class HAB extends GenericSubsystem{
     @Override
     public void init(){
         leadScrewMtr = new WPI_TalonSRX(9);
+        rightArmEnc = new Encoder(0, 0); //gav
+        leftArmEnc = new Encoder(0, 0); //gav
         leadScrewEncRaw = new Encoder(23, 22);
         leadScrewEncRaw.setDistancePerPulse(0.03103);
         leadScrewEncRaw.reset();
@@ -75,7 +92,7 @@ public class HAB extends GenericSubsystem{
                 }
                 break;
         }
-       // System.out.println("HAB Encoder Value:" + leadScrewEncRaw.getDistance());
+
     }
 
     public void ctrlDown(){
@@ -101,4 +118,38 @@ public class HAB extends GenericSubsystem{
         return 20;
     }
 
+    public void armsDown(MotorGroup rightMtrs, MotorGroup leftMtrs){
+        while(wantedDegree < actualDegree){
+            leftSpeed = leftArmEnc.getRate();
+            rightSpeed = rightArmEnc.getRate();
+            armOffset = Math.abs(rightArmEnc.getDistance() - leftArmEnc.getDistance());
+
+            if(leftSpeed < wantedSpeed){
+                leftMtrs.set(leftSpeed + 0.05); //gav
+            }else if(leftSpeed > wantedSpeed){
+                leftMtrs.set(leftSpeed - 0.05); //gav
+            }else{
+                leftMtrs.set(leftSpeed);
+            }
+
+            if(rightSpeed < wantedSpeed){
+                leftMtrs.set(rightSpeed + 0.05); //gav
+            }else if(rightSpeed > wantedSpeed){
+                leftMtrs.set(rightSpeed - 0.05); //gav
+            }else{
+                leftMtrs.set(rightSpeed);
+            }
+
+            if(armOffset > 2.0){ //gav
+                if(rightSpeed > leftSpeed){
+                    rightMtrs.set(0.0);
+                }else{ //if leftSpeed is faster than rightSpeed
+                    leftMtrs.set(0.0);
+                }
+            }else{
+                rightMtrs.set(rightSpeed);
+                leftMtrs.set(leftSpeed);
+            }
+        }
+    }
 }
