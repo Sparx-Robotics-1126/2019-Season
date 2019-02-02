@@ -99,21 +99,21 @@ public class Drives extends GenericSubsystem{
         leftMtrs = new MotorGroup(leftMtr1, leftMtr2);
         // rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
         // rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
-        leftEncoder = new EncoderData(rawLeft, 0.033860431);
-        rightEncoder = new EncoderData(rawRight, 0.033860431);
-        rightEncoder.reset();
-        leftEncoder.reset();
-        leftMtrs.setInverted(true);
-        gyro = new AHRS(SerialPort.Port.kUSB);
-        lastAngle = 0;
-        speedLeft = 0;
-        speedRight = 0;
-        resetGyroAngle();
-        moveDist = 0;
-        moveSpeed = 0;
-        turnAngle = 0;
-        turnSpeed = 0;
-        drivesPTO = new Solenoid(1);
+        // leftEncoder = new EncoderData(rawLeft, 0.033860431);
+        // rightEncoder = new EncoderData(rawRight, 0.033860431);
+        // rightEncoder.reset();
+        // leftEncoder.reset();
+         leftMtrs.setInverted(true);
+        // gyro = new AHRS(SerialPort.Port.kUSB);
+        // lastAngle = 0;
+        // speedLeft = 0;
+        // speedRight = 0;
+        // resetGyroAngle();
+        // moveDist = 0;
+        // moveSpeed = 0;
+        // turnAngle = 0;
+        // turnSpeed = 0;
+       // drivesPTO = new Solenoid(1);
         arms = new Arms(rightMtrs, leftMtrs);
     }
 
@@ -136,7 +136,7 @@ public class Drives extends GenericSubsystem{
         changeState(DriveState.STANDBY);
         switch(state){
             case STANDBY:
-
+                arms.armsDown();
                 break;
             case TELEOP:
                 rightMtrs.set(speedRight);
@@ -196,8 +196,8 @@ public class Drives extends GenericSubsystem{
                 break;
 
         }
-        System.out.println("Right Encoder: " + leftEncoder.getDistance());
-        System.out.println("Left Encoder: " + rightEncoder.getDistance());
+        // System.out.println("Right Encoder: " + leftEncoder.getDistance());
+        // System.out.println("Left Encoder: " + rightEncoder.getDistance());
     }
 
     //debugs all the possible problems in drives

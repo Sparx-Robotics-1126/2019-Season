@@ -16,12 +16,14 @@ import frc.util.MotorGroup;
  */
 public class Arms {
 
-    final double wantedDegree = 0.0; 
-    final double wantedSpeed = 10; //gav
+    final double wantedDegree = 1000; 
+    final double wantedSpeed = 5; //gav
     double armOffset;
     double actualDegree = 0;
     double leftSetMtrSpeed;
     double rightSetMtrSpeed;
+    double wantedRightMtrPwr;
+    double wantedLeftMtrPwr;
     private MotorGroup rightMtrs;
     private MotorGroup leftMtrs;
     private Encoder leftArmEnc;
@@ -32,38 +34,40 @@ public class Arms {
         this.rightMtrs = rightMtrs;
         this.leftMtrs = leftMtrs;
         rightArmEnc = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
-        leftArmEnc = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
+        leftArmEnc = new Encoder(IO.leftDrivesEncoderChannel2, IO.leftDrivesEncoderChannel1);
         rightArmEnc.setDistancePerPulse(0.033860431);
         leftArmEnc.setDistancePerPulse(0.033860431);
     }
 
     public void armsDown(){
-        while(wantedDegree < actualDegree){
+        if(wantedDegree > actualDegree){
             leftSetMtrSpeed = leftArmEnc.getRate();
             rightSetMtrSpeed = rightArmEnc.getRate();
             armOffset = Math.abs(rightArmEnc.getDistance() - leftArmEnc.getDistance());
 
             if(leftSetMtrSpeed < wantedSpeed){
-                leftSetMtrSpeed += 0.05; //gav
+                wantedLeftMtrPwr += 0.05; //gav
             }else if(leftSetMtrSpeed > wantedSpeed){
-                leftSetMtrSpeed -= 0.05; //gav
+                wantedLeftMtrPwr -= 0.05; //gav
             }
 
             if(rightSetMtrSpeed < wantedSpeed){
-                rightSetMtrSpeed += 0.05; //gav
+                wantedRightMtrPwr += 0.05; //gav
             }else if(rightSetMtrSpeed > wantedSpeed){
-                rightSetMtrSpeed -= 0.05; //gav
+                wantedRightMtrPwr -= 0.05; //gav
             }
 
-            if(armOffset > 2.0){ //gav
-                if(rightSetMtrSpeed > leftSetMtrSpeed){
-                    rightSetMtrSpeed = 0.0;
-                }else{ //if leftSpeed is faster than rightSpeed
-                    leftSetMtrSpeed = 0.0;
-                }
-            }
+            // if(armOffset > 2.0){ //gav
+            //     if(rightArmEnc.getDistance() > leftArmEnc.getDistance()){
+            //         wantedRightMtrPwr = 0.0;
+            //     }else{ //if leftSpeed is faster than rightSpeed
+            //         wantedLeftMtrPwr = 0.0;
+            //     }
+            // }
         }
-        rightMtrs.set(rightSetMtrSpeed);
-        leftMtrs.set(leftSetMtrSpeed);
+        rightMtrs.set(wantedRightMtrPwr);
+        leftMtrs.set(wantedLeftMtrPwr);
+        System.out.println("right power: " + wantedRightMtrPwr  + " right distance: " + rightArmEnc.getDistance() + " right speed" + rightArmEnc.getRate());
+        System.out.println("left power: " + wantedLeftMtrPwr  + " left distance: " + leftArmEnc.getDistance() + " left speed" + leftArmEnc.getRate());
     }
 }

@@ -47,8 +47,8 @@ public class RobotSystem extends Thread{
     }
     
     public void init(){
-        //drives.start();
-        hab.start();
+        drives.start();
+       // hab.start();
     }
 
     @Override

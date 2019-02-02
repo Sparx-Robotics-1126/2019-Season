@@ -66,29 +66,29 @@ public class TeleOP implements Controls{
 
     @Override
     public void execute(){
-		if(isOffZeroAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
-			drives.joystickRight(getAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS));
-		} else {
-			drives.joystickRight(0);
-		}
-		if(isOffZeroAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
-			drives.joystickLeft(getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
-		} else {
-			drives.joystickLeft(0);
-		}
-		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)){
-			drives.buttonB(true);
-		}else{
-			drives.buttonB(false);
-		}
-		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)){
-			hab.ctrlDown();
-			System.out.println("Y button pressed");
-		}
-		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X)){
-			hab.ctrlUP();
-			System.out.println("X button pressed");
-		}
+		// if(isOffZeroAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
+		// 	drives.joystickRight(getAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS));
+		// } else {
+		// 	drives.joystickRight(0);
+		// }
+		// if(isOffZeroAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
+		// 	drives.joystickLeft(getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
+		// } else {
+		// 	drives.joystickLeft(0);
+		// }
+		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)){
+		// 	drives.buttonB(true);
+		// }else{
+		// 	drives.buttonB(false);
+		// }
+		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)){
+		// 	hab.ctrlDown();
+		// 	System.out.println("Y button pressed");
+		// }
+		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X)){
+		// 	hab.ctrlUP();
+		// 	System.out.println("X button pressed");
+		// }
     }
 
     /**
