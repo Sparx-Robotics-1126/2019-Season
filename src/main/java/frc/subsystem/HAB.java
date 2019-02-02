@@ -33,7 +33,7 @@ public class HAB extends GenericSubsystem{
     @Override
     public void init(){
         leadScrewMtr = new WPI_TalonSRX(9);
-        leadScrewEncRaw = new Encoder(22, 23);
+        leadScrewEncRaw = new Encoder(23, 22);
         leadScrewEncRaw.setDistancePerPulse(0.03103);
         leadScrewEncRaw.reset();
     }
@@ -62,7 +62,7 @@ public class HAB extends GenericSubsystem{
 
     public void leadScrewDown(){
         if(leadScrewEncRaw.getDistance()< 24){ //gav
-            leadScrewMtr.set(0.2); //gav
+            leadScrewMtr.set(-0.3); //gav
         }else{
             leadScrewMtr.set(0.0);
         }

@@ -9,7 +9,6 @@ package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -45,7 +44,6 @@ public class Robot extends TimedRobot {
     system = new RobotSystem();
     system.init();
     system.start();
-    CameraServer.getInstance().startAutomaticCapture();
     System.out.println("***INIT ROBOT COMPLETE***");
   }
   

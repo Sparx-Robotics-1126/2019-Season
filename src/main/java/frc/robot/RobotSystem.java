@@ -30,6 +30,7 @@ public class RobotSystem extends Thread{
         currentState = RobotState.STANDBY;
         currentControl = teleop;
         hab = new HAB();
+        hab.init();
     }
 
     
@@ -46,7 +47,7 @@ public class RobotSystem extends Thread{
     }
     
     public void init(){
-        drives.start();
+        //drives.start();
         hab.start();
     }
 
