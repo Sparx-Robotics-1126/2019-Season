@@ -20,8 +20,8 @@ public class Arms {
     final double wantedSpeed = 10; //gav
     double armOffset;
     double actualDegree = 0;
-    double leftSpeed;
-    double rightSpeed;
+    double leftSetMtrSpeed;
+    double rightSetMtrSpeed;
     private MotorGroup rightMtrs;
     private MotorGroup leftMtrs;
     private Encoder leftArmEnc;
@@ -39,36 +39,31 @@ public class Arms {
 
     public void armsDown(){
         while(wantedDegree < actualDegree){
-            leftSpeed = leftArmEnc.getRate();
-            rightSpeed = rightArmEnc.getRate();
+            leftSetMtrSpeed = leftArmEnc.getRate();
+            rightSetMtrSpeed = rightArmEnc.getRate();
             armOffset = Math.abs(rightArmEnc.getDistance() - leftArmEnc.getDistance());
 
-            if(leftSpeed < wantedSpeed){
-                leftMtrs.set(leftSpeed + 0.05); //gav
-            }else if(leftSpeed > wantedSpeed){
-                leftMtrs.set(leftSpeed - 0.05); //gav
-            }else{
-                leftMtrs.set(leftSpeed);
+            if(leftSetMtrSpeed < wantedSpeed){
+                leftSetMtrSpeed += 0.05; //gav
+            }else if(leftSetMtrSpeed > wantedSpeed){
+                leftSetMtrSpeed -= 0.05; //gav
             }
 
-            if(rightSpeed < wantedSpeed){
-                leftMtrs.set(rightSpeed + 0.05); //gav
-            }else if(rightSpeed > wantedSpeed){
-                leftMtrs.set(rightSpeed - 0.05); //gav
-            }else{
-                leftMtrs.set(rightSpeed);
+            if(rightSetMtrSpeed < wantedSpeed){
+                rightSetMtrSpeed += 0.05; //gav
+            }else if(rightSetMtrSpeed > wantedSpeed){
+                rightSetMtrSpeed -= 0.05; //gav
             }
 
             if(armOffset > 2.0){ //gav
-                if(rightSpeed > leftSpeed){
-                    rightMtrs.set(0.0);
+                if(rightSetMtrSpeed > leftSetMtrSpeed){
+                    rightSetMtrSpeed = 0.0;
                 }else{ //if leftSpeed is faster than rightSpeed
-                    leftMtrs.set(0.0);
+                    leftSetMtrSpeed = 0.0;
                 }
-            }else{
-                rightMtrs.set(rightSpeed);
-                leftMtrs.set(leftSpeed);
             }
         }
+        rightMtrs.set(rightSetMtrSpeed);
+        leftMtrs.set(leftSetMtrSpeed);
     }
 }
