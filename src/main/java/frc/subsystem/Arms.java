@@ -11,24 +11,28 @@ import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.IO;
 import frc.util.MotorGroup;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 /**
  * Add your docs here.
  */
 public class Arms {
 
     final double wantedDegree = 1000; 
-    final double wantedSpeed = 5; //gav
+    final double wantedSpeed = 10; //gav
     double armOffset;
     double actualDegree = 0;
-    double leftSetMtrSpeed;
-    double rightSetMtrSpeed;
+    double leftMtrSpeed;
+    double rightMtrSpeed;
     double wantedRightMtrPwr;
     double wantedLeftMtrPwr;
     private MotorGroup rightMtrs;
     private MotorGroup leftMtrs;
+    private WPI_TalonSRX leftArmMtr;
+    private WPI_TalonSRX rightArmMtr;
     private Encoder leftArmEnc;
     private Encoder rightArmEnc;
-
+    
 
     public Arms(MotorGroup rightMtrs, MotorGroup leftMtrs){
         this.rightMtrs = rightMtrs;
@@ -41,22 +45,23 @@ public class Arms {
 
     public void armsDown(){
         if(wantedDegree > actualDegree){
-            leftSetMtrSpeed = leftArmEnc.getRate();
-            rightSetMtrSpeed = rightArmEnc.getRate();
+            leftMtrSpeed = leftArmEnc.getRate();
+            rightMtrSpeed = rightArmEnc.getRate();
             armOffset = Math.abs(rightArmEnc.getDistance() - leftArmEnc.getDistance());
 
-            if(leftSetMtrSpeed < wantedSpeed){
-                wantedLeftMtrPwr += 0.05; //gav
-            }else if(leftSetMtrSpeed > wantedSpeed){
-                wantedLeftMtrPwr -= 0.05; //gav
+            if(leftMtrSpeed < wantedSpeed){
+                wantedLeftMtrPwr += 0.01; //gav
+            }else if(leftMtrSpeed > wantedSpeed){
+                wantedLeftMtrPwr -= 0.01; //gav
             }
+            wantedLeftMtrPwr = wantedLeftMtrPwr > 1 ? 1 : wantedLeftMtrPwr;
 
-            if(rightSetMtrSpeed < wantedSpeed){
-                wantedRightMtrPwr += 0.05; //gav
-            }else if(rightSetMtrSpeed > wantedSpeed){
-                wantedRightMtrPwr -= 0.05; //gav
+            if(rightMtrSpeed < wantedSpeed){
+                wantedRightMtrPwr += 0.01; //gav
+            }else if(rightMtrSpeed > wantedSpeed){
+                wantedRightMtrPwr -= 0.01; //gav
             }
-
+            wantedRightMtrPwr = wantedRightMtrPwr > 1 ? 1 : wantedRightMtrPwr;
             // if(armOffset > 2.0){ //gav
             //     if(rightArmEnc.getDistance() > leftArmEnc.getDistance()){
             //         wantedRightMtrPwr = 0.0;
@@ -67,7 +72,13 @@ public class Arms {
         }
         rightMtrs.set(wantedRightMtrPwr);
         leftMtrs.set(wantedLeftMtrPwr);
-        System.out.println("right power: " + wantedRightMtrPwr  + " right distance: " + rightArmEnc.getDistance() + " right speed" + rightArmEnc.getRate());
-        System.out.println("left power: " + wantedLeftMtrPwr  + " left distance: " + leftArmEnc.getDistance() + " left speed" + leftArmEnc.getRate());
+        System.out.println("right power: " + wantedRightMtrPwr  + " right distance: " + rightArmEnc.getDistance() + " right speed " + rightArmEnc.getRate());
+        System.out.println("left power: " + wantedLeftMtrPwr  + " left distance: " + leftArmEnc.getDistance() + " left speed " + leftArmEnc.getRate());
     }
+
+    public void armMtrs(){
+        leftArmMtr.set(0.5);
+        rightArmMtr.set(0.5);
+    }
+
 }
