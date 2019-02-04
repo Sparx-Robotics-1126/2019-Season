@@ -70,6 +70,7 @@ public class TeleOP implements Controls{
 
     @Override
     public void execute(){
+		setJoystickStates();
 		if(isOffZeroAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
 			drives.joystickRight(getAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS));
 		} else {
@@ -80,20 +81,13 @@ public class TeleOP implements Controls{
 		} else {
 			drives.joystickLeft(0);
 		}
-		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)){
-		// 	hatch.flipperButton(true);
-		// }else{
-		// 	hatch.flipperButton(false);
-		// }
-		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)){
+		if(isRisingEdgeButton(11)){
 			hatch.flipperButton(true);
-			System.out.println("Y button pressed");
 		}else{
 			hatch.flipperButton(false);
 		}
-		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X)){
+		if(isRisingEdgeButton(10)){
 			hatch.shooterButton(true);
-			System.out.println("X button pressed");
 		}else{
 			hatch.shooterButton(false);
 		}
@@ -198,7 +192,7 @@ public class TeleOP implements Controls{
 //		buttonStates[8][0] =  isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_A);
 //		buttonStates[9][0] =  isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B);
 		buttonStates[10][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X);
-//		buttonStates[11][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y);
+		buttonStates[11][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y);
 		
 		buttonStates[12][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L1);
 		buttonStates[13][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1);

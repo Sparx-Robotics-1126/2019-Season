@@ -21,7 +21,11 @@ public class Hatch extends GenericSubsystem{
 
     private boolean flipperState;
 
+    private boolean flipperButtonState;
+
     private boolean shooterState;
+
+    private boolean shooterButtonState;
 
     private HatchState state;
 
@@ -41,7 +45,9 @@ public class Hatch extends GenericSubsystem{
         flipper = new Solenoid(1);
         shooter = new Solenoid(0);
         flipperState = false;
+        flipperButtonState = false;
         shooterState = false;
+        shooterButtonState = false;
         state = HatchState.STANDBY;
         time = 0;
     }
@@ -52,14 +58,20 @@ public class Hatch extends GenericSubsystem{
             case STANDBY:
                 break;
             case FLIPPER:
-                flipper.set(flipperState);
+                if(flipperButtonState==true){
+                    flipperState = !flipperState;
+                    flipper.set(flipperState);
+                }
                 state = HatchState.STANDBY;
                 break;
             case SHOOT_AND_FLIPPER:
-                shooter.set(shooterState);
+                if(shooterButtonState==true){
+                    shooterState = !shooterState;
+                    shooter.set(shooterState);
+                }
                 if(shooterState==true){
                     if(System.currentTimeMillis() > time + 1000){
-                        flipper.set(shooterState);
+                        flipper.set(true);
                         state = HatchState.STANDBY;
                     }
                 }
@@ -68,12 +80,12 @@ public class Hatch extends GenericSubsystem{
     }
 
     public void flipperButton(boolean condition){ 
-        flipperState = condition;
+        flipperButtonState = condition;
         state = HatchState.FLIPPER;
     }
 
     public void shooterButton(boolean condition){
-        shooterState = condition;
+        shooterButtonState = condition;
         time = System.currentTimeMillis();
         state = HatchState.SHOOT_AND_FLIPPER;
     }
