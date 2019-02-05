@@ -126,7 +126,7 @@ public class Vision{
         // else
         //     direction = directions.STANDBY;
         */
-        System.out.println(direction);
+      //  System.out.println(direction);
         return direction;
     }
 

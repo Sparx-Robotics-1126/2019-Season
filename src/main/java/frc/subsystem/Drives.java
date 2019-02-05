@@ -48,10 +48,6 @@ public class Drives extends GenericSubsystem{
 
     private Encoder rawLeft;
 
-    private EncoderData rightEncoder; 
-
-    private EncoderData leftEncoder;
-
     private AHRS gyro;
 
     private MotorGroup rightMtrs;
@@ -98,7 +94,7 @@ public class Drives extends GenericSubsystem{
 
     //----------------------------------------Constants----------------------------------------
 
-    private final double ANGLE_OFF_BY = .1;
+    private final double ANGLE_OFF_BY = 2;
 
     private final double SPEED_PERCENTAGE = .8;
 
@@ -121,12 +117,11 @@ public class Drives extends GenericSubsystem{
         leftMtrs = new MotorGroup(leftMtr1, leftMtr2);
         rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
         rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
-        leftEncoder = new EncoderData(rawLeft, 0.033860431);
-        rightEncoder = new EncoderData(rawRight, 0.033860431);
-        rightEncoder.reset();
-        leftEncoder.reset();
+        rawRight.setDistancePerPulse(0.033860431);
+        rawLeft.setDistancePerPulse(-0.033860431);
         leftMtrs.setInverted(true);
         gyro = new AHRS(SerialPort.Port.kUSB);
+        gyro.reset();
         rightServo = new Servo(0);
         leftServo = new Servo(1);
         lastAngle = 0;
@@ -137,7 +132,7 @@ public class Drives extends GenericSubsystem{
         moveSpeed = 0; 
         turnAngle = 0;
         turnSpeed = 0;
-        hatchPTO = new Solenoid(0);
+      //  hatchPTO = new Solenoid(0)
         vision = new Vision();
         state = state.STANDBY;
         timeLow = 0;
@@ -163,10 +158,11 @@ public class Drives extends GenericSubsystem{
     //does all the code for drives
     public void execute(){
         //move(0.8, 150);
-        //turn(0.5, 90);
+        
         //changeState(DriveState.LINE_FOLLOWER);
         switch(state){
             case STANDBY:
+                System.out.println("You are a bold one");
                 break;
             case TELEOP:
                 //System.out.println("Drives SpeedRight: " + speedRight + " speedLeft: " + speedLeft);
@@ -180,17 +176,22 @@ public class Drives extends GenericSubsystem{
                
                 break;
             case MOVE_FORWARD:
+                System.out.println("Hello");
                 if(getDistance() > moveDist){
+                    System.out.println("There");
                     rightMtrs.stopMotors();
                     leftMtrs.stopMotors();
                     changeState(DriveState.STANDBY);
                 }else{
+                    //straightenForward();
                     rightMtrs.set(speedRight);
                     leftMtrs.set(speedLeft);
                 }
                 break;
             case MOVE_BACKWARD:
-                if(getDistance() < moveDist){
+                System.out.println("General");
+                if(getDistance() > moveDist){
+                    System.out.println("Kenobi");
                     rightMtrs.stopMotors();
                     leftMtrs.stopMotors();
                     changeState(DriveState.STANDBY);
@@ -205,9 +206,10 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.stopMotors();
                     changeState(DriveState.STANDBY);
                 }else{
-                    rightMtrs.set(speedRight);
-                    leftMtrs.set(-speedLeft);
+                    rightMtrs.set(-turnSpeed);
+                    leftMtrs.set(turnSpeed);
                 }
+                // System.out.println("turn right");
                 break;
             case TURN_LEFT:
                 if(getAngle() < turnAngle){
@@ -215,9 +217,10 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.stopMotors();
                     changeState(DriveState.STANDBY);
                 }else{
-                    rightMtrs.set(-speedRight);
-                    leftMtrs.set(speedLeft);
+                    rightMtrs.set(turnSpeed);
+                    leftMtrs.set(-turnSpeed);
                 }
+               // System.out.println("turn left");
                 break;
             case LINE_FOLLOWER: 
                 directions st = vision.getDirection();
@@ -274,14 +277,16 @@ public class Drives extends GenericSubsystem{
                     shiftedToHigh = true;
                     changeState(DriveState.SHIFT_NEUTRAL);
                 }
-            case ARMS:
+           // case ARMS:
                 
                 
                 
         }
       //  System.out.println("State: " + )
-        System.out.println("Right Encoder: " + leftEncoder.getDistance());
-        System.out.println("Left Encoder: " + rightEncoder.getDistance());
+        System.out.println("Right Encoder: " + rawRight.getDistance());
+        System.out.println("Left Encoder: " + rawLeft.getDistance());
+         //System.out.println("Gyro: " + getAngle());
+         System.out.println("GetDistance: " + getDistance());
     }
 
     //debugs all the possible problems in drives
@@ -353,9 +358,7 @@ public class Drives extends GenericSubsystem{
 
     //gets the distance the robot has travelled since the last time the encoders were reset
     private double getDistance() {
-		rightEncoder.calculateSpeed();
-		leftEncoder.calculateSpeed();
-		return (rightEncoder.getDistance() + leftEncoder.getDistance())/2;
+		return (rawRight.getDistance() + rawLeft.getDistance())/2;
     }
 
     //gets the angle the robot has turned since the last time the gyro was reset 
@@ -366,22 +369,18 @@ public class Drives extends GenericSubsystem{
     //resets the gyro's angle so the robot turns to the angle from where the robot is currently facing
     private void resetGyroAngle(){
         lastAngle = gyro.getAngle();
+        System.out.println("Reset: " + lastAngle);
     }
 
     //turns the robot a specified angle 
     public void turn(double speed, double angle){
         turnAngle = angle;
         turnSpeed = speed;
+        resetGyroAngle();
         if(angle > 0){
-          changeState(DriveState.TURN_RIGHT);
+            changeState(DriveState.TURN_RIGHT);
         }else{
-            if(getAngle() < angle){
-                rightMtrs.stopMotors();
-                leftMtrs.stopMotors();
-            }else{
-                rightMtrs.set(-speed);
-                leftMtrs.set(speed);
-            }
+            changeState(DriveState.TURN_LEFT);
         }
 
     }
@@ -393,7 +392,9 @@ public class Drives extends GenericSubsystem{
 
     //used by RobotSystem to put the robot in the teleop state
     public void toTeleop(){
-        changeState(DriveState.TELEOP);
+       // changeState(DriveState.TELEOP);
+       //turn(0.5, 90);
+       move(0.5, 120);
     }
 
 }
