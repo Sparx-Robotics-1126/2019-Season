@@ -36,17 +36,17 @@ public class Drives extends GenericSubsystem{
 
     private WPI_TalonSRX rightMtr2;
 
-    //private WPI_TalonSRX rightMtr3;
+    private WPI_TalonSRX rightMtr3;
 
     private WPI_TalonSRX leftMtr1;
 
     private WPI_TalonSRX leftMtr2;
 
-    //private WPI_TalonSRX leftMtr3;
+    private WPI_TalonSRX leftMtr3;
 
-    private Encoder rawRight;
+    private Encoder rightEnc;
 
-    private Encoder rawLeft;
+    private Encoder leftEnc;
 
     private AHRS gyro;
 
@@ -111,14 +111,16 @@ public class Drives extends GenericSubsystem{
     public void init(){
         rightMtr1 = new WPI_TalonSRX(IO.rightDriveCIM1);
         rightMtr2 = new WPI_TalonSRX(IO.rightDriveCIM2);
+        rightMtr3 = new WPI_TalonSRX(IO.rightDriveCIM3);
         leftMtr1 = new WPI_TalonSRX(IO.leftDriveCIM1);
         leftMtr2 = new WPI_TalonSRX(IO.leftDriveCIM2);
-        rightMtrs = new MotorGroup(rightMtr1, rightMtr2);
-        leftMtrs = new MotorGroup(leftMtr1, leftMtr2);
-        rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
-        rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
-        rawRight.setDistancePerPulse(0.033860431);
-        rawLeft.setDistancePerPulse(-0.033860431);
+        leftMtr3 = new WPI_TalonSRX(IO.leftDriveCIM3);
+        rightMtrs = new MotorGroup(rightMtr1, rightMtr2, rightMtr3);
+        leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
+        rightEnc = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
+        leftEnc = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
+        rightEnc.setDistancePerPulse(0.033860431);
+        leftEnc.setDistancePerPulse(-0.033860431);
         leftMtrs.setInverted(true);
         gyro = new AHRS(SerialPort.Port.kUSB);
         gyro.reset();
@@ -277,14 +279,15 @@ public class Drives extends GenericSubsystem{
                     shiftedToHigh = true;
                     changeState(DriveState.SHIFT_NEUTRAL);
                 }
-           // case ARMS:
+            case ARMS:
+                break;
                 
                 
                 
         }
       //  System.out.println("State: " + )
-        System.out.println("Right Encoder: " + rawRight.getDistance());
-        System.out.println("Left Encoder: " + rawLeft.getDistance());
+        System.out.println("Right Encoder: " + rightEnc.getDistance());
+        System.out.println("Left Encoder: " + leftEnc.getDistance());
          //System.out.println("Gyro: " + getAngle());
          System.out.println("GetDistance: " + getDistance());
     }
@@ -358,7 +361,7 @@ public class Drives extends GenericSubsystem{
 
     //gets the distance the robot has travelled since the last time the encoders were reset
     private double getDistance() {
-		return (rawRight.getDistance() + rawLeft.getDistance())/2;
+		return (rightEnc.getDistance() + leftEnc.getDistance())/2;
     }
 
     //gets the angle the robot has turned since the last time the gyro was reset 
@@ -392,9 +395,9 @@ public class Drives extends GenericSubsystem{
 
     //used by RobotSystem to put the robot in the teleop state
     public void toTeleop(){
-       // changeState(DriveState.TELEOP);
+        changeState(DriveState.TELEOP);
        //turn(0.5, 90);
-       move(0.5, 120);
+      // move(0.5, 120);
     }
 
 }

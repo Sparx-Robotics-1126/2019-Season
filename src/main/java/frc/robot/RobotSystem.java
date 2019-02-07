@@ -22,7 +22,6 @@ public class RobotSystem extends Thread{
     private Controls teleop;
     private Controls currentControl; 
     private Drives drives;
-    private Vision vision;
 
     public RobotSystem(){
         drives = new Drives();
