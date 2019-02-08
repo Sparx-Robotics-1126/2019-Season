@@ -80,15 +80,9 @@ public class Drives extends GenericSubsystem{
 
     private Vision vision;
 
-    private double timeLow;
+    private double shiftingTime;
 
-    private double timeNeutral;
-
-    private double timeHigh;
-
-    private boolean shiftedToLow;
-
-    private boolean shiftedToHigh;
+    private boolean shifted;
 
     private boolean servoEnabled;
 
@@ -119,9 +113,9 @@ public class Drives extends GenericSubsystem{
         leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
         rightEnc = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
         leftEnc = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
-        rightEnc.setDistancePerPulse(0.033860431);
-        leftEnc.setDistancePerPulse(-0.033860431);
-        leftMtrs.setInverted(true);
+        rightEnc.setDistancePerPulse(-0.033860431);
+        leftEnc.setDistancePerPulse(0.033860431);
+        rightMtrs.setInverted(true);
         gyro = new AHRS(SerialPort.Port.kUSB);
         gyro.reset();
         rightServo = new Servo(0);
@@ -137,9 +131,8 @@ public class Drives extends GenericSubsystem{
       //  hatchPTO = new Solenoid(0)
         vision = new Vision();
         state = state.STANDBY;
-        timeLow = 0;
-        shiftedToLow = false;
-        shiftedToHigh = false;
+        shiftingTime = 0;
+        shifted = false;
         servoEnabled = false;
     }
 
@@ -249,36 +242,37 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.set(0);
                     rightMtrs.set(0);
                 }
+                break;
             case SHIFT_LOW:
-                leftMtrs.set(0.2);
-                rightMtrs.set(0.2);
-                shiftedToLow = false;
-                if(timeLow + .2 < Timer.getFPGATimestamp()){
+                if(shiftingTime + 400 < System.currentTimeMillis()){
                     leftMtrs.set(speedLeft);
                     rightMtrs.set(speedLeft);
-                    shiftedToLow = true;
-                    changeState(DriveState.SHIFT_NEUTRAL);
+                    changeState(DriveState.TELEOP);
                 }
+                break;
             case SHIFT_NEUTRAL:
-                if(!shiftedToLow){
-                    lowShift();
-                }
-                if(!servoEnabled){
-                    enableServo();
-                }
-                if(!shiftedToHigh){
-                    highShift();
-                }
-            case SHIFT_HIGH:
                 leftMtrs.set(0.2);
                 rightMtrs.set(0.2);
-                shiftedToHigh = false;
-                if(timeHigh + .2 < Timer.getFPGATimestamp()){
+                //SOOLEEEBOI
+                if(shiftingTime + 200 < System.currentTimeMillis()){
+                    if(!servoEnabled){
+                        enableServo();
+                    }
+                    if(!shifted){
+                        changeState(DriveState.SHIFT_LOW);
+                    }
+                    if(shifted){
+                        changeState(DriveState.SHIFT_HIGH);
+                    }
+                }
+                break;
+            case SHIFT_HIGH:
+                if(shiftingTime + 400 < System.currentTimeMillis()){
                     leftMtrs.set(speedLeft);
                     rightMtrs.set(speedRight);
-                    shiftedToHigh = true;
-                    changeState(DriveState.SHIFT_NEUTRAL);
+                    changeState(DriveState.TELEOP);
                 }
+                break;
             case ARMS:
                 break;
                 
@@ -335,13 +329,15 @@ public class Drives extends GenericSubsystem{
     }
 
     private void lowShift(){
-        timeLow = Timer.getFPGATimestamp();
-        changeState(DriveState.SHIFT_LOW);
+        shifted = true;
+        shiftingTime = System.currentTimeMillis();
+        changeState(DriveState.SHIFT_NEUTRAL);
     }
 
     private void highShift(){
-        timeHigh = Timer.getFPGATimestamp();
-        changeState(DriveState.SHIFT_HIGH);
+        shifted = false;
+        shiftingTime = System.currentTimeMillis();
+        changeState(DriveState.SHIFT_NEUTRAL);
     }
 
     private void enableServo(){
