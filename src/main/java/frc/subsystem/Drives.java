@@ -54,8 +54,6 @@ public class Drives extends GenericSubsystem{
 
     private MotorGroup leftMtrs;
 
-    private Solenoid hatchPTO;
-
     private Servo rightServo;
 
     private Servo leftServo;
@@ -322,10 +320,6 @@ public class Drives extends GenericSubsystem{
     public void joystickRight(double speed) {
         speedRight = speed;
      //   rightMtrs.set(speed);
-    }
-
-    public void buttonB(boolean a){
-        hatchPTO.set(a);
     }
 
     private void lowShift(){
