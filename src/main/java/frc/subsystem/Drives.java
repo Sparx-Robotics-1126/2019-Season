@@ -111,7 +111,12 @@ public class Drives extends GenericSubsystem{
         moveSpeed = 0;
         turnAngle = 0;
         turnSpeed = 0;
-        //drivesPTO = new Solenoid(1);
+        //  hatchPTO = new Solenoid(0)
+        vision = new Vision();
+        state = state.STANDBY;
+        shiftingTime = 0;
+        shifted = false;
+        servoEnabled = false;
     }
 
     public enum DriveState{

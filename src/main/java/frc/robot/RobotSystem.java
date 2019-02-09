@@ -12,6 +12,8 @@ import frc.controls.TeleOP;
 import frc.subsystem.Drives;
 import frc.subsystem.HAB;
 import frc.subsystem.Hatch;
+import frc.subsystem.Vision;
+import edu.wpi.first.wpilibj.Compressor;
 
 /**
  * Add your docs here.
@@ -24,6 +26,7 @@ public class RobotSystem extends Thread{
     private Drives drives;
     private HAB hab;
     private Hatch hatch;
+    
 
     public RobotSystem(){
         drives = new Drives();

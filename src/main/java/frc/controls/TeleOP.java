@@ -70,27 +70,35 @@ public class TeleOP implements Controls{
 
     @Override
     public void execute(){
-		setJoystickStates();
-		if(isOffZeroAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
-			drives.joystickRight(getAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS));
-		} else {
-			drives.joystickRight(0);
-		}
-		if(isOffZeroAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
-			drives.joystickLeft(getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
-		} else {
+		// if(isOffZeroAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
+		// 	drives.joystickRight(getAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS));
+		// } else {
+		// 	drives.joystickRight(0);
+		// }
+		// if(isOffZeroAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
+		// 	drives.joystickLeft(getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
+		// } else {
+		// 	drives.joystickLeft(0);
+		// }
+		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)){
+		// 	drives.buttonB(true);
+		// }else{
+		// 	drives.buttonB(false);
+		// }
+		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1)){
+		// 	drives.buttonB(true);
+		// }else{
+		// 	drives.buttonB(false);
+		// }
+		if(isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y)){
+			drives.joystickLeft(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y));
+		}else{
 			drives.joystickLeft(0);
 		}
-		if(isRisingEdgeButton(11)){
-			hatch.flipperButton(true);
+		if(isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y)){
+			drives.joystickRight(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y));
 		}else{
-			hatch.flipperButton(false);
-		}
-		if(isRisingEdgeButton(10)){
-			hatch.shooterButton(true);
-		}else{
-			hatch.shooterButton(false);
-		}
+			drives.joystickRight(0);
     }
 
     /**
