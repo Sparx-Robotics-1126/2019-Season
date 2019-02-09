@@ -37,7 +37,11 @@ public class MotorGroup extends SpeedControllerGroup{
 		super(arg0, arg1);
 		speedControllers = new SpeedController[]{arg0, arg1};	
 	}
-    
+	
+	//public double getPower()
+	//{
+
+	//}
     /**
 	 * Gets the speed controller at motorNum, if motorNum is bigger than the number of 
 	 		motors in this motorGroup return null. Motor numbering starts at 0.

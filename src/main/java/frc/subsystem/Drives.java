@@ -10,16 +10,20 @@ package frc.subsystem;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.sensors.EncoderData;
+import frc.subsystem.Vision.directions;
 import frc.util.MotorGroup;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.Servo;
 
 /**
  * Add your docs here.
@@ -32,21 +36,17 @@ public class Drives extends GenericSubsystem{
 
     private WPI_TalonSRX rightMtr2;
 
-    //private WPI_TalonSRX rightMtr3;
+    private WPI_TalonSRX rightMtr3;
 
     private WPI_TalonSRX leftMtr1;
 
     private WPI_TalonSRX leftMtr2;
 
-    //private WPI_TalonSRX leftMtr3;
+    private WPI_TalonSRX leftMtr3;
 
-    private Encoder rawRight;
+    private Encoder rightEnc;
 
-    private Encoder rawLeft;
-
-    private EncoderData rightEncoder; 
-
-    private EncoderData leftEncoder;
+    private Encoder leftEnc;
 
     private AHRS gyro;
 
@@ -54,9 +54,9 @@ public class Drives extends GenericSubsystem{
 
     private MotorGroup leftMtrs;
 
-    private Solenoid drivesPTO;
+    private Servo rightServo;
 
-    private CameraServer delete;
+    private Servo leftServo;
 
     //----------------------------------------Variable----------------------------------------
 
@@ -76,9 +76,17 @@ public class Drives extends GenericSubsystem{
 
     private DriveState state;
 
+    private Vision vision;
+
+    private double shiftingTime;
+
+    private boolean shifted;
+
+    private boolean servoEnabled;
+
     //----------------------------------------Constants----------------------------------------
 
-    private final double ANGLE_OFF_BY = .1;
+    private final double ANGLE_OFF_BY = 2;
 
     private final double SPEED_PERCENTAGE = .8;
 
@@ -86,32 +94,44 @@ public class Drives extends GenericSubsystem{
     public Drives(){
         super("Drives");
     }
+    public void resetVision()
+    {
+        vision.reset();
+    }
 
     //initialized all the variable in drives
     public void init(){
         rightMtr1 = new WPI_TalonSRX(IO.rightDriveCIM1);
         rightMtr2 = new WPI_TalonSRX(IO.rightDriveCIM2);
+        rightMtr3 = new WPI_TalonSRX(IO.rightDriveCIM3);
         leftMtr1 = new WPI_TalonSRX(IO.leftDriveCIM1);
         leftMtr2 = new WPI_TalonSRX(IO.leftDriveCIM2);
-        rightMtrs = new MotorGroup(rightMtr1, rightMtr2);
-        leftMtrs = new MotorGroup(leftMtr1, leftMtr2);
-        rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
-        rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
-        leftEncoder = new EncoderData(rawLeft, 0.033860431);
-        rightEncoder = new EncoderData(rawRight, 0.033860431);
-        rightEncoder.reset();
-        leftEncoder.reset();
-        leftMtrs.setInverted(true);
+        leftMtr3 = new WPI_TalonSRX(IO.leftDriveCIM3);
+        rightMtrs = new MotorGroup(rightMtr1, rightMtr2, rightMtr3);
+        leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
+        rightEnc = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
+        leftEnc = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
+        rightEnc.setDistancePerPulse(-0.033860431);
+        leftEnc.setDistancePerPulse(0.033860431);
+        rightMtrs.setInverted(true);
         gyro = new AHRS(SerialPort.Port.kUSB);
+        gyro.reset();
+        rightServo = new Servo(0);
+        leftServo = new Servo(1);
         lastAngle = 0;
         speedLeft = 0;
         speedRight = 0;
         resetGyroAngle();
         moveDist = 0;
-        moveSpeed = 0;
+        moveSpeed = 0; 
         turnAngle = 0;
         turnSpeed = 0;
-        drivesPTO = new Solenoid(1);
+      //  hatchPTO = new Solenoid(0)
+        vision = new Vision();
+        state = state.STANDBY;
+        shiftingTime = 0;
+        shifted = false;
+        servoEnabled = false;
     }
 
     public enum DriveState{
@@ -121,34 +141,50 @@ public class Drives extends GenericSubsystem{
         MOVE_BACKWARD,
         TURN_RIGHT,
         TURN_LEFT,
-        SENSOR_LEFT,
-        SENSOR_MID,
-        SENSOR_RIGHT;
+        SHIFT_LOW,
+        SHIFT_HIGH,
+        SHIFT_NEUTRAL,
+        ARMS,
+        LINE_FOLLOWER;
     }
 
     //does all the code for drives
     public void execute(){
         //move(0.8, 150);
-        //turn(0.5, 90);
+        
+        //changeState(DriveState.LINE_FOLLOWER);
         switch(state){
             case STANDBY:
+                System.out.println("You are a bold one");
                 break;
             case TELEOP:
-                rightMtrs.set(speedRight);
-                leftMtrs.set(speedLeft);
+                //System.out.println("Drives SpeedRight: " + speedRight + " speedLeft: " + speedLeft);
+                vision.getDirection();
+                if(!vision.triggered()){
+                    rightMtrs.set(speedRight);
+                    leftMtrs.set(speedLeft);
+                }else{
+                    changeState(DriveState.LINE_FOLLOWER);
+                }
+               
                 break;
             case MOVE_FORWARD:
+                System.out.println("Hello");
                 if(getDistance() > moveDist){
+                    System.out.println("There");
                     rightMtrs.stopMotors();
                     leftMtrs.stopMotors();
                     changeState(DriveState.STANDBY);
                 }else{
+                    //straightenForward();
                     rightMtrs.set(speedRight);
                     leftMtrs.set(speedLeft);
                 }
                 break;
             case MOVE_BACKWARD:
-                if(getDistance() < moveDist){
+                System.out.println("General");
+                if(getDistance() > moveDist){
+                    System.out.println("Kenobi");
                     rightMtrs.stopMotors();
                     leftMtrs.stopMotors();
                     changeState(DriveState.STANDBY);
@@ -163,9 +199,10 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.stopMotors();
                     changeState(DriveState.STANDBY);
                 }else{
-                    rightMtrs.set(speedRight);
-                    leftMtrs.set(-speedLeft);
+                    rightMtrs.set(-turnSpeed);
+                    leftMtrs.set(turnSpeed);
                 }
+                // System.out.println("turn right");
                 break;
             case TURN_LEFT:
                 if(getAngle() < turnAngle){
@@ -173,26 +210,78 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.stopMotors();
                     changeState(DriveState.STANDBY);
                 }else{
-                    rightMtrs.set(-speedRight);
-                    leftMtrs.set(speedLeft);
+                    rightMtrs.set(turnSpeed);
+                    leftMtrs.set(-turnSpeed);
+                }
+               // System.out.println("turn left");
+                break;
+            case LINE_FOLLOWER: 
+                directions st = vision.getDirection();
+                // System.out.println("Left motor power = " + leftMtr1.getBusVoltage());
+                //System.out.println("right motor power = " + rightMtr1.getBusVoltage());
+                if(st == directions.LEFT){
+                    leftMtrs.set(-0.5);
+                    rightMtrs.set(0.5);
+                }else if(st == directions.RIGHT){
+                    leftMtrs.set(0.5);
+                    rightMtrs.set(-0.5);
+                }else if(st == directions.FORWARD){
+                    leftMtrs.set(0.3);
+                    rightMtrs.set(0.3);
+                }else if(st == directions.SLIGHTLEFT){
+                    leftMtrs.set(0.00);
+                    rightMtrs.set(0.30);
+                }else if(st == directions.SLIGHTRIGHT){
+                    leftMtrs.set(0.30);
+                    rightMtrs.set(0.10);
+                }
+                else if(st == directions.STANDBY)
+                {
+                    leftMtrs.set(0);
+                    rightMtrs.set(0);
                 }
                 break;
-            case SENSOR_LEFT:
-                leftMtrs.stopMotors();
-                rightMtrs.set(0.4);
+            case SHIFT_LOW:
+                if(shiftingTime + 400 < System.currentTimeMillis()){
+                    leftMtrs.set(speedLeft);
+                    rightMtrs.set(speedLeft);
+                    changeState(DriveState.TELEOP);
+                }
                 break;
-            case SENSOR_MID:
-                leftMtrs.set(0.4);
-                rightMtrs.set(0.4);
+            case SHIFT_NEUTRAL:
+                leftMtrs.set(0.2);
+                rightMtrs.set(0.2);
+                //SOOLEEEBOI
+                if(shiftingTime + 200 < System.currentTimeMillis()){
+                    if(!servoEnabled){
+                        enableServo();
+                    }
+                    if(!shifted){
+                        changeState(DriveState.SHIFT_LOW);
+                    }
+                    if(shifted){
+                        changeState(DriveState.SHIFT_HIGH);
+                    }
+                }
                 break;
-            case SENSOR_RIGHT:
-                leftMtrs.set(0.4);
-                rightMtrs.stopMotors();
+            case SHIFT_HIGH:
+                if(shiftingTime + 400 < System.currentTimeMillis()){
+                    leftMtrs.set(speedLeft);
+                    rightMtrs.set(speedRight);
+                    changeState(DriveState.TELEOP);
+                }
                 break;
-
+            case ARMS:
+                break;
+                
+                
+                
         }
-        System.out.println("Right Encoder: " + leftEncoder.getDistance());
-        System.out.println("Left Encoder: " + rightEncoder.getDistance());
+      //  System.out.println("State: " + )
+        System.out.println("Right Encoder: " + rightEnc.getDistance());
+        System.out.println("Left Encoder: " + leftEnc.getDistance());
+         //System.out.println("Gyro: " + getAngle());
+         System.out.println("GetDistance: " + getDistance());
     }
 
     //debugs all the possible problems in drives
@@ -225,14 +314,30 @@ public class Drives extends GenericSubsystem{
 
     public void joystickLeft(double speed) {
         speedLeft = speed;
+     // leftMtrs.set(speed);
     }
 
     public void joystickRight(double speed) {
         speedRight = speed;
+     //   rightMtrs.set(speed);
     }
 
-    public void buttonB(boolean a){
-        drivesPTO.set(a);
+    private void lowShift(){
+        shifted = true;
+        shiftingTime = System.currentTimeMillis();
+        changeState(DriveState.SHIFT_NEUTRAL);
+    }
+
+    private void highShift(){
+        shifted = false;
+        shiftingTime = System.currentTimeMillis();
+        changeState(DriveState.SHIFT_NEUTRAL);
+    }
+
+    private void enableServo(){
+        rightServo.set(1);
+        leftServo.set(1);
+        servoEnabled = true;
     }
 
     //straightens the robot
@@ -246,9 +351,7 @@ public class Drives extends GenericSubsystem{
 
     //gets the distance the robot has travelled since the last time the encoders were reset
     private double getDistance() {
-		rightEncoder.calculateSpeed();
-		leftEncoder.calculateSpeed();
-		return (rightEncoder.getDistance() + leftEncoder.getDistance())/2;
+		return (rightEnc.getDistance() + leftEnc.getDistance())/2;
     }
 
     //gets the angle the robot has turned since the last time the gyro was reset 
@@ -259,22 +362,18 @@ public class Drives extends GenericSubsystem{
     //resets the gyro's angle so the robot turns to the angle from where the robot is currently facing
     private void resetGyroAngle(){
         lastAngle = gyro.getAngle();
+        System.out.println("Reset: " + lastAngle);
     }
 
     //turns the robot a specified angle 
     public void turn(double speed, double angle){
         turnAngle = angle;
         turnSpeed = speed;
+        resetGyroAngle();
         if(angle > 0){
-          changeState(DriveState.TURN_RIGHT);
+            changeState(DriveState.TURN_RIGHT);
         }else{
-            if(getAngle() < angle){
-                rightMtrs.stopMotors();
-                leftMtrs.stopMotors();
-            }else{
-                rightMtrs.set(-speed);
-                leftMtrs.set(speed);
-            }
+            changeState(DriveState.TURN_LEFT);
         }
 
     }
@@ -287,19 +386,8 @@ public class Drives extends GenericSubsystem{
     //used by RobotSystem to put the robot in the teleop state
     public void toTeleop(){
         changeState(DriveState.TELEOP);
+       //turn(0.5, 90);
+      // move(0.5, 120);
     }
 
-    //vision call this class to tell the robot what to do when it hits the line
-    public void visionSenses(int st){
-        if(st == -1){
-            changeState(DriveState.SENSOR_LEFT);
-        }else if(st == 0){
-            changeState(DriveState.SENSOR_MID);
-        }else if(st == 1){
-            changeState(DriveState.SENSOR_RIGHT);
-        }else{
-            changeState(DriveState.STANDBY);
-        }
-    }
-    
 }

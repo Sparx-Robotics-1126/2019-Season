@@ -30,8 +30,6 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private RobotSystem system;
 
-  
-  Spark brmotor = new Spark(0);
 
   /**
    * This function is run when the robot is first started up and should be
@@ -45,13 +43,13 @@ public class Robot extends TimedRobot {
     system = new RobotSystem();
     system.init();
     system.start();
-    CameraServer.getInstance().startAutomaticCapture();
+  //  CameraServer.getInstance().startAutomaticCapture();
     System.out.println("***INIT ROBOT COMPLETE***");
   }
   
   public void teleopInit() {
-
-	  system.teleop();
+    system.resetVision();
+    system.teleop();
   }
   
   /**
