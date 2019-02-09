@@ -9,6 +9,8 @@ package frc.controls;
 
 import edu.wpi.first.wpilibj.Joystick;
 import frc.subsystem.Drives;
+import frc.subsystem.HAB;
+import frc.subsystem.Hatch;
 
 /**
  * Add your docs here.
@@ -17,7 +19,11 @@ public class TeleOP implements Controls{
 
     private Joystick[] joysticks;
 
-    private Drives drives;
+	private Drives drives;
+	
+	private HAB hab;
+
+	private Hatch hatch;
 
     private boolean[][] buttonStates =
 		{{false, false}, //LEFTJOY_LEFT
@@ -55,8 +61,10 @@ public class TeleOP implements Controls{
 				{false, false},  //XBOX_DOWN
                 {false, false}};  //XBOX_LEFT
                 
-    public TeleOP(Drives drives){
-        this.drives = drives;
+    public TeleOP(Drives drives, HAB hab, Hatch hatch){
+		this.drives = drives;
+		this.hab = hab;
+		this.hatch = hatch;
         joysticks = new Joystick[] {new Joystick(CtrlMap.RIGHTJOYSTICK), new Joystick(CtrlMap.LEFTJOYSTICK), new Joystick(CtrlMap.XBOXCONTROLLER)};
     }
 
@@ -193,7 +201,7 @@ public class TeleOP implements Controls{
 //		buttonStates[8][0] =  isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_A);
 //		buttonStates[9][0] =  isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B);
 		buttonStates[10][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X);
-//		buttonStates[11][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y);
+		buttonStates[11][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y);
 		
 		buttonStates[12][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L1);
 		buttonStates[13][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1);
