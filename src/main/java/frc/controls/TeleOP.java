@@ -99,6 +99,7 @@ public class TeleOP implements Controls{
 			drives.joystickRight(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y));
 		}else{
 			drives.joystickRight(0);
+		}
     }
 
     /**
