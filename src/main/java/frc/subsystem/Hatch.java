@@ -9,6 +9,7 @@ package frc.subsystem;
 
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.IO;
 
 /**
  * Add your docs here.
@@ -19,13 +20,9 @@ public class Hatch extends GenericSubsystem{
 
     private Solenoid shooter;
 
-    private boolean flipperState;
+    private boolean flipperValue;
 
-    private boolean flipperButtonState;
-
-    private boolean shooterState;
-
-    private boolean shooterButtonState;
+    private boolean shooterValue;
 
     private HatchState state;
 
@@ -38,56 +35,56 @@ public class Hatch extends GenericSubsystem{
     public enum HatchState{
         STANDBY,
         FLIPPER,
+        HOME,
         SHOOT_AND_FLIPPER;
     }
 
     public void init(){
-        flipper = new Solenoid(1);
-        shooter = new Solenoid(0);
-        flipperState = false;
-        flipperButtonState = false;
-        shooterState = false;
-        shooterButtonState = false;
+        flipper = new Solenoid(IO.hatchSolenoid1);
+        shooter = new Solenoid(IO.hatchSolenoid2);
+        flipperValue = false;
+        shooterValue = false;
         state = HatchState.STANDBY;
         time = 0;
     }
 
     public void execute(){
-       flipper.set(flipperState);
        switch(state){
             case STANDBY:
                 break;
             case FLIPPER:
-                if(flipperButtonState==true){
-                    flipperState = !flipperState;
-                    flipper.set(flipperState);
-                }
+                flipperValue = true;
                 state = HatchState.STANDBY;
                 break;
             case SHOOT_AND_FLIPPER:
-                if(shooterButtonState==true){
-                    shooterState = !shooterState;
-                    shooter.set(shooterState);
-                }
-                if(shooterState==true){
-                    if(System.currentTimeMillis() > time + 1000){
-                        flipper.set(true);
-                        state = HatchState.STANDBY;
-                    }
+                shooterValue = true;
+                if(System.currentTimeMillis() > time + 0){
+                    state = HatchState.FLIPPER;
                 }
                 break;
+            case HOME:
+                flipperValue = false;
+                shooterValue = false;
+                state = HatchState.STANDBY;
        }
+       flipper.set(flipperValue);
+       shooter.set(shooterValue);
     }
 
-    public void flipperButton(boolean condition){ 
-        flipperButtonState = condition;
+    public void flipperButton(){
+    //    System.out.println("FLIPPER"); 
         state = HatchState.FLIPPER;
     }
 
-    public void shooterButton(boolean condition){
-        shooterButtonState = condition;
+    public void shooterButton(){
+      //  System.out.println("Shooter");
         time = System.currentTimeMillis();
         state = HatchState.SHOOT_AND_FLIPPER;
+    }
+
+    public void homeButton(){
+      //  System.out.println("Home");
+        state = HatchState.HOME;
     }
 
     public void debug(){

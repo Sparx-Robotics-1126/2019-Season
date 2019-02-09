@@ -155,7 +155,7 @@ public class Drives extends GenericSubsystem{
         //changeState(DriveState.LINE_FOLLOWER);
         switch(state){
             case STANDBY:
-                System.out.println("You are a bold one");
+                //System.out.println("You are a bold one");
                 break;
             case TELEOP:
                 //System.out.println("Drives SpeedRight: " + speedRight + " speedLeft: " + speedLeft);
@@ -278,10 +278,10 @@ public class Drives extends GenericSubsystem{
                 
         }
       //  System.out.println("State: " + )
-        System.out.println("Right Encoder: " + rightEnc.getDistance());
-        System.out.println("Left Encoder: " + leftEnc.getDistance());
+        System.out.println("Right Encoder: " + rightEnc.getRaw());
+        System.out.println("Left Encoder: " + leftEnc.getRaw());
          //System.out.println("Gyro: " + getAngle());
-         System.out.println("GetDistance: " + getDistance());
+        //System.out.println("GetDistance: " + getDistance());
     }
 
     //debugs all the possible problems in drives
