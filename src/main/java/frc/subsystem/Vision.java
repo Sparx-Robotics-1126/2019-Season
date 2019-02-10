@@ -13,6 +13,7 @@ import java.util.OptionalInt;
 import javax.lang.model.util.ElementScanner6;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.IO;
 
 /**
  * Add your docs here.
@@ -23,8 +24,10 @@ public class Vision{
 
     private DigitalInput leftIR;
     
-    private DigitalInput centerIR;
+    private DigitalInput centerLeftIR;
     
+    private DigitalInput centerRightIR;
+
     private DigitalInput rightIR;
 
     int firstHit;
@@ -34,9 +37,10 @@ public class Vision{
    private boolean lir, rir, cir, hitLine, cirHit;
     public Vision()
     {
-        leftIR = new DigitalInput(0);
-        centerIR = new DigitalInput(1);
-        rightIR = new DigitalInput(2);
+        leftIR = new DigitalInput(IO.leftFollowingSensor);
+        centerLeftIR = new DigitalInput(IO.centerLeftFollowingSensor);
+        centerRightIR = new DigitalInput(IO.centerRightFollowingSensor);
+        rightIR = new DigitalInput(IO.rightFollowingSensor);
         direction  = directions.STANDBY;
     }
 
@@ -60,7 +64,7 @@ public class Vision{
     public directions getDirection() 
     {
         lir = !leftIR.get();
-        cir = !centerIR.get();
+        cir = !centerLeftIR.get();
         rir = !rightIR.get();
 
         if(!hitLine)
@@ -77,56 +81,7 @@ public class Vision{
         }
         else if(!cir && cirHit)
             direction = directions.SLIGHTRIGHT;
-            /*
-            System.out.println("over: " + over + "rightHit: " + rightHit + "leftHit: " + leftHit);
-        if(rir)
-            if(over)
-                direction = directions.LEFT;
-            else
-                rightHit = true;
-        else if(rightHit && !over)
-            over = true;
-        else 
-            direction = directions.FORWARD;
-
-        if(lir)
-            if(over)
-                direction = directions.RIGHT;
-            else
-                leftHit = true;
-        else if(leftHit && !over)
-         over = true;
-        else 
-         direction = directions.FORWARD;
-        */
-
-
-        /*
-        if(lir && !cir)
-            direction = directions.SLIGHTRIGHT;
-        else if(rir && cir && centerBfrRight)
-            direction = directions.RIGHT;
-        else if(rir && cir && !centerBfrRight)
-            direction = directions.FORWARD;  
-        else if(rir && !cir)
-            direction = directions.SLIGHTLEFT;
-        else if(lir && cir && centerBfrLeft)
-            direction = directions.LEFT;
-        else if(lir && cir && !centerBfrLeft)
-            direction = directions.FORWARD;
-        //else if(!lir && cir && !rir)
-         //   direction = directions.FORWARD;
-        else 
-            direction = directions.FORWARD;
-
-        // if(firstHit == 0)
-        //     direction = directions.LEFT;
-        // else if(firstHit == 2)
-        //     direction = directions.RIGHT;
-        // else
-        //     direction = directions.STANDBY;
-        */
-      //  System.out.println(direction);
+        System.out.println("lir: " + lir + " cir: " + cir + " rir: " + rir);
         return direction;
     }
 

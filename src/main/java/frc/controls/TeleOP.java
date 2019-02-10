@@ -108,6 +108,12 @@ public class TeleOP implements Controls{
 		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)){
 			hatch.homeButton();
 		}
+		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_A)){
+			drives.findLine();
+		}
+		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)){
+			drives.toTeleop();
+		}
 		// if(isRisingEdgeButton(13)){
 		// 	hatch.shooterButton(true);
 		// }else{

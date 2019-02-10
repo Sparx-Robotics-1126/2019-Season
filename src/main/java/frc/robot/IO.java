@@ -36,4 +36,8 @@ public class IO {
     public static final int leadScrewCIM =                                     4;
     public static final int rightHabMotor =                                    5;
     public static final int leftHabMotor =                                     6;
+    public static final int leftFollowingSensor =                             14;
+    public static final int centerLeftFollowingSensor =                       15;
+    public static final int centerRightFollowingSensor =                      16;
+    public static final int rightFollowingSensor =                            17;
 }
