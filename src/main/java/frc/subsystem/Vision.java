@@ -30,12 +30,11 @@ public class Vision{
 
     private DigitalInput rightIR;
 
-    int firstHit;
-
     private Drives drives;
 
-   private boolean lir, rir, cir, hitLine, cirHit;
-    public Vision()
+    private boolean hitLine, centerHit, rightHitFirst;
+    
+	public Vision()
     {
         leftIR = new DigitalInput(IO.leftFollowingSensor);
         centerLeftIR = new DigitalInput(IO.centerLeftFollowingSensor);
@@ -47,8 +46,9 @@ public class Vision{
     public void reset()
     {
         hitLine = false;
+		rightHitFirst = false;
+		centerHit = false;
         System.out.println("Vision reset");
-        cirHit = false;
     }
 
     public enum directions
@@ -61,32 +61,48 @@ public class Vision{
         SLIGHTRIGHT
     }
 
-    public directions getDirection() 
-    {
-        lir = !leftIR.get();
-        cir = !centerLeftIR.get();
-        rir = !rightIR.get();
-
-        if(!hitLine)
-            direction = directions.FORWARD;
-        if(rir)
-        {
+    public directions getDirection(){
+        boolean left = !leftIR.get();
+		boolean right = !rightIR.get();
+        boolean centerLeft = !centerLeftIR.get();
+		boolean centerRight = !centerRightIR.get();
+		
+		//If we've hit right turn right
+		if(right){
             direction = directions.RIGHT;
             hitLine = true;
-        }
-        else if(cir)
-        {
-            direction = directions.SLIGHTLEFT;
-            cirHit = true;
-        }
-        else if(!cir && cirHit)
-            direction = directions.SLIGHTRIGHT;
-        System.out.println("lir: " + lir + " cir: " + cir + " rir: " + rir);
+			rightHitFirst = true;
+			
+		//If we've hit left turn left
+        }else if(left){
+			direction = directions.LEFT;
+            hitLine = true;
+			rightHitFirst = false;
+		}
+		
+		//We'ver hit line on side now we turn until center line hit.
+        if(hitLine && !centerHit){
+			//Waiting for the middle to be found
+			if((rightHitFirst && centerLeft) || (!rightHitFirst && centerRight)){
+				centerHit = true;
+			}
+        }else{
+			//Still Searching for line
+			direction = directions.FORWARD;
+		}
+		
+		//We've found line now we must stay on it
+		if(hitLine && centerHit){
+			if(centerLeft){
+				direction = directions.SLIGHTLEFT;
+			}else{
+				direction = directions.SLIGHTRIGHT;
+			}	
+		}
         return direction;
     }
 
     public boolean triggered(){
-        return lir || rir;
+        return hitLine;
     }
-
 }
