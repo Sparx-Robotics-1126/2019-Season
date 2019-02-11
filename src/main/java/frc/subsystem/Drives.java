@@ -177,6 +177,8 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.stopMotors();
                     changeState(DriveState.STANDBY);
                 }else{
+                    wantedSpeedRight = moveSpeed;
+                    wantedSpeedLeft = moveSpeed;
                     straightenForward();
                     rightMtrs.set(wantedSpeedRight);
                     leftMtrs.set(wantedSpeedLeft);
@@ -190,6 +192,9 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.stopMotors();
                     changeState(DriveState.STANDBY);
                 }else{
+                    wantedSpeedRight = moveSpeed;
+                    wantedSpeedLeft = moveSpeed;
+                    straightenForward();
                     rightMtrs.set(-speedRight);
                     leftMtrs.set(-speedLeft);
                 }
@@ -313,8 +318,6 @@ public class Drives extends GenericSubsystem{
     public void move(double speed, double dist){
         moveSpeed = speed;
         moveDist = dist;
-        wantedSpeedRight = moveSpeed;
-        wantedSpeedLeft = moveSpeed;
         if(moveDist > 0){
             changeState(DriveState.MOVE_FORWARD);
         }else{
@@ -355,7 +358,7 @@ public class Drives extends GenericSubsystem{
         if(getAngle() > ANGLE_OFF_BY){
             wantedSpeedLeft *= SPEED_PERCENTAGE; 
         }else if(getAngle() < ANGLE_OFF_BY){
-            wantedSpeedRight *= SPEED_PERCENTAGE;
+            wantedSpeedRight *= -SPEED_PERCENTAGE;
         }
     }
 
