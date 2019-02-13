@@ -22,11 +22,18 @@ public class RobotSystem extends Thread{
     private Controls teleop;
     private Controls currentControl; 
     private Drives drives;
+    private HAB hab;
+    private Hatch hatch;
+    
 
     public RobotSystem(){
         drives = new Drives();
         drives.init();
-        teleop = new TeleOP(drives);
+        hab = new HAB();
+        hab.init();
+        hatch = new Hatch();
+        hatch.init();
+        teleop = new TeleOP(drives, hab, hatch);
         currentState = RobotState.STANDBY;
         currentControl = teleop;
         //Compressor compress = new Compressor(IO.compressor);
@@ -52,7 +59,9 @@ public class RobotSystem extends Thread{
     }
     
     public void init(){
-        drives.start();
+        //drives.start();
+        //hab.start();
+        hatch.start();
     }
 
     @Override
