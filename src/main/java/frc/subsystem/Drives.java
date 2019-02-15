@@ -92,6 +92,8 @@ public class Drives extends GenericSubsystem{
 
     private boolean shiftingPosition;
 
+    private boolean isMoving;
+
     //----------------------------------------Constants----------------------------------------
 
     private final double ANGLE_OFF_BY = 2;
@@ -144,6 +146,7 @@ public class Drives extends GenericSubsystem{
         wantedSpeedLeft = 0;
         shifter = new Solenoid(IO.shiftingSolenoid);
         shiftingPosition = false;
+        isMoving = false;
     }
 
     public enum DriveState{
@@ -186,6 +189,7 @@ public class Drives extends GenericSubsystem{
                   //  System.out.println("There");
                     rightMtrs.stopMotors();
                     leftMtrs.stopMotors();
+                    isMoving = false;
                     changeState(DriveState.STANDBY);
                 }else{
                     wantedSpeedRight = moveSpeed;
@@ -201,6 +205,7 @@ public class Drives extends GenericSubsystem{
                   //  System.out.println("Kenobi");
                     rightMtrs.stopMotors();
                     leftMtrs.stopMotors();
+                    isMoving = false;
                     changeState(DriveState.STANDBY);
                 }else{
                     wantedSpeedRight = moveSpeed;
@@ -214,6 +219,7 @@ public class Drives extends GenericSubsystem{
                 if(getAngle() > turnAngle){
                     rightMtrs.stopMotors();
                     leftMtrs.stopMotors();
+                    isMoving = false;
                     changeState(DriveState.STANDBY);
                 }else{
                     rightMtrs.set(-turnSpeed);
@@ -225,6 +231,7 @@ public class Drives extends GenericSubsystem{
                 if(getAngle() < turnAngle){
                     rightMtrs.stopMotors();
                     leftMtrs.stopMotors();
+                    isMoving = false;
                     changeState(DriveState.STANDBY);
                 }else{
                     rightMtrs.set(turnSpeed);
@@ -328,7 +335,7 @@ public class Drives extends GenericSubsystem{
 
     //checks if drives is done with its autonomous code
     public boolean isDone(){
-        return false;
+        return !isMoving;
     }
 
     //the time in milliseconds between each call to execute
@@ -341,12 +348,19 @@ public class Drives extends GenericSubsystem{
         moveSpeed = speed;
         moveDist = dist;
         resetGyroAngle();
+        isMoving = true;
         if(moveDist > 0){
             changeState(DriveState.MOVE_FORWARD);
         }else{
             changeState(DriveState.MOVE_BACKWARD);
             
         }
+    }
+
+    public void stopMotors(){
+        isMoving = false;
+        leftMtrs.stopMotors();
+        rightMtrs.stopMotors();
     }
 
     public void joystickLeft(double speed) {
@@ -413,6 +427,7 @@ public class Drives extends GenericSubsystem{
         turnAngle = angle;
         turnSpeed = speed;
         resetGyroAngle();
+        isMoving = true;
         if(angle > 0){
             changeState(DriveState.TURN_RIGHT);
         }else{
