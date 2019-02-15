@@ -173,9 +173,9 @@ public class Drives extends GenericSubsystem{
             case TELEOP:
                 //System.out.println("Drives SpeedRight: " + speedRight + " speedLeft: " + speedLeft);
                 if(!shiftingPosition && (getAverageRate() > 275)){
-                    changeState(DriveState.SHIFT_HIGH);
+                    highShift();
                 }else if(shiftingPosition && (getAverageRate() < 150)){
-                    changeState(DriveState.SHIFT_LOW);
+                    lowShift();
                 }
                 rightMtrs.set(speedRight);
                 leftMtrs.set(speedLeft);
@@ -259,9 +259,10 @@ public class Drives extends GenericSubsystem{
                 }
                 break;
             case SHIFT_LOW:
-                 leftMtrs.set(0.2);
-                 rightMtrs.set(0.2);
+                leftMtrs.set(0.2);
+                rightMtrs.set(0.2);
                 shifter.set(false);
+                shiftingPosition = false;
                 if(shiftingTime + 400 < System.currentTimeMillis()){
                     leftMtrs.set(speedLeft);
                     rightMtrs.set(speedLeft);
@@ -284,9 +285,10 @@ public class Drives extends GenericSubsystem{
                 }
                 break;
             case SHIFT_HIGH:
-                 leftMtrs.set(0.2);
-                 rightMtrs.set(0.2);
+                leftMtrs.set(0.2);
+                rightMtrs.set(0.2);
                 shifter.set(true);
+                shiftingPosition = true;
                 if(shiftingTime + 400 < System.currentTimeMillis()){
                     leftMtrs.set(speedLeft);
                     rightMtrs.set(speedRight);
