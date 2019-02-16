@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.Vector;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import edu.wpi.first.wpilibj.Timer;
 import frc.subsystem.GenericSubsystem;
@@ -37,8 +37,8 @@ public class Logger extends GenericSubsystem {
 	private DecimalFormat df;
 	private DecimalFormat df2;
 
-	private ArrayDeque<String> dataToPrint;
-	private ArrayDeque<String> printToLog;
+	private ConcurrentLinkedDeque<String> dataToPrint;
+	private ConcurrentLinkedDeque<String> printToLog;
 	private File logFile;
 
 	private StackWalker stw;
@@ -49,7 +49,7 @@ public class Logger extends GenericSubsystem {
 		if(!makeLogsDir()) { 
 			return;			  
 		}					
-		dataToPrint = new ArrayDeque<String>();
+		dataToPrint = new ConcurrentLinkedDeque<String>();
 		df = new DecimalFormat();
 		df.setGroupingUsed(false);
 		df.setMinimumFractionDigits(3);
@@ -68,7 +68,7 @@ public class Logger extends GenericSubsystem {
 		try {
 			logFile = new File(LOGS_DIRECTORY_LOCATION + "0-" + logName);
 			logFile.createNewFile();
-			printToLog = new ArrayDeque<String>();
+			printToLog = new ConcurrentLinkedDeque<String>();
 			log("LOGGER", "INFO", "Log created at " + logFile.getAbsolutePath());
 		} catch (Exception e) {
 			return;
@@ -86,24 +86,19 @@ public class Logger extends GenericSubsystem {
 					String str = null;
 					while(!isInterrupted()) {
 						if(!dataToPrint.isEmpty()) {
-							synchronized(dataToPrint) {
-								str = "[" + timerToHMS() + "]" + dataToPrint.remove();
-								systemOut.print(str);
-							}
+							str = "[" + timerToHMS() + "]" + dataToPrint.remove();
+							systemOut.print(str);
 						}
 						if(str != null) {
-							synchronized(printToLog) {
-								printToLog.push(str);
-								loggerNotify();
-								str = null;
-							}
+							printToLog.push(str);
+							loggerNotify();
+							str = null;
 						}
 						try {
 							synchronized(printThread) {
-								printThread.wait();
+								printThread.wait(10);
 							}
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
@@ -268,7 +263,7 @@ public class Logger extends GenericSubsystem {
 
 				@Override
 				public void println(String x) {
-					logOut(x, Tag.ERROR);
+					logOut(x + "\n", Tag.ERROR);
 				}
 
 				@Override
@@ -331,8 +326,8 @@ public class Logger extends GenericSubsystem {
 	public void getStackInfo(boolean getClass, int stack){
 		StackWalker.StackFrame frame = stw.walk(stream1 -> stream1.skip(stack).findFirst().orElse(null));
 		if(getClass) {
-			stackInfo[0] = frame.getClassName();
-
+			stackInfo[0] = frame.getClassName() + ":" + frame.getLineNumber();
+			//			stackInfo[0] = frame.getClassName();
 			if(stackInfo[0].indexOf('.') != -1) {
 				stackInfo[0] = stackInfo[0].substring(stackInfo[0].lastIndexOf('.') + 1);
 			}
@@ -362,10 +357,8 @@ public class Logger extends GenericSubsystem {
 		if(stw != null) {
 			getStackInfo(true, 3);
 		}
-		String log = "[" + stackInfo[0].toUpperCase() + "][" + stackInfo[1].toUpperCase() + "][" + type.toString() + "] " + message;
-		synchronized(dataToPrint) {
-			dataToPrint.add(log);
-		}
+		String log = "[" + stackInfo[0] + "][" + stackInfo[1] + "][" + type.toString() + "] " + message;
+		dataToPrint.add(log);
 		synchronized(printThread) {
 			printThread.notify();
 		}
@@ -375,9 +368,9 @@ public class Logger extends GenericSubsystem {
 	public void log(String subsystem, String method, Tag type, String message) {
 		String log = "[" + timerToHMS() + "][" + subsystem.toUpperCase() + "][" + method.toUpperCase() + "][" + type.toString().toUpperCase() + "] " + message;
 		if(logReady && LOG_TO_CONSOLE) {
-			synchronized(dataToPrint) {
-				dataToPrint.add(log);
-			}
+			//			synchronized(dataToPrint) {
+			dataToPrint.add(log);
+			//			}
 			synchronized(printThread) {
 				printThread.notify();
 			}
@@ -405,9 +398,10 @@ public class Logger extends GenericSubsystem {
 
 	public void log(String message) {
 		if(stw != null) {
+			
 			getStackInfo(true);
 		}
-		log(stackInfo[0].toUpperCase(), stackInfo[1], Tag.INFO, message);
+		log(stackInfo[0], stackInfo[1], Tag.INFO, message);
 	}
 
 	private String timerToHMS() {
@@ -513,18 +507,16 @@ public class Logger extends GenericSubsystem {
 		StringBuilder builder = new StringBuilder();
 		while(!isInterrupted()) {
 			try {
-				sleep(1000);
+				sleep(2000);
 				if(logReady) {
 					while(printToLog.size() > 0) {
-						synchronized (printToLog) {
-							builder.append(printToLog.poll());
-						}
-						Files.write(logFile.toPath(), builder.toString().getBytes(), StandardOpenOption.APPEND, StandardOpenOption.DSYNC, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-						builder.setLength(0);
+						builder.append(printToLog.remove());
 					}
+					Files.write(logFile.toPath(), builder.toString().getBytes(), StandardOpenOption.APPEND, StandardOpenOption.DSYNC, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+					builder.setLength(0);
 				}
 				synchronized(this) {
-					wait();
+					wait(60000);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
