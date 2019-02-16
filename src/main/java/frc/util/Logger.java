@@ -29,6 +29,7 @@ public class Logger extends GenericSubsystem {
 	//	private final String LOGS_DIRECTORY_LOCATION = "C:\\Users\\Spenser\\Documents\\Miscellaneous\\Sparx\\"; //starting from the home directory
 	private boolean logReady;
 	private final boolean LOG_TO_CONSOLE = true;
+	private final int maxSavedFiles = 10;
 	private String[] stackInfo;
 
 	private PrintStream systemOut;
@@ -48,10 +49,6 @@ public class Logger extends GenericSubsystem {
 		if(!makeLogsDir()) { 
 			return;			  
 		}					
-		long counterNumber = readCounter();
-		if(counterNumber == -1) {
-			return;
-		}
 		dataToPrint = new ArrayDeque<String>();
 		df = new DecimalFormat();
 		df.setGroupingUsed(false);
@@ -63,16 +60,16 @@ public class Logger extends GenericSubsystem {
 		df2.setMinimumIntegerDigits(2);
 		stackInfo = new String[2];
 		stw = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
-		compression();
+		updateFiles();
 		logName = LocalDateTime.now().getDayOfMonth() + "_" + LocalDateTime.now().getMonth() + "_" + LocalDateTime.now().getYear() + 
 				"-" + LocalDateTime.now().getHour() + "_" + LocalDateTime.now().getMinute() + "_" + LocalDateTime.now().getSecond() + ".log";
 		timer = new Timer();
 		timer.start();
 		try {
-			logFile = new File(LOGS_DIRECTORY_LOCATION + counterNumber + "-" + logName);
+			logFile = new File(LOGS_DIRECTORY_LOCATION + "0-" + logName);
 			logFile.createNewFile();
 			printToLog = new ArrayDeque<String>();
-			log("LOGGER", "INFO", "Log created at " + logName);
+			log("LOGGER", "INFO", "Log created at " + logFile.getAbsolutePath());
 		} catch (Exception e) {
 			return;
 		}
@@ -324,9 +321,9 @@ public class Logger extends GenericSubsystem {
 			System.setOut(printStream);
 			System.setErr(printStreamErr);
 		}
-		
+
 	}
-	
+
 	public synchronized void loggerNotify() {
 		this.notify();
 	}
@@ -335,7 +332,7 @@ public class Logger extends GenericSubsystem {
 		StackWalker.StackFrame frame = stw.walk(stream1 -> stream1.skip(stack).findFirst().orElse(null));
 		if(getClass) {
 			stackInfo[0] = frame.getClassName();
-			
+
 			if(stackInfo[0].indexOf('.') != -1) {
 				stackInfo[0] = stackInfo[0].substring(stackInfo[0].lastIndexOf('.') + 1);
 			}
@@ -372,7 +369,7 @@ public class Logger extends GenericSubsystem {
 		synchronized(printThread) {
 			printThread.notify();
 		}
-		
+
 	}
 
 	public void log(String subsystem, String method, Tag type, String message) {
@@ -446,14 +443,28 @@ public class Logger extends GenericSubsystem {
 		return -1;
 	}
 
-	private void compression() {
+	private void updateFiles() {
 		File logsDirectory = new File(LOGS_DIRECTORY_LOCATION);
 		File[] files = logsDirectory.listFiles();
 		ArrayList<String> logs = new ArrayList<String>();
+		String name;
+		int counter;
 		for(File file: files) {
-			if(file.getName().endsWith(".log")) {
-				logs.add(file.getName().substring(0, file.getName().lastIndexOf('.')));
+			name = file.getName();
+			if(name.indexOf('-') != -1) {
+				counter = Integer.parseInt(name.substring(0, name.indexOf('-')));
+				if(name.endsWith(".tar.gz") || name.endsWith(".log")) {
+					if(counter > 9) {
+						file.delete();
+					} else {
+						file.renameTo(new File((counter + 1) + name.substring(name.indexOf('-'))));
+					}
+				}
+				if(name.endsWith(".log")) {
+					logs.add((counter + 1) + name.substring(name.indexOf('-'), name.lastIndexOf('.')));
+				}
 			}
+
 		}
 		if(COMPRESSION_MODE.equals("TAR.GZ")) {
 			for(String str: logs) {
@@ -461,7 +472,7 @@ public class Logger extends GenericSubsystem {
 				File originalFile = new File(LOGS_DIRECTORY_LOCATION + str + ".log");
 				compressedFile.delete();
 				try {
-					Process ps = Runtime.getRuntime().exec("tar -zcf " + str + ".tar.gz " + str + ".log");
+					Process ps = Runtime.getRuntime().exec("tar -zcf " + str + ".tar.gz " + str + ".log", null, compressedFile.getParentFile());
 					ps.waitFor();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -477,7 +488,7 @@ public class Logger extends GenericSubsystem {
 				File originalFile = new File(LOGS_DIRECTORY_LOCATION + str + ".log");
 				compressedFile.delete();
 				try {
-					Process ps = Runtime.getRuntime().exec("zip " + str + ".zip " + str + ".log");
+					Process ps = Runtime.getRuntime().exec("zip " + str + ".zip " + str + ".log", null, compressedFile.getParentFile());
 					ps.waitFor();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -506,7 +517,7 @@ public class Logger extends GenericSubsystem {
 				if(logReady) {
 					while(printToLog.size() > 0) {
 						synchronized (printToLog) {
-							builder.append(printToLog.poll() + "\n");
+							builder.append(printToLog.poll());
 						}
 						Files.write(logFile.toPath(), builder.toString().getBytes(), StandardOpenOption.APPEND, StandardOpenOption.DSYNC, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
 						builder.setLength(0);
@@ -521,10 +532,10 @@ public class Logger extends GenericSubsystem {
 
 		}
 	}
-	
+
 	@Override
 	public void execute() {
-		
+
 	}
 
 	@Override
