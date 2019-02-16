@@ -12,8 +12,7 @@ import frc.controls.TeleOP;
 import frc.subsystem.Drives;
 import frc.subsystem.HAB;
 import frc.subsystem.Hatch;
-import frc.subsystem.Vision;
-import edu.wpi.first.wpilibj.Compressor;
+import frc.util.Logger;
 
 /**
  * Add your docs here.
@@ -26,20 +25,22 @@ public class RobotSystem extends Thread{
     private Drives drives;
     private HAB hab;
     private Hatch hatch;
+    private Logger logging;
     
 
     public RobotSystem(){
-        drives = new Drives();
-        drives.init();
+//        drives = new Drives();
+//        drives.init();
         // hab = new HAB();
         // hab.init();
-        hatch = new Hatch();
-        hatch.init();
+//        hatch = new Hatch();
+//        hatch.init();
+    	logging = new Logger();
         teleop = new TeleOP(drives, hatch);
         currentState = RobotState.STANDBY;
-        currentControl = teleop;
-        Compressor compress = new Compressor(IO.compressor);
-        compress.setClosedLoopControl(true);
+//        currentControl = teleop;
+//        Compressor compress = new Compressor(IO.compressor);
+//        compress.setClosedLoopControl(true);
     }
 
     
@@ -51,19 +52,20 @@ public class RobotSystem extends Thread{
 
     public void resetVision()
     {
-        drives.resetVision();
+//        drives.resetVision();
     }
 
     public void teleop() {
     	currentControl = teleop;
         currentState = RobotState.TELE;
-        drives.toTeleop();
+//        drives.toTeleop();
     }
     
     public void init(){
-        drives.start();
+    	logging.start();
+//        drives.start();
         //hab.start();
-        hatch.start();
+//        hatch.start();
     }
 
     @Override

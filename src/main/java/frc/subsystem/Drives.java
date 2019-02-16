@@ -323,7 +323,7 @@ public class Drives extends GenericSubsystem{
         // System.out.println("Gyro: " + getAngle());
         //  System.out.println("left rate: " + leftEnc.getRate());
         //  System.out.println("right rate: " + rightEnc.getRate());
-         System.out.println("rate: " + getAverageRate());
+//         System.out.println("rate: " + getAverageRate());
         // System.out.println("GetDistance: " + getDistance());
         // System.out.println("RightMtr" + wantedSpeedRight + " LeftMtr: " + wantedSpeedLeft);
     }

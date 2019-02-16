@@ -14,9 +14,14 @@ public abstract class GenericSubsystem extends Thread{
 
     private String name;
 	public GenericSubsystem(String name){
-		this.name = name;
-		setPriority(Thread.NORM_PRIORITY);
+		this(name, Thread.NORM_PRIORITY);
 	}
+	
+	public GenericSubsystem(String name, int priority){
+		this.name = name;
+		setPriority(priority);
+	}
+
 
     public abstract void init();
 
