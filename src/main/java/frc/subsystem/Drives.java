@@ -158,7 +158,6 @@ public class Drives extends GenericSubsystem{
         TURN_LEFT,
         SHIFT_LOW,
         SHIFT_HIGH,
-        SHIFT_NEUTRAL,
         ARMS,
         FINDING_LINE,
         LINE_FOLLOWER;
@@ -274,21 +273,6 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.set(speedLeft);
                     rightMtrs.set(speedLeft);
                     changeState(DriveState.TELEOP);
-                }
-                break;
-            case SHIFT_NEUTRAL:
-                leftMtrs.set(0.2);
-                rightMtrs.set(0.2);
-                if(shiftingTime + 200 < System.currentTimeMillis()){
-                    if(!servoEnabled){
-                        enableServo();
-                    }
-                    if(!shifted){
-                        changeState(DriveState.SHIFT_LOW);
-                    }
-                    if(shifted){
-                        changeState(DriveState.SHIFT_HIGH);
-                    }
                 }
                 break;
             case SHIFT_HIGH:
@@ -449,7 +433,7 @@ public class Drives extends GenericSubsystem{
     }
 
     public void moveForward(){
-        move(0.5, 240);
+        move(1, 120);
     }
 
     public void findLine(){
