@@ -37,8 +37,8 @@ public class Arms {
     public Arms(MotorGroup rightMtrs, MotorGroup leftMtrs){
         this.rightMtrs = rightMtrs;
         this.leftMtrs = leftMtrs;
-        rightArmEnc = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
-        leftArmEnc = new Encoder(IO.leftDrivesEncoderChannel2, IO.leftDrivesEncoderChannel1);
+        rightArmEnc = new Encoder(20, 21);
+        leftArmEnc = new Encoder(22, 23);
         rightArmEnc.setDistancePerPulse(0.033860431);
         leftArmEnc.setDistancePerPulse(0.033860431);
     }
