@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import frc.controls.Autonomous;
 import frc.controls.Controls;
 import frc.controls.TeleOP;
 import frc.subsystem.Drives;
@@ -21,7 +22,8 @@ import edu.wpi.first.wpilibj.Compressor;
 public class RobotSystem extends Thread{
 
     private RobotState currentState;
-    private Controls teleop;
+    private TeleOP teleop;
+    private Autonomous autonomous;
     private Controls currentControl; 
     private Drives drives;
     private HAB hab;
@@ -36,6 +38,7 @@ public class RobotSystem extends Thread{
         hatch = new Hatch();
         hatch.init();
         teleop = new TeleOP(drives, hatch);
+        autonomous = new Autonomous(drives, hatch);
         currentState = RobotState.STANDBY;
         currentControl = teleop;
         Compressor compress = new Compressor(IO.compressor);
@@ -58,6 +61,12 @@ public class RobotSystem extends Thread{
     	currentControl = teleop;
         currentState = RobotState.TELE;
         drives.toTeleop();
+    }
+    
+    public void autonomous() {
+    	autonomous.reset();
+    	currentControl = autonomous;
+    	currentState = RobotState.AUTO;
     }
     
     public void init(){
