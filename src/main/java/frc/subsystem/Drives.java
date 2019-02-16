@@ -97,10 +97,12 @@ public class Drives extends GenericSubsystem{
         leftMtr2 = new WPI_TalonSRX(IO.leftDriveCIM2);
         rightMtrs = new MotorGroup(rightMtr1, rightMtr2);
         leftMtrs = new MotorGroup(leftMtr1, leftMtr2);
-        // rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
-        // rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
-        // leftEncoder = new EncoderData(rawLeft, 0.033860431);
-        // rightEncoder = new EncoderData(rawRight, 0.033860431);
+        rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
+        rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
+        rawRight.setDistancePerPulse(0.033860431);
+        rawLeft.setDistancePerPulse(0.033860431);
+        leftEncoder = new EncoderData(rawLeft, 0.033860431);
+        rightEncoder = new EncoderData(rawRight, 0.033860431);
         // rightEncoder.reset();
         // leftEncoder.reset();
          leftMtrs.setInverted(true);
@@ -114,7 +116,7 @@ public class Drives extends GenericSubsystem{
         // turnAngle = 0;
         // turnSpeed = 0;
        // drivesPTO = new Solenoid(1);
-        arms = new Arms(rightMtrs, leftMtrs);
+        arms = new Arms(rightMtrs, leftMtrs, rawRight, rawLeft);
     }
 
     public enum DriveState{

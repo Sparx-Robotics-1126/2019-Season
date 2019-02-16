@@ -34,11 +34,11 @@ public class Arms {
     private Encoder rightArmEnc;
     
 
-    public Arms(MotorGroup rightMtrs, MotorGroup leftMtrs){
+    public Arms(MotorGroup rightMtrs, MotorGroup leftMtrs, Encoder rightEnc, Encoder leftEnc){
         this.rightMtrs = rightMtrs;
         this.leftMtrs = leftMtrs;
-        rightArmEnc = new Encoder(20, 21);
-        leftArmEnc = new Encoder(22, 23);
+        rightArmEnc = rightEnc;
+        leftArmEnc = leftEnc;
         rightArmEnc.setDistancePerPulse(0.033860431);
         leftArmEnc.setDistancePerPulse(0.033860431);
     }
