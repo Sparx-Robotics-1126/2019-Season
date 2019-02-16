@@ -6,53 +6,96 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.util;
-public class Arduino{
-private edu.wpi.first.wpilibj.SerialPort arduino;
 
-private String out;
+public class Arduino {
+  private edu.wpi.first.wpilibj.SerialPort arduino;
 
-public Arduino(int baudRate, edu.wpi.first.wpilibj.SerialPort.Port port, int dataBits, 
-edu.wpi.first.wpilibj.SerialPort.Parity parity, edu.wpi.first.wpilibj.SerialPort.StopBits stopBits)
-{
+  private String out;
+
+  private double edgeDist, midDist;
+
+  private boolean waiting;
+
+  public Arduino(int baudRate, edu.wpi.first.wpilibj.SerialPort.Port port, int dataBits,
+      edu.wpi.first.wpilibj.SerialPort.Parity parity, edu.wpi.first.wpilibj.SerialPort.StopBits stopBits) {
     out = "";
     arduino = new edu.wpi.first.wpilibj.SerialPort(baudRate, port, dataBits, parity, stopBits);
-}
-
-
-public double getDistance()
-{
-double distance = -1.0;
-String temp;
-if(arduino.getBytesReceived() > 0)
-  {
-    out += arduino.readString();
+    edgeDist = Double.MAX_VALUE;
+    midDist = Double.MAX_VALUE;
   }
 
-  int pos = -1;
-  for(int i = out.length() - 5; i >= 2; i--)
+  private void updateDistances()
   {
-    if(out.charAt(i) == '.')
+    if(!waiting)
     {
-      pos = i;
-      break;
-    }
-  }
-  if(pos != -1)
-  {
-  out = out.substring(pos - 2);
-  temp = out.substring(0, 7);
-  out = out.substring(7);
-    if(temp.equals("NO.NONE"))
-    {
-      System.err.println("out of range");
-      distance = Double.MAX_VALUE;
+      byte[] buffer = {42};
+      arduino.write(buffer, 1);
+      waiting = true;
     }
     else
     {
-      distance = Double.parseDouble(temp);
-      //System.out.println("distance = " + distance);
+      if(arduino.getBytesReceived() >= 13)
+      {
+        String temp;
+        temp = arduino.readString();
+        if(temp.substring(0, 6).equals("XX.XXX"))
+          edgeDist = Double.MAX_VALUE;
+        else
+          edgeDist = Double.parseDouble(temp.substring(0, 6));
+        if(temp.substring(7, 13).equals("XX.XXX"))
+          edgeDist = Double.MAX_VALUE;
+        else
+          midDist = Double.parseDouble(temp.substring(7, 13));
+        waiting = false;
+      }
     }
   }
-  return distance;
-}
+
+  public double getEdgeDist()
+  {
+    updateDistances();
+    double toReturn = edgeDist;
+    edgeDist = -1.0;
+    return toReturn;
+  }
+
+  public double getmidDist()
+  {
+    updateDistances();
+    double toReturn = midDist;
+    midDist = -1.0;
+    return toReturn;
+  }
+  
+
+  /*
+  public double getDistance() {
+    double distance = -1.0;
+    String temp;
+    if (arduino.getBytesReceived() > 0) {
+      out += arduino.readString();
+    }
+
+    int pos = -1;
+    for (int i = out.length() - 5; i >= 2; i--) {
+      if (out.charAt(i) == '.') {
+        pos = i;
+        break;
+      }
+    }
+    if (pos != -1) {
+      out = out.substring(pos - 2);
+      temp = out.substring(0, 7);
+      out = out.substring(7);
+      if (temp.equals("NO.NONE")) {
+        System.err.println("out of range");
+        distance = Double.MAX_VALUE;
+      } else {
+        distance = Double.parseDouble(temp);
+        // System.out.println("distance = " + distance);
+      }
+    }
+    return distance;
+  }
+  */
 }

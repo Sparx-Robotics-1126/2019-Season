@@ -23,13 +23,9 @@ import frc.util.Arduino;
  */
 public class Vision extends GenericSubsystem {
 
-    private Arduino arduinoLE;
+    private Arduino arduinoLeft;
 
-    private Arduino arduinoLM;
-
-    private Arduino arduinoRE;
-
-    private Arduino arduinoRM;
+    private Arduino arduinoRight;
 
     private double d1, d2;
 
@@ -98,10 +94,9 @@ public class Vision extends GenericSubsystem {
 
     public void init()
     {
-        arduinoLM = new Arduino(115200, Port.kUSB1, 8, Parity.kSpace, StopBits.kOne);
-        arduinoLE = new Arduino(115200, Port.kUSB2, 8, Parity.kSpace, StopBits.kOne);
-        arduinoRM = new Arduino(115200, Port.kUSB1, 8, Parity.kSpace, StopBits.kOne);
-        arduinoRE = new Arduino(115200, Port.kUSB2, 8, Parity.kSpace, StopBits.kOne);
+        arduinoLeft = new Arduino(115200, Port.kUSB1, 8, Parity.kSpace, StopBits.kOne);
+        arduinoRight = new Arduino(115200, Port.kUSB2, 8, Parity.kSpace, StopBits.kOne);
+    
         vState = VisionState1.SENSING;
         firstIt = true;
         DriveState = MoveState.STANDBY;
@@ -134,7 +129,7 @@ public class Vision extends GenericSubsystem {
 
     @Override
     public void execute() 
-    {
+        {
         // double num, num2;
         // num = arduinoLE.getDistance();
         // if(num != -1.0 && num != Double.MAX_VALUE)
@@ -142,6 +137,19 @@ public class Vision extends GenericSubsystem {
         // num2 = arduinoLM.getDistance();
         // if(num2 != -1.0 && num2 != Double.MAX_VALUE)
         // System.out.println("Arduino 2: " + num);
+
+        double distance;
+        distance = arduinoLeft.getEdgeDist();
+        if(distance != -1.0)
+            System.out.println("Distance 1: " + distance);
+        distance = arduinoLeft.getmidDist();
+        if(distance != -1.0)
+            System.out.println("Distance 2: " + distance);
+        //paraliningMethod();
+      }
+
+      private void paraliningMethod()
+      {
 
         switch(vState)
       {
@@ -225,19 +233,17 @@ public class Vision extends GenericSubsystem {
                 DriveState = MoveState.FORWARD;
                 break;
         }
-
-               
       }
 
       private void onRightSetDistances()
       {
         double distance;
 
-        distance = arduinoRE.getDistance();
+        distance = arduinoRight.getEdgeDist();
         if(distance != -1)
             d1 = distance;
 
-        distance = arduinoRM.getDistance();
+        distance = arduinoRight.getmidDist();
         if(distance != -1)
             d2 = distance;
       }
@@ -246,11 +252,11 @@ public class Vision extends GenericSubsystem {
       {
         double distance;
 
-        distance = arduinoLE.getDistance();
+        distance = arduinoLeft.getEdgeDist();
         if(distance != -1)
             d1 = distance;
 
-        distance = arduinoLM.getDistance();
+        distance = arduinoLeft.getmidDist();
         if(distance != -1)
             d2 = distance;
       }
