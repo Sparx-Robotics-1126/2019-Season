@@ -26,13 +26,16 @@ public class RobotSystem extends Thread{
     private Drives drives;
     private HAB hab;
     private Hatch hatch;
+    private Vision vision;
     
 
     public RobotSystem(){
-        drives = new Drives();
-        drives.init();
+        //drives = new Drives();
+        //drives.init();
         // hab = new HAB();
         // hab.init();
+        vision = new Vision();
+        vision.init();
         hatch = new Hatch();
         hatch.init();
         teleop = new TeleOP(drives, hatch);
@@ -57,11 +60,12 @@ public class RobotSystem extends Thread{
     public void teleop() {
     	currentControl = teleop;
         currentState = RobotState.TELE;
-        drives.toTeleop();
+        //drives.toTeleop();
     }
     
     public void init(){
-        drives.start();
+        vision.start();
+        //drives.start();
         //hab.start();
         hatch.start();
     }

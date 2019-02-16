@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.sensors.EncoderData;
-import frc.subsystem.Vision.directions;
+import frc.subsystem.Vision.MoveState;
 import frc.util.MotorGroup;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -222,30 +222,42 @@ public class Drives extends GenericSubsystem{
                // System.out.println("turn left");
                 break;
             case LINE_FOLLOWER: 
-                directions st = vision.getDirection();
+            
+                MoveState st = vision.getDirection();
                 // System.out.println("Left motor power = " + leftMtr1.getBusVoltage());
                 //System.out.println("right motor power = " + rightMtr1.getBusVoltage());
-                if(st == directions.LEFT){
+                if(st == MoveState.LEFT){
                     leftMtrs.set(-0.5);
                     rightMtrs.set(0.5);
-                }else if(st == directions.RIGHT){
+                }else if(st == MoveState.RIGHT){
                     leftMtrs.set(0.5);
                     rightMtrs.set(-0.5);
-                }else if(st == directions.FORWARD){
+                }else if(st == MoveState.FORWARD){
                     leftMtrs.set(0.3);
                     rightMtrs.set(0.3);
-                }else if(st == directions.SLIGHTLEFT){
-                    leftMtrs.set(0.00);
-                    rightMtrs.set(0.30);
-                }else if(st == directions.SLIGHTRIGHT){
-                    leftMtrs.set(0.30);
-                    rightMtrs.set(0.10);
+                }else if(st == MoveState.SLOWLEFT){
+                    leftMtrs.set(-0.2);
+                    rightMtrs.set(0.2);
+                }else if(st == MoveState.SLOWRIGHT){
+                    leftMtrs.set(0.2);
+                    rightMtrs.set(-0.2);
                 }
-                else if(st == directions.STANDBY)
+                else if(st == MoveState.STANDBY)
                 {
                     leftMtrs.set(0);
                     rightMtrs.set(0);
                 }
+                else if(st == MoveState.FORWARD)
+                {
+                    leftMtrs.set(.3);
+                    rightMtrs.set(.3);
+                }
+                else if(st == MoveState.BACKWARD)
+                {
+                    leftMtrs.set(-.3);
+                    rightMtrs.set(-.3);
+                }
+                
                 break;
             case SHIFT_LOW:
                 if(shiftingTime + 400 < System.currentTimeMillis()){
@@ -280,6 +292,7 @@ public class Drives extends GenericSubsystem{
             case ARMS:
                 break;
             case FINDING_LINE: 
+            /*
                 vision.getDirection();
                 if(vision.triggered()){
                     changeState(DriveState.LINE_FOLLOWER);
@@ -288,6 +301,7 @@ public class Drives extends GenericSubsystem{
                     leftMtrs.set(0.35);
                 }
                 break;
+                */
                 
                 
                 

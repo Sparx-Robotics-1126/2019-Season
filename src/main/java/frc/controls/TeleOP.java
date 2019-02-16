@@ -25,6 +25,8 @@ public class TeleOP implements Controls{
 
 	private Hatch hatch;
 
+	
+
     private boolean[][] buttonStates =
 		{{false, false}, //LEFTJOY_LEFT
 				{false, false},  //LEFTJOY_MIDDLE
@@ -89,6 +91,7 @@ public class TeleOP implements Controls{
 		// }else{
 		// 	drives.buttonB(false);
 		// }
+
 		if(isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y)){
 			drives.joystickLeft(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y));
 		}else{
