@@ -1,18 +1,22 @@
 package frc.controls;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.subsystem.Drives;
 import frc.subsystem.Hatch;
 
 public class Autonomous implements Controls{
 
-	private ArrayList<int[]> currentAuto;
-	private int[] currentStepData;
+	private Vector<AutoMethod> currentAuto;
+	private Vector<double[]> currentAutoParams;
+	private double[] currentStepData;
 	private int currentStep;
 	private double delayTimeStart;
 	private double delayTime;
@@ -39,25 +43,67 @@ public class Autonomous implements Controls{
 
 	private enum AutoMethod {
 		/**
+		 * Moves forward with a given distance at a given speed.
 		 * @param speed - speed to go (in inches/second)
 		 * @param distance - distance to go (in inches)
 		 */
 		DRIVES_FORWARD(0, 2),	
 		/**
+		 * Moves backward with a given distance at a given speed.
 		 * @param speed - speed to go (in inches/second)
 		 * @param distance - distance to go (in inches)
 		 */
 		DRIVES_BACKWARD(1, 2),
-		DRIVES_TIMED(2, 3),		
+		/**
+		 * Moves forward for a period of time at a given speed.
+		 * @param time - time to move (seconds)
+		 * @param speed - speed to go (inches/second)
+		 */
+		DRIVES_TIMED(2, 2),		
+		/**
+		 * Turns left x degrees at a given speed.
+		 * @param degree - degrees to go (degrees)
+		 * @param speed - speed to go (inches/second)
+		 */
 		DRIVES_TURNLEFT(3, 2),
+		/**
+		 * Turns right x degrees at a given speed.
+		 * @param degree - degrees to go (degrees)
+		 * @param speed - speed to go (inches/second)
+		 */
 		DRIVES_TURNRIGHT(4, 2),
+		/**
+		 * Starts vision following using line sensors.
+		 */
 		DRIVES_FOLLOWLINE(5, 0),
+		/**
+		 * Waits until any autonomous drive functions have finished.
+		 */
 		DRIVES_WAIT(6, 0),
+		/**
+		 * Stops drives.
+		 */
 		DRIVES_STOP(7, 0),
+		/**
+		 * Returns the hatch to home.
+		 */
 		HATCH_HOME(20, 0),
+		/**
+		 * Shoots and flips the hatch.
+		 */
 		HATCH_SHOOTFLIP(21, 0),
+		/**
+		 * Flips the hatch.
+		 */
 		HATCH_FLIP(22, 0),
+		/**
+		 * Pauses the auto for x seconds
+		 * @param seconds - the number of seconds to pause the auto for.
+		 */
 		AUTO_DELAY(99, 1),
+		/**
+		 * Kills the auto.
+		 */
 		AUTO_STOP(100, 0);
 
 		private final int id;
@@ -68,30 +114,36 @@ public class Autonomous implements Controls{
 			this.parameterCount = parameterCount;
 		}
 
-		private void printer(int[] parameters) {
+		private String printer(double[] parameters) {
 			switch(this) {
 			case DRIVES_FORWARD:
-				break;
+				return "DRIVES_FORWARD: move forward " + parameters[1] + " inches at a speed of " + parameters[0] + ".";
 			case DRIVES_BACKWARD:
-				break;
+				return "DRIVES_BACKWARD: move backward " + parameters[1] + " inches at a speed of " + parameters[0] + ".";
 			case DRIVES_TIMED:
-				break;
+				return "DRIVES_TIMED: move for " + parameters[1] + " seconds at a speed of " + parameters[0] + ".";
 			case DRIVES_TURNLEFT:
-				break;
+				return "DRIVES_TURNLEFT: turn " + parameters[0] + " degrees left at a speed of " + parameters[1] + ".";
 			case DRIVES_TURNRIGHT:
-				break;
+				return "DRIVES_TURNRIGHT: turn " + parameters[0] + " degrees right at a speed of " + parameters[1] + ".";
 			case DRIVES_FOLLOWLINE:
-				break;
+				return "DRIVES_FOLLOWLINE: enable automatic vision tracking.";
 			case DRIVES_WAIT:
-				break;
+				return "DRIVES_WAIT: wait until drives has finished.";
 			case DRIVES_STOP:
-				break;
+				return "DRIVES_STOP: stop drives.";
 			case HATCH_HOME:
-				break;
+				return "HATCH_HOME: return the hatch to the home position.";
 			case HATCH_SHOOTFLIP:
-				break;
+				return "HATCH_SHOOTFLIP: shoot and flip the hatch.";
 			case HATCH_FLIP:
-				break;
+				return "HATCH_FLIP: flip the hatch.";
+			case AUTO_DELAY:
+				return "AUTO_DELAY: pause auto for " + parameters[0] + " seconds.";
+			case AUTO_STOP:
+				return "AUTO_STOP: stop auto.";
+			default:
+				return "Unknown";
 			}
 		}
 
@@ -109,7 +161,8 @@ public class Autonomous implements Controls{
 	public Autonomous(Drives drives, Hatch hatch) {
 		this.drives = drives;
 		this.hatch = hatch;
-		currentAuto = new ArrayList<int[]>();
+		currentAuto = new Vector<AutoMethod>();
+		currentAutoParams = new Vector<double[]>();
 
 		autoSelector = new SendableChooser<Autos>();
 		autoSelector.setDefaultOption("Do Nothing", Autos.DO_NOTHING);
@@ -125,6 +178,7 @@ public class Autonomous implements Controls{
 	public void reset() {
 		currentStepData = null;
 		currentAuto.clear();
+		currentAutoParams.clear();
 		currentStep = 0;
 		delayTime = -1;
 		delayTimeStart = -1;
@@ -134,22 +188,17 @@ public class Autonomous implements Controls{
 		this.runAuto = runAuto;
 	}
 
-	private boolean addStep(AutoMethod autoMethod, int... parameters) {
-		int[] autoMethodArray;
+	private boolean addStep(AutoMethod autoMethod, double... parameters) {
 		if(parameters != null) {
 			if(parameters.length != autoMethod.parameterCount) {
 				System.out.println("Invalid number of parameters passed in - expected " + autoMethod.parameterCount + " but got " + parameters.length);
 				return false;
 			}
-			autoMethodArray = new int[parameters.length + 1];
-			for(int i = 1; i < autoMethodArray.length; i++) {
-				autoMethodArray[i] = parameters[i - 1];
-			}
 		} else {
-			autoMethodArray = new int[0];
+			parameters = new double[0];
 		}
-		autoMethodArray[0] = autoMethod.id;
-		currentAuto.add(autoMethodArray);
+		currentAuto.add(autoMethod);
+		currentAutoParams.add(parameters);
 		return true;
 	}
 
@@ -159,6 +208,7 @@ public class Autonomous implements Controls{
 			return false;
 		}
 		currentAuto.remove(index);
+		currentAutoParams.remove(index);
 		//		System.out.println("Removed step " + );
 		return true;
 	}
@@ -223,25 +273,25 @@ public class Autonomous implements Controls{
 			currentStep++;
 		}
 		if(currentStep < currentAuto.size()) {
-			currentStepData = currentAuto.get(currentStep);
-			switch(AutoMethod.toAutoMethod(currentStepData[0])) {
+			currentStepData = currentAutoParams.get(currentStep);
+			switch(currentAuto.get(currentStep)) {
 			case DRIVES_FORWARD:
-				drives.move(currentStepData[1], currentStepData[2]);
+				drives.move(currentStepData[0], currentStepData[1]);
 				currentStep++;
 				break;
 			case DRIVES_BACKWARD:
-				drives.move(currentStepData[1], -currentStepData[2]);
+				drives.move(currentStepData[0], -currentStepData[1]);
 				currentStep++;
 				break;
 			case DRIVES_TIMED:
 				currentStep++;
 				break;
 			case DRIVES_TURNLEFT:
-				drives.turn(currentStepData[1], currentStepData[2]);
+				drives.turn(currentStepData[0], currentStepData[1]);
 				currentStep++;
 				break;
 			case DRIVES_TURNRIGHT:
-				drives.turn(currentStepData[1], -currentStepData[2]);
+				drives.turn(currentStepData[0], -currentStepData[1]);
 				currentStep++;
 				break;
 			case DRIVES_FOLLOWLINE:
@@ -271,16 +321,38 @@ public class Autonomous implements Controls{
 				break;
 			case AUTO_DELAY:
 				delayTimeStart = Timer.getFPGATimestamp();
-				delayTime = currentAuto.get(currentStep)[1] / 1000.0;
+				delayTime = currentStepData[0];
 				break;
 			case AUTO_STOP:
 				currentStep = currentAuto.size() + 1;
 				break;
 			default:
-				System.out.println("Invalid auto (" + AutoMethod.toAutoMethod(currentStepData[0]) + ")");
+				System.out.println("Invalid auto (" + currentAuto.get(currentStep) + ")");
 				break;
 			}
 		}
 	}
 
+	public class AutoSendable extends SendableBase {
+
+		public String[] displayAuto() {
+			String[] str = new String[currentAuto.size()];
+			for(int i = 0; i < currentAuto.size(); i++) {
+				str[i] = currentAuto.get(i).printer(currentAutoParams.get(i));
+			}
+			return str;
+		}
+		
+		public double[] getAuto() {
+			return null;
+		}
+		
+		@Override
+		public void initSendable(SendableBuilder builder) {
+			builder.addStringArrayProperty("Autonomous", this::displayAuto, null);
+//			builder.addDoubleArrayProperty("Autonomous parameters", getter, setter);
+		}
+		
+	}
+	
 }
