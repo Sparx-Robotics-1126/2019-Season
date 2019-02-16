@@ -81,10 +81,47 @@ public class Logger extends GenericSubsystem {
 	}
 
 	public void printOverride() {
+		if(printThread == null) {
+			printThread = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					String str = null;
+					while(!isInterrupted()) {
+						if(!dataToPrint.isEmpty()) {
+							synchronized(dataToPrint) {
+								str = "[" + timerToHMS() + "]" + dataToPrint.remove();
+								systemOut.print(str);
+							}
+						}
+						if(str != null) {
+							synchronized(printToLog) {
+								printToLog.push(str);
+								loggerNotify();
+								str = null;
+							}
+						}
+						try {
+							synchronized(printThread) {
+								printThread.wait();
+							}
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+			});
+			printThread.setPriority(Thread.MIN_PRIORITY);
+		}
+		if(!printThread.isAlive()) {
+			printThread.start();
+		}
 		if(systemOut == null) {
 			OutputStream os = new OutputStream() {
 				@Override
 				public void write(int b) throws IOException {
+					return;
 				}
 			};
 			PrintStream printStream = new PrintStream(os) {
@@ -136,8 +173,105 @@ public class Logger extends GenericSubsystem {
 
 				@Override
 				public void println(String x) {
-					logOut(x);
-					printThread.notify();
+					logOut(x + "\n", Tag.INFO);
+				}
+
+				@Override
+				public void print(boolean x) {
+					print(x + "");
+				}
+
+				@Override
+				public void print(char x) {
+					print(x + "");				
+				}
+
+				@Override
+				public void print(char[] x) {
+					print(String.valueOf(x));
+				}
+
+				@Override
+				public void print(double x) {
+					print(x + "");				
+				}
+
+				@Override
+				public void print(float x) {
+					print(x + "");
+				}
+
+				@Override
+				public void print(int x) {
+					print(x + "");
+				}
+
+				@Override
+				public void print(long x) {
+					print(x + "");
+				}
+
+				@Override
+				public void print(Object x) {
+					print(String.valueOf(x));
+				}
+
+				@Override
+				public void print(String x) {
+					println(x);
+				}
+
+			};
+			PrintStream printStreamErr = new PrintStream(os) {
+
+				@Override
+				public void println() {
+					println("");
+				}
+
+				@Override
+				public void println(boolean x) {
+					println(x + "");
+				}
+
+				@Override
+				public void println(char x) {
+					println(x + "");
+				}
+
+				@Override
+				public void println(char[] x) {
+					println(String.valueOf(x));
+				}
+
+				@Override
+				public void println(double x) {
+					println(x + "");
+				}
+
+				@Override
+				public void println(float x) {
+					println(x + "");
+				}
+
+				@Override
+				public void println(int x) {
+					println(x + "");
+				}
+
+				@Override
+				public void println(long x) {
+					println(x + "");
+				}
+
+				@Override
+				public void println(Object x) {
+					println(String.valueOf(x));
+				}
+
+				@Override
+				public void println(String x) {
+					logOut(x, Tag.ERROR);
 				}
 
 				@Override
@@ -188,49 +322,26 @@ public class Logger extends GenericSubsystem {
 			};
 			systemOut = System.out;
 			System.setOut(printStream);
-			System.setErr(printStream);
+			System.setErr(printStreamErr);
 		}
-
-		if(printThread == null) {
-			printThread = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					String str = null;
-					while(!isInterrupted()) {
-						if(!dataToPrint.isEmpty()) {
-							synchronized(dataToPrint) {
-								str = "[" + timerToHMS() + "]" + dataToPrint.remove();
-								systemOut.print(str);
-							}
-						}
-						if(str != null) {
-							synchronized(printToLog) {
-								printToLog.push(str);
-								str = null;
-							}
-						}
-						try {
-							wait();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-				}
-			});
-			printThread.setPriority(Thread.MIN_PRIORITY);
-			printThread.start();
-		}
-		if(!printThread.isAlive()) {
-			printThread.start();
-		}
+		
+	}
+	
+	public synchronized void loggerNotify() {
+		this.notify();
 	}
 
 	public void getStackInfo(boolean getClass, int stack){
 		StackWalker.StackFrame frame = stw.walk(stream1 -> stream1.skip(stack).findFirst().orElse(null));
 		if(getClass) {
 			stackInfo[0] = frame.getClassName();
+			
+			if(stackInfo[0].indexOf('.') != -1) {
+				stackInfo[0] = stackInfo[0].substring(stackInfo[0].lastIndexOf('.') + 1);
+			}
+			if(stackInfo[0].indexOf('$') != -1) {
+				stackInfo[0] = stackInfo[0].substring(0, stackInfo[0].indexOf('$'));
+			}
 		}
 		stackInfo[1] = frame.getMethodName();
 	}
@@ -250,23 +361,32 @@ public class Logger extends GenericSubsystem {
 		INTERRUPTED;	//Used when commands have been interrupted
 	}
 
-	public void logOut(String message) {
+	public void logOut(String message, Tag type) {
 		if(stw != null) {
 			getStackInfo(true, 3);
 		}
-		String log = "[" + stackInfo[0].toUpperCase() + "][" + stackInfo[1].toUpperCase() + "][INFO] " + message;
+		String log = "[" + stackInfo[0].toUpperCase() + "][" + stackInfo[1].toUpperCase() + "][" + type.toString() + "] " + message;
 		synchronized(dataToPrint) {
 			dataToPrint.add(log);
-			this.notify();
 		}
+		synchronized(printThread) {
+			printThread.notify();
+		}
+		
 	}
 
 	public void log(String subsystem, String method, Tag type, String message) {
 		String log = "[" + timerToHMS() + "][" + subsystem.toUpperCase() + "][" + method.toUpperCase() + "][" + type.toString().toUpperCase() + "] " + message;
-		if(!logReady || LOG_TO_CONSOLE) {
+		if(logReady && LOG_TO_CONSOLE) {
 			synchronized(dataToPrint) {
 				dataToPrint.add(log);
-				this.notify();
+			}
+			synchronized(printThread) {
+				printThread.notify();
+			}
+		} else {
+			if(!logReady) {
+				System.out.println(log);
 			}
 		}
 	}
@@ -290,7 +410,7 @@ public class Logger extends GenericSubsystem {
 		if(stw != null) {
 			getStackInfo(true);
 		}
-		log(stackInfo[0], stackInfo[1], Tag.INFO, message);
+		log(stackInfo[0].toUpperCase(), stackInfo[1], Tag.INFO, message);
 	}
 
 	private String timerToHMS() {
@@ -378,7 +498,7 @@ public class Logger extends GenericSubsystem {
 	}
 
 	@Override
-	public void execute() {
+	public void run() {
 		StringBuilder builder = new StringBuilder();
 		while(!isInterrupted()) {
 			try {
@@ -392,12 +512,19 @@ public class Logger extends GenericSubsystem {
 						builder.setLength(0);
 					}
 				}
-				wait();
+				synchronized(this) {
+					wait();
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
 		}
+	}
+	
+	@Override
+	public void execute() {
+		
 	}
 
 	@Override

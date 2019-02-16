@@ -42,7 +42,6 @@ public class RobotSystem extends Thread{
 //        Compressor compress = new Compressor(IO.compressor);
 //        compress.setClosedLoopControl(true);
     }
-
     
     public enum RobotState{
 		STANDBY,
@@ -67,7 +66,7 @@ public class RobotSystem extends Thread{
         //hab.start();
 //        hatch.start();
     }
-
+    
     @Override
     public void run(){
         while(true){
