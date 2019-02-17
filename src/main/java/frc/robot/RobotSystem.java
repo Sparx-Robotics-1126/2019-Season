@@ -8,13 +8,12 @@
 package frc.robot;
 
 import frc.controls.Autonomous;
+import edu.wpi.first.wpilibj.Compressor;
 import frc.controls.Controls;
 import frc.controls.TeleOP;
 import frc.subsystem.Drives;
 import frc.subsystem.HAB;
 import frc.subsystem.Hatch;
-import frc.subsystem.Vision;
-import edu.wpi.first.wpilibj.Compressor;
 
 /**
  * Add your docs here.
@@ -29,19 +28,20 @@ public class RobotSystem extends Thread{
     private HAB hab;
     private Hatch hatch;
     
+    private Compressor compress;
 
     public RobotSystem(){
         drives = new Drives();
         drives.init();
-        // hab = new HAB();
-        // hab.init();
+        hab = new HAB();
+        hab.init();
         hatch = new Hatch();
         hatch.init();
-        teleop = new TeleOP(drives, hatch);
+        teleop = new TeleOP(drives, hab, hatch);
         autonomous = new Autonomous(drives, hatch);
         currentState = RobotState.STANDBY;
         currentControl = teleop;
-        Compressor compress = new Compressor(IO.compressor);
+        compress = new Compressor(IO.ROBOT_COMPRESSOR);
         compress.setClosedLoopControl(true);
     }
 
@@ -72,7 +72,7 @@ public class RobotSystem extends Thread{
     
     public void init(){
         drives.start();
-        //hab.start();
+        hab.start();
         hatch.start();
     }
 

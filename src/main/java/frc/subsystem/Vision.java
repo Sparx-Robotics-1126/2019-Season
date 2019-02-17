@@ -8,10 +8,6 @@
 
 package frc.subsystem;
 
-import java.util.OptionalInt;
-
-import javax.lang.model.util.ElementScanner6;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.IO;
 
@@ -30,16 +26,14 @@ public class Vision{
 
     private DigitalInput rightIR;
 
-    private Drives drives;
-
     private boolean hitLine, centerHit, rightHitFirst;
     
 	public Vision()
     {
-        leftIR = new DigitalInput(IO.leftFollowingSensor);
-        centerLeftIR = new DigitalInput(IO.centerLeftFollowingSensor);
-        centerRightIR = new DigitalInput(IO.centerRightFollowingSensor);
-        rightIR = new DigitalInput(IO.rightFollowingSensor);
+        leftIR = new DigitalInput(IO.VISION_LEFTFOLLOWINGSENSOR);
+        centerLeftIR = new DigitalInput(IO.VISION_CENTERLEFTFOLLOWINGSENSOR);
+        centerRightIR = new DigitalInput(IO.VISION_CENTERRIGHTFOLLOWINGSENSOR);
+        rightIR = new DigitalInput(IO.VISION_RIGHTFOLLOWINGSENSOR);
         direction  = directions.STANDBY;
     }
 
