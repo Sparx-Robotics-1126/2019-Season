@@ -17,67 +17,71 @@ import frc.subsystem.Hatch;
 /**
  * Add your docs here.
  */
-public class RobotSystem extends Thread {
+public class RobotSystem extends Thread{
 
-	private RobotState currentState;
-	private Controls teleop;
-	private Controls currentControl;
-	private Drives drives;
-	private HAB hab;
-	private Hatch hatch;
+    private RobotState currentState;
+    private Controls teleop;
+    private Controls currentControl; 
+    private Drives drives;
+    private HAB hab;
+    private Hatch hatch;
+    
+    private Compressor compress;
 
-	private Compressor compress;
+    public RobotSystem(){
+        drives = new Drives();
+        drives.init();
+        hab = new HAB();
+        hab.init();
+        hatch = new Hatch();
+        hatch.init();
+        teleop = new TeleOP(drives, hab, hatch);
+        currentState = RobotState.STANDBY;
+        currentControl = teleop;
+        compress = new Compressor(IO.ROBOT_COMPRESSOR);
+        compress.setClosedLoopControl(true);
+    }
 
-	public RobotSystem() {
-		drives = new Drives();
-		drives.init();
-		hab = new HAB();
-		hab.init();
-		hatch = new Hatch();
-		hatch.init();
-		teleop = new TeleOP(drives, hab, hatch);
-		currentState = RobotState.STANDBY;
-		currentControl = teleop;
-		compress = new Compressor(IO.ROBOT_COMPRESSOR);
-		compress.setClosedLoopControl(true);
-	}
+    
+    public enum RobotState{
+		STANDBY,
+		AUTO,
+		TELE;
+    }
 
-	public enum RobotState {
-		STANDBY, AUTO, TELE;
-	}
+    public void resetVision()
+    {
+        drives.resetVision();
+    }
 
-	public void resetVision() {
-		drives.resetVision();
-	}
+    public void teleop() {
+    	currentControl = teleop;
+        currentState = RobotState.TELE;
+        drives.toTeleop();
+    }
+    
+    public void init(){
+        drives.start();
+        hab.start();
+        hatch.start();
+    }
 
-	public void teleop() {
-		currentControl = teleop;
-		currentState = RobotState.TELE;
-		drives.toTeleop();
-	}
-
-	public void init() {
-		drives.start();
-		hab.start();
-		hatch.start();
-	}
-
-	@Override
-	public void run() {
-		while (true) {
-			switch (currentState) {
-			case STANDBY:
-				break;
-			case AUTO:
-			case TELE:
-				currentControl.execute();
+    @Override
+    public void run(){
+        while(true){
+			switch(currentState){
+				case STANDBY:
+					break;
+				case AUTO:
+				case TELE:
+					currentControl.execute();
 			}
-
+			
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
 			}
 		}
-	}
+    }
 
 }

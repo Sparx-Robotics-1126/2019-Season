@@ -93,10 +93,6 @@ public class Drives extends GenericSubsystem {
 		super("Drives");
 	}
 
-	public void resetVision() {
-		vision.reset();
-	}
-
 	// initialized all the variable in drives
 	public void init() {
 		rightMtr1 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_1);
@@ -111,7 +107,6 @@ public class Drives extends GenericSubsystem {
 		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
 		rightEnc.setDistancePerPulse(-0.02110013);// 0.07897476
 		leftEnc.setDistancePerPulse(0.02110013);
-		rightMtrs.setInverted(true);
 		gyro = new AHRS(SerialPort.Port.kUSB);
 		gyro.reset();
 		lastAngle = 0;
@@ -123,6 +118,7 @@ public class Drives extends GenericSubsystem {
 		turnAngle = 0;
 		turnSpeed = 0;
 		state = DriveState.STANDBY;
+		vision = new Vision();
 		shiftingTime = 0;
 		wantedSpeedRight = 0;
 		wantedSpeedLeft = 0;
@@ -286,7 +282,6 @@ public class Drives extends GenericSubsystem {
 		// System.out.println("GetDistance: " + getDistance());
 		// System.out.println("RightMtr" + wantedSpeedRight + " LeftMtr: " +
 		// wantedSpeedLeft);
-		System.out.println("rate: " + getAverageRate());
 	}
 
 	// checks if drives is done with its autonomous code
@@ -412,6 +407,10 @@ public class Drives extends GenericSubsystem {
 
 	public Arms getArms() {
 		return arms;
+	}
+	
+	public void resetVision() {
+		vision.reset();
 	}
 
 	@Override
