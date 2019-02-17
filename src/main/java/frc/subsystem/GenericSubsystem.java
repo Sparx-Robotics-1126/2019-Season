@@ -10,41 +10,45 @@ package frc.subsystem;
 /**
  * Add your docs here.
  */
-public abstract class GenericSubsystem extends Thread{
+public abstract class GenericSubsystem extends Thread {
 
-    private String name;
-	public GenericSubsystem(String name){
+	private String name;
+
+	public GenericSubsystem(String name) {
 		this.name = name;
 		setPriority(Thread.NORM_PRIORITY);
 	}
 
-    public abstract void init();
+	public abstract void init();
 
-    public abstract void execute();
+	public abstract void execute();
 
-    public abstract void debug();
+	public abstract void debug();
 
-    public abstract boolean isDone();
+	public abstract boolean isDone();
 
-    public abstract long sleepTime();
+	public abstract long sleepTime();
 
-    protected void log(String message){
+	protected void log(String message) {
 		print(message);
 	}
-	
-	protected void print(String message){
+
+	protected void print(String message) {
 		System.out.println(name + ": " + message);
 	}
 
-    @Override
-	public void run(){
+	@Override
+	public void run() {
 		log("Initializing " + name + "...");
-		//init();
+		// init();
 		long timeWait = sleepTime();
 		log("Starting " + name + "...");
-		while(true){
+		while (true) {
 			execute();
-			try { Thread.sleep(timeWait); } catch (InterruptedException e) {}
+			try {
+				Thread.sleep(timeWait);
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 
