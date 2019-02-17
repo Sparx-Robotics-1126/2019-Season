@@ -48,6 +48,8 @@ public class Drives extends GenericSubsystem{
 
     private Solenoid shifter;
     
+    private Solenoid drivesPTOArms;
+    
 	private Arms arms;
 
 	//----------------------------------------Variable----------------------------------------
@@ -107,8 +109,8 @@ public class Drives extends GenericSubsystem{
         leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
         rightEnc = new Encoder(IO.DRIVES_RIGHTENCODER_CH1, IO.DRIVES_RIGHTENCODER_CH2);
         leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
-        rightEnc.setDistancePerPulse(-0.07897476);
-        leftEnc.setDistancePerPulse(0.07897476);
+        rightEnc.setDistancePerPulse(-0.02110013);//0.07897476
+        leftEnc.setDistancePerPulse(0.02110013);
         rightMtrs.setInverted(true);
         gyro = new AHRS(SerialPort.Port.kUSB);
         gyro.reset();
@@ -120,13 +122,12 @@ public class Drives extends GenericSubsystem{
         moveSpeed = 0; 
         turnAngle = 0;
         turnSpeed = 0;
-      //  hatchPTO = new Solenoid(0)
-        vision = new Vision();
         state = DriveState.STANDBY;
         shiftingTime = 0;
         wantedSpeedRight = 0;
         wantedSpeedLeft = 0;
         shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID);
+        drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID);
         shiftingPosition = false;
         isMoving = false;
     }
@@ -147,9 +148,9 @@ public class Drives extends GenericSubsystem{
 
     //does all the code for drives
     public void execute(){
-        //move(0.8, 150);
-        
-        //changeState(DriveState.LINE_FOLLOWER);
+    	if(state != DriveState.ARMS && drivesPTOArms.get()) {
+    		drivesPTOArms.set(false);
+    	}
         switch(state){
             case STANDBY:
                 //System.out.println("You are a bold one");
@@ -269,6 +270,7 @@ public class Drives extends GenericSubsystem{
                 }
                 break;
             case ARMS:
+            	drivesPTOArms.set(true);
                 arms.armsDown();
                 if(arms.isDone()) {
                     toTeleop();
@@ -398,6 +400,9 @@ public class Drives extends GenericSubsystem{
 
 	//changes the state of the robot to what is given as a parameter
 	public void changeState(DriveState st){
+		if(state == DriveState.ARMS && st != DriveState.ARMS) {
+			drivesPTOArms.set(false);
+		}
 		state = st;
 	}
 
