@@ -8,22 +8,14 @@
 package frc.subsystem;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
-import frc.sensors.EncoderData;
 import frc.subsystem.Vision.directions;
 import frc.util.MotorGroup;
-
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SerialPort;
-import edu.wpi.first.wpilibj.Servo;
 
 /**
  * Add your docs here.
@@ -80,8 +72,6 @@ public class Drives extends GenericSubsystem{
 
     private double shiftingTime;
 
-    private boolean shifted;
-
     private double wantedSpeedRight;
 
     private double wantedSpeedLeft;
@@ -132,9 +122,8 @@ public class Drives extends GenericSubsystem{
         turnSpeed = 0;
       //  hatchPTO = new Solenoid(0)
         vision = new Vision();
-        state = state.STANDBY;
+        state = DriveState.STANDBY;
         shiftingTime = 0;
-        shifted = false;
         wantedSpeedRight = 0;
         wantedSpeedLeft = 0;
         shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID);
@@ -353,13 +342,11 @@ public class Drives extends GenericSubsystem{
     }
 
     public void lowShift(){
-        shifted = true;
         shiftingTime = System.currentTimeMillis();
         changeState(DriveState.SHIFT_LOW);
     }
 
     public void highShift(){
-        shifted = false;
         shiftingTime = System.currentTimeMillis();
         changeState(DriveState.SHIFT_HIGH);
     }

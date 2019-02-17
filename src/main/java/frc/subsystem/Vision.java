@@ -8,10 +8,6 @@
 
 package frc.subsystem;
 
-import java.util.OptionalInt;
-
-import javax.lang.model.util.ElementScanner6;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.IO;
 
@@ -29,8 +25,6 @@ public class Vision{
     private DigitalInput centerRightIR;
 
     private DigitalInput rightIR;
-
-    private Drives drives;
 
     private boolean hitLine, centerHit, rightHitFirst;
     

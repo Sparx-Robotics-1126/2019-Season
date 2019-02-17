@@ -8,7 +8,6 @@
 package frc.subsystem;
 
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.IO;
 
 /**
