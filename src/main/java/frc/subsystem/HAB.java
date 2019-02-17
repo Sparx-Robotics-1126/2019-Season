@@ -52,7 +52,7 @@ public class HAB extends GenericSubsystem {
 	}
 
 	public enum LeadScrewState {
-		STANDBY, UP, DOWN, HOME;
+		STANDBY, UP, DOWN, HOME, PRE_ARMS;
 	}
 
 	@Override
@@ -76,6 +76,13 @@ public class HAB extends GenericSubsystem {
 				state = LeadScrewState.STANDBY;
 			}
 			break;
+		case PRE_ARMS:
+			if(leadScrewEncRaw.getDistance() > -2.5) {
+				leadScrewMtr.set(-1);
+			} else {
+				leadScrewMtr.set(0);
+				state = LeadScrewState.STANDBY;
+			}
 		case HOME:
 			if (bottomSensor.get()) {
 				leadScrewMtr.set(0.3);
@@ -97,6 +104,10 @@ public class HAB extends GenericSubsystem {
 
 	public void ctrlUP() {
 		state = LeadScrewState.UP;
+	}
+	
+	public void ctrlPreArms() {
+		state = LeadScrewState.PRE_ARMS;
 	}
 
 	public void setHabSpeedLeft(double speed) {

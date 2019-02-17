@@ -109,6 +109,9 @@ public class TeleOP implements Controls {
 		if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_START)) {
 			hab.ctrlDown();
 		}
+		if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_BACK)) {
+			hab.ctrlPreArms();
+		}
 		if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X)) {
 			System.out.println("Button pressed");
 			hab.ctrlUP();
@@ -219,31 +222,36 @@ public class TeleOP implements Controls {
 		// for(boolean povs[]: povStates) {
 		// povs[1] = povs[0];
 		// }
-//		buttonStates[0][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_LEFT);
-//		buttonStates[1][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_MIDDLE);
-//		buttonStates[2][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_RIGHT);
+		// buttonStates[0][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK,
+		// CtrlMap.JOY_LEFT);
+		// buttonStates[1][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK,
+		// CtrlMap.JOY_MIDDLE);
+		// buttonStates[2][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK,
+		// CtrlMap.JOY_RIGHT);
 		// buttonStates[3][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK,
 		// CtrlMap.JOY_TRIGGER);
 		// buttonStates[4][0] = isPressedButton(CtrlMap.LEFTJOYSTICK2,
 		// CtrlMap.JOY_LEFT);
-//		buttonStates[5][0] = isPressedButton(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_MIDDLE);
+		// buttonStates[5][0] = isPressedButton(CtrlMap.LEFTJOYSTICK,
+		// CtrlMap.JOY_MIDDLE);
 		// buttonStates[6][0] = isPressedButton(CtrlMap.LEFTJOYSTICK,
 		// CtrlMap.JOY_RIGHT);
 		// buttonStates[7][0] = isPressedButton(CtrlMap.LEFTJOYSTICK,
 		// CtrlMap.JOY_TRIGGER);
 
-		 buttonStates[8][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_A);
-		 buttonStates[9][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B);
+		buttonStates[8][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_A);
+		buttonStates[9][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B);
 		buttonStates[10][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X);
 		buttonStates[11][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y);
 
 		buttonStates[12][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L1);
 		buttonStates[13][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1);
-		// buttonStates[14][0] = isPressedButton(CtrlMap.XBOXCONTROLLER,
-		// CtrlMap.XBOX_BACK);
+		buttonStates[14][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_BACK);
 		buttonStates[15][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_START);
-//		buttonStates[16][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L2);
-//		buttonStates[17][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R2);
+		// buttonStates[16][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER,
+		// CtrlMap.XBOX_L2);
+		// buttonStates[17][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER,
+		// CtrlMap.XBOX_R2);
 		// buttonStates[18][0] = isPressedButton(CtrlMap.XBOXCONTROLLER,
 		// CtrlMap.XBOX_L3);
 		// buttonStates[19][0] = isPressedButton(CtrlMap.XBOXCONTROLLER,
@@ -257,9 +265,9 @@ public class TeleOP implements Controls {
 		// povStates[5][0] = isPressedPOV(CtrlMap.LEFTJOYSTICK, CtrlMap.POV_RIGHT);
 		// povStates[6][0] = isPressedPOV(CtrlMap.LEFTJOYSTICK, CtrlMap.POV_DOWN);
 		// povStates[7][0] = isPressedPOV(CtrlMap.LEFTJOYSTICK, CtrlMap.POV_LEFT);
-//		povStates[8][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_UP);
-//		povStates[9][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_RIGHT);
-//		povStates[10][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_DOWN);
-//		povStates[11][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_LEFT);
+		// povStates[8][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_UP);
+		// povStates[9][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_RIGHT);
+		// povStates[10][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_DOWN);
+		// povStates[11][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_LEFT);
 	}
 }

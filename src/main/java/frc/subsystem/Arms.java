@@ -70,7 +70,7 @@ public class Arms {
 			leftMtrSpeed = -leftArmEnc.getRate();
 
 			if (leftMtrSpeed < wantedSpeed) {
-				wantedLeftMtrPwr -= 0.01; // gav
+				wantedLeftMtrPwr -= 0.02; // gav
 			} else if (leftMtrSpeed > wantedSpeed) {
 				wantedLeftMtrPwr += 0.01; // gav
 			}
@@ -87,7 +87,7 @@ public class Arms {
 			}
 			rightMtrSpeed = -rightArmEnc.getRate();
 			if (rightMtrSpeed < wantedSpeed) {
-				wantedRightMtrPwr += 0.01; // gav
+				wantedRightMtrPwr += 0.02; // gav
 			} else if (rightMtrSpeed > wantedSpeed) {
 				wantedRightMtrPwr -= 0.01; // gav
 			}
