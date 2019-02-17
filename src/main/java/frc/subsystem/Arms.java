@@ -18,8 +18,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
  */
 public class Arms {
 
-    final double wantedDegree = 1000; 
-    final double wantedSpeed = 10; //gav
+    final double wantedDegree = 17; 
+    final double wantedSpeed = 1; //gav
     double armOffset;
     double actualDegree = 0;
     double leftMtrSpeed;
@@ -39,15 +39,13 @@ public class Arms {
         this.leftMtrs = leftMtrs;
         rightArmEnc = rightEnc;
         leftArmEnc = leftEnc;
-        rightArmEnc.setDistancePerPulse(0.033860431);
-        leftArmEnc.setDistancePerPulse(0.033860431);
     }
 
     public void armsDown(){
         if(wantedDegree > actualDegree){
-            leftMtrSpeed = leftArmEnc.getRate();
-            rightMtrSpeed = rightArmEnc.getRate();
-            armOffset = Math.abs(rightArmEnc.getDistance() - leftArmEnc.getDistance());
+            leftMtrSpeed = -leftArmEnc.getRate();
+            rightMtrSpeed = -rightArmEnc.getRate();
+          
 
             if(leftMtrSpeed < wantedSpeed){
                 wantedLeftMtrPwr += 0.01; //gav
@@ -69,9 +67,12 @@ public class Arms {
             //         wantedLeftMtrPwr = 0.0;
             //     }
             // }
+            actualDegree = (-leftArmEnc.getDistance() + rightArmEnc.getDistance()) / 2;
         }
         rightMtrs.set(wantedRightMtrPwr);
         leftMtrs.set(wantedLeftMtrPwr);
+
+        
        // System.out.println("right power: " + wantedRightMtrPwr  + " right distance: " + rightArmEnc.getDistance() + " right speed " + rightArmEnc.getRate());
        // System.out.println("left power: " + wantedLeftMtrPwr  + " left distance: " + leftArmEnc.getDistance() + " left speed " + leftArmEnc.getRate());
     }

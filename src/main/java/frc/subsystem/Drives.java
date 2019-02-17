@@ -101,8 +101,8 @@ public class Drives extends GenericSubsystem{
         rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
         rawRight.setDistancePerPulse(0.033860431);
         rawLeft.setDistancePerPulse(0.033860431);
-        leftEncoder = new EncoderData(rawLeft, 0.033860431);
-        rightEncoder = new EncoderData(rawRight, 0.033860431);
+        // leftEncoder = new EncoderData(rawLeft, 0.033860431);
+        // rightEncoder = new EncoderData(rawRight, 0.033860431);
         // rightEncoder.reset();
         // leftEncoder.reset();
          leftMtrs.setInverted(true);
@@ -115,8 +115,11 @@ public class Drives extends GenericSubsystem{
         // moveSpeed = 0;
         // turnAngle = 0;
         // turnSpeed = 0;
-       // drivesPTO = new Solenoid(1);
+        drivesPTO = new Solenoid(1);
+        drivesPTO.set(true);
         arms = new Arms(rightMtrs, leftMtrs, rawRight, rawLeft);
+        state = DriveState.STANDBY;
+
     }
 
     public enum DriveState{
@@ -128,83 +131,100 @@ public class Drives extends GenericSubsystem{
         TURN_LEFT,
         SENSOR_LEFT,
         SENSOR_MID,
+        ARMS,
         SENSOR_RIGHT;
     }
 
     //does all the code for drives
     public void execute(){
-        //move(0.8, 150);
-        //turn(0.5, 90);
-        changeState(DriveState.STANDBY);
         switch(state){
-            case STANDBY:
+            case ARMS:
                 arms.armsDown();
                 break;
-            case TELEOP:
-                rightMtrs.set(speedRight);
-                leftMtrs.set(speedLeft);
+            case STANDBY:   
                 break;
-            case MOVE_FORWARD:
-                if(getDistance() > moveDist){
-                    rightMtrs.stopMotors();
-                    leftMtrs.stopMotors();
-                    changeState(DriveState.STANDBY);
-                }else{
-                    rightMtrs.set(speedRight);
-                    leftMtrs.set(speedLeft);
-                }
-                break;
-            case MOVE_BACKWARD:
-                if(getDistance() < moveDist){
-                    rightMtrs.stopMotors();
-                    leftMtrs.stopMotors();
-                    changeState(DriveState.STANDBY);
-                }else{
-                    rightMtrs.set(-speedRight);
-                    leftMtrs.set(-speedLeft);
-                }
-                break;
-            case TURN_RIGHT:
-                if(getAngle() > turnAngle){
-                    rightMtrs.stopMotors();
-                    leftMtrs.stopMotors();
-                    changeState(DriveState.STANDBY);
-                }else{
-                    rightMtrs.set(speedRight);
-                    leftMtrs.set(-speedLeft);
-                }
-                break;
-            case TURN_LEFT:
-                if(getAngle() < turnAngle){
-                    rightMtrs.stopMotors();
-                    leftMtrs.stopMotors();
-                    changeState(DriveState.STANDBY);
-                }else{
-                    rightMtrs.set(-speedRight);
-                    leftMtrs.set(speedLeft);
-                }
-                break;
-            case SENSOR_LEFT:
-                leftMtrs.stopMotors();
-                rightMtrs.set(0.4);
-                break;
-            case SENSOR_MID:
-                leftMtrs.set(0.4);
-                rightMtrs.set(0.4);
-                break;
-            case SENSOR_RIGHT:
-                leftMtrs.set(0.4);
-                rightMtrs.stopMotors();
-                break;
-
         }
-        // System.out.println("Right Encoder: " + leftEncoder.getDistance());
-        // System.out.println("Left Encoder: " + rightEncoder.getDistance());
+        //move(0.8, 150);
+        //turn(0.5, 90);
+        // changeState(DriveState.STANDBY);
+        // switch(state){
+        //     case STANDBY:
+        //         arms.armsDown();
+        //         break;
+        //     case TELEOP:
+        //         rightMtrs.set(speedRight);
+        //         leftMtrs.set(speedLeft);
+        //         break;
+        //     case MOVE_FORWARD:
+        //         if(getDistance() > moveDist){
+        //             rightMtrs.stopMotors();
+        //             leftMtrs.stopMotors();
+        //             changeState(DriveState.STANDBY);
+        //         }else{
+        //             rightMtrs.set(speedRight);
+        //             leftMtrs.set(speedLeft);
+        //         }
+        //         break;
+        //     case MOVE_BACKWARD:
+        //         if(getDistance() < moveDist){
+        //             rightMtrs.stopMotors();
+        //             leftMtrs.stopMotors();
+        //             changeState(DriveState.STANDBY);
+        //         }else{
+        //             rightMtrs.set(-speedRight);
+        //             leftMtrs.set(-speedLeft);
+        //         }
+        //         break;
+        //     case TURN_RIGHT:
+        //         if(getAngle() > turnAngle){
+        //             rightMtrs.stopMotors();
+        //             leftMtrs.stopMotors();
+        //             changeState(DriveState.STANDBY);
+        //         }else{
+        //             rightMtrs.set(speedRight);
+        //             leftMtrs.set(-speedLeft);
+        //         }
+        //         break;
+        //     case TURN_LEFT:
+        //         if(getAngle() < turnAngle){
+        //             rightMtrs.stopMotors();
+        //             leftMtrs.stopMotors();
+        //             changeState(DriveState.STANDBY);
+        //         }else{
+        //             rightMtrs.set(-speedRight);
+        //             leftMtrs.set(speedLeft);
+        //         }
+        //         break;
+        //     case SENSOR_LEFT:
+        //         leftMtrs.stopMotors();
+        //         rightMtrs.set(0.4);
+        //         break;
+        //     case SENSOR_MID:
+        //         leftMtrs.set(0.4);
+        //         rightMtrs.set(0.4);
+        //         break;
+        //     case SENSOR_RIGHT:
+        //         leftMtrs.set(0.4);
+        //         rightMtrs.stopMotors();
+        //         break;
+        //     case ARMS:
+                
+
+        // }
+        // // System.out.println("Right Encoder: " + leftEncoder.getDistance());
+        // // System.out.println("Left Encoder: " + rightEncoder.getDistance());
+        System.out.println("right enc: " + rawRight.getDistance() + " left enc: " + rawLeft.getDistance());
+     // System.out.println("left enc: " + rawLeft.getDistance());
+        System.out.println("left rate: " + rawLeft.getRate() + " right rate: " + rawRight.getRate());
     }
 
     //debugs all the possible problems in drives
     public void debug(){
 
+    }
+
+    public void helper(){
+        drivesPTO.set(true);
     }
 
     //checks if drives is done with its autonomous code
@@ -287,7 +307,7 @@ public class Drives extends GenericSubsystem{
     }
 
     //changes the state of the robot to what is given as a parameter
-    private void changeState(DriveState st){
+    public void changeState(DriveState st){
         state = st;
     }
 
@@ -307,6 +327,10 @@ public class Drives extends GenericSubsystem{
         }else{
             changeState(DriveState.STANDBY);
         }
+    }
+
+    public Arms getArms(){
+        return arms;
     }
     
 }

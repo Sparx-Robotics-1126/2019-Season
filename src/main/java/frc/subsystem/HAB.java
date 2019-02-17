@@ -41,8 +41,8 @@ public class HAB extends GenericSubsystem{
 
     @Override
     public void init(){
-        leadScrewMtr = new WPI_TalonSRX(4);
-        leadScrewEncRaw = new Encoder(24, 25);
+        leadScrewMtr = new WPI_TalonSRX(9);
+        leadScrewEncRaw = new Encoder(23, 22);
         leadScrewEncRaw.setDistancePerPulse(0.03103);
         leadScrewEncRaw.reset();
         bottomSensor = new DigitalInput(14);
@@ -55,7 +55,7 @@ public class HAB extends GenericSubsystem{
         DOWN,
         HOME;
     }
-
+    
     @Override
     public void execute(){
         switch(state){

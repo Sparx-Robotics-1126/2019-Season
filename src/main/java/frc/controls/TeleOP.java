@@ -81,10 +81,9 @@ public class TeleOP implements Controls{
 		// }else{
 		// 	drives.buttonB(false);
 		// }
-		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)){
-		// 	hab.ctrlDown();
-		// 	System.out.println("Y button pressed");
-		// }
+		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)){
+			drives.changeState(Drives.DriveState.ARMS);
+		}
 		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X)){
 		// 	hab.ctrlUP();
 		// 	System.out.println("X button pressed");
