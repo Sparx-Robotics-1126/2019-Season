@@ -36,10 +36,10 @@ public class Vision{
     
 	public Vision()
     {
-        leftIR = new DigitalInput(IO.leftFollowingSensor);
-        centerLeftIR = new DigitalInput(IO.centerLeftFollowingSensor);
-        centerRightIR = new DigitalInput(IO.centerRightFollowingSensor);
-        rightIR = new DigitalInput(IO.rightFollowingSensor);
+        leftIR = new DigitalInput(IO.VISION_LEFTFOLLOWINGSENSOR);
+        centerLeftIR = new DigitalInput(IO.VISION_CENTERLEFTFOLLOWINGSENSOR);
+        centerRightIR = new DigitalInput(IO.VISION_CENTERRIGHTFOLLOWINGSENSOR);
+        rightIR = new DigitalInput(IO.VISION_RIGHTFOLLOWINGSENSOR);
         direction  = directions.STANDBY;
     }
 

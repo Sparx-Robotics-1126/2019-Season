@@ -40,8 +40,8 @@ public class Hatch extends GenericSubsystem{
     }
 
     public void init(){
-        flipper = new Solenoid(IO.hatchSolenoid1);
-        shooter = new Solenoid(IO.hatchSolenoid2);
+        flipper = new Solenoid(IO.HATCH_SOLENOID_1);
+        shooter = new Solenoid(IO.HATCH_SOLENOID_2);
         flipperValue = false;
         shooterValue = false;
         state = HatchState.STANDBY;

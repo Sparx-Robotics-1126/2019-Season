@@ -35,10 +35,10 @@ public class RobotSystem extends Thread{
         hab.init();
         hatch = new Hatch();
         hatch.init();
-        teleop = new TeleOP(drives, hatch);
+        teleop = new TeleOP(drives, hab, hatch);
         currentState = RobotState.STANDBY;
         currentControl = teleop;
-        Compressor compress = new Compressor(IO.compressor);
+        Compressor compress = new Compressor(IO.ROBOT_COMPRESSOR);
         compress.setClosedLoopControl(true);
     }
 

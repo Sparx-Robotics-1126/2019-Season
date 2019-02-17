@@ -54,11 +54,8 @@ public class Drives extends GenericSubsystem{
 
 	private MotorGroup leftMtrs;
 
-    private Servo rightServo;
-
-    private Servo leftServo;
-
     private Solenoid shifter;
+    
 	private Arms arms;
 
 	//----------------------------------------Variable----------------------------------------
@@ -85,8 +82,6 @@ public class Drives extends GenericSubsystem{
 
     private boolean shifted;
 
-    private boolean servoEnabled;
-
     private double wantedSpeedRight;
 
     private double wantedSpeedLeft;
@@ -112,23 +107,21 @@ public class Drives extends GenericSubsystem{
 
     //initialized all the variable in drives
     public void init(){
-        rightMtr1 = new WPI_TalonSRX(IO.rightDriveCIM1);
-        rightMtr2 = new WPI_TalonSRX(IO.rightDriveCIM2);
-        rightMtr3 = new WPI_TalonSRX(IO.rightDriveCIM3);
-        leftMtr1 = new WPI_TalonSRX(IO.leftDriveCIM1);
-        leftMtr2 = new WPI_TalonSRX(IO.leftDriveCIM2);
-        leftMtr3 = new WPI_TalonSRX(IO.leftDriveCIM3);
+        rightMtr1 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_1);
+        rightMtr2 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_2);
+        rightMtr3 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_3);
+        leftMtr1 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_1);
+        leftMtr2 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_2);
+        leftMtr3 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_3);
         rightMtrs = new MotorGroup(rightMtr1, rightMtr2, rightMtr3);
         leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
-        rightEnc = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
-        leftEnc = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
+        rightEnc = new Encoder(IO.DRIVES_RIGHTENCODER_CH1, IO.DRIVES_RIGHTENCODER_CH2);
+        leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
         rightEnc.setDistancePerPulse(-0.07897476);
         leftEnc.setDistancePerPulse(0.07897476);
         rightMtrs.setInverted(true);
         gyro = new AHRS(SerialPort.Port.kUSB);
         gyro.reset();
-        rightServo = new Servo(0);
-        leftServo = new Servo(1);
         lastAngle = 0;
         speedLeft = 0;
         speedRight = 0;
@@ -142,10 +135,9 @@ public class Drives extends GenericSubsystem{
         state = state.STANDBY;
         shiftingTime = 0;
         shifted = false;
-        servoEnabled = false;
         wantedSpeedRight = 0;
         wantedSpeedLeft = 0;
-        shifter = new Solenoid(IO.shiftingSolenoid);
+        shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID);
         shiftingPosition = false;
         isMoving = false;
     }
@@ -289,7 +281,7 @@ public class Drives extends GenericSubsystem{
                 break;
             case ARMS:
                 arms.armsDown();
-                if(arms.isDone() {
+                if(arms.isDone()) {
                     toTeleop();
                 }
                 break;
@@ -372,12 +364,6 @@ public class Drives extends GenericSubsystem{
         changeState(DriveState.SHIFT_HIGH);
     }
 
-    private void enableServo(){
-        rightServo.set(1);
-        leftServo.set(1);
-        servoEnabled = true;
-    }
-
     //straightens the robot
     private void straightenForward(){
         if(getAngle() > ANGLE_OFF_BY){
@@ -446,5 +432,10 @@ public class Drives extends GenericSubsystem{
 
 	public Arms getArms(){
 		return arms;
+	}
+	@Override
+	public long sleepTime() {
+		// TODO Auto-generated method stub
+		return 20;
 	}
 }
