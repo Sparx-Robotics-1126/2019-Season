@@ -7,12 +7,10 @@
 
 package frc.subsystem;
 
-import edu.wpi.first.wpilibj.Encoder;
-import frc.robot.IO;
-import frc.util.MotorGroup;
-
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.Encoder;
+import frc.util.MotorGroup;
 /**
  * Add your docs here.
  */
