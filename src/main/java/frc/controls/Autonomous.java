@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.subsystem.Drives;
 import frc.subsystem.Hatch;
 
@@ -20,8 +21,12 @@ public class Autonomous implements Controls{
 	private int currentStep;
 	private double delayTimeStart;
 	private double delayTime;
+	
+	private Autos selectedAuto;
 
 	private Drives drives;
+	
+	private boolean firstRun;
 	private Hatch hatch;
 
 	public boolean runAuto;
@@ -169,7 +174,10 @@ public class Autonomous implements Controls{
 		autoSelector.addOption("Left side Hab 1 to front hatch", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT);
 		autoSelector.addOption("Left side Hab 1 to middle hatch", Autos.HAB_ONE_TO_LEFT_HATCH_MIDDLE);
 		autoSelector.addOption("Left side Hab 1 to back hatch", Autos.HAB_ONE_TO_LEFT_HATCH_BACK);
-		LiveWindow.add(autoSelector);
+		SmartDashboard.putData(autoSelector);
+		
+		selectedAuto = Autos.DO_NOTHING;
+		firstRun = true;
 	}
 
 	public void printCurrentAuto() {
@@ -214,50 +222,54 @@ public class Autonomous implements Controls{
 	}
 
 	public void setAuto(Autos auto) {
-		currentAuto.clear();
-		switch(auto) {
-		case HAB_ONE_TO_LEFT_HATCH_FRONT:
-			System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_FRONT");
-			addStep(AutoMethod.DRIVES_FORWARD, 180, 50);
-			addStep(AutoMethod.DRIVES_WAIT);
-			addStep(AutoMethod.DRIVES_FOLLOWLINE);
-			addStep(AutoMethod.DRIVES_WAIT);
-			addStep(AutoMethod.HATCH_SHOOTFLIP);
-			addStep(AutoMethod.AUTO_DELAY, 200);
-			addStep(AutoMethod.DRIVES_BACKWARD, 30, 50);
-			addStep(AutoMethod.AUTO_STOP);
-			break;
-		case HAB_ONE_TO_LEFT_HATCH_MIDDLE:
-			System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_MIDDLE");
-			addStep(AutoMethod.DRIVES_FORWARD, 216, 50);
-			addStep(AutoMethod.DRIVES_WAIT);
-			addStep(AutoMethod.DRIVES_FOLLOWLINE);
-			addStep(AutoMethod.DRIVES_WAIT);
-			addStep(AutoMethod.HATCH_SHOOTFLIP);
-			addStep(AutoMethod.AUTO_DELAY, 200);
-			addStep(AutoMethod.DRIVES_BACKWARD, 30, 50);
-			addStep(AutoMethod.AUTO_STOP);
-			break;
-		case HAB_ONE_TO_LEFT_HATCH_BACK:
-			System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_BACK");
-			addStep(AutoMethod.DRIVES_FORWARD, 252, 50);
-			addStep(AutoMethod.DRIVES_WAIT);
-			addStep(AutoMethod.DRIVES_FOLLOWLINE);
-			addStep(AutoMethod.DRIVES_WAIT);
-			addStep(AutoMethod.HATCH_SHOOTFLIP);
-			addStep(AutoMethod.AUTO_DELAY, 200);
-			addStep(AutoMethod.DRIVES_BACKWARD, 30, 50);
-			addStep(AutoMethod.AUTO_STOP);
-			break;
-		default: 
-			break;
+		firstRun = false;
+		if(auto != selectedAuto) {
+			currentAuto.clear();
+			switch(auto) {
+			case HAB_ONE_TO_LEFT_HATCH_FRONT:
+//				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_FRONT");
+				addStep(AutoMethod.DRIVES_FORWARD, 0.5, 180); //-
+				addStep(AutoMethod.DRIVES_WAIT);
+				addStep(AutoMethod.DRIVES_FOLLOWLINE);
+				addStep(AutoMethod.DRIVES_WAIT);
+//				addStep(AutoMethod.HATCH_SHOOTFLIP);
+//				addStep(AutoMethod.AUTO_DELAY, 0.2);
+//				addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
+				addStep(AutoMethod.AUTO_STOP);
+				break;
+			case HAB_ONE_TO_LEFT_HATCH_MIDDLE:
+				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_MIDDLE");
+				addStep(AutoMethod.DRIVES_FORWARD, 0.5, 216);
+				addStep(AutoMethod.DRIVES_WAIT);
+				addStep(AutoMethod.DRIVES_FOLLOWLINE);
+				addStep(AutoMethod.DRIVES_WAIT);
+				addStep(AutoMethod.HATCH_SHOOTFLIP);
+				addStep(AutoMethod.AUTO_DELAY, 0.2);
+				addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
+				addStep(AutoMethod.AUTO_STOP);
+				break;
+			case HAB_ONE_TO_LEFT_HATCH_BACK:
+				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_BACK");
+				addStep(AutoMethod.DRIVES_FORWARD, 0.5, 252);
+				addStep(AutoMethod.DRIVES_WAIT);
+				addStep(AutoMethod.DRIVES_FOLLOWLINE);
+				addStep(AutoMethod.DRIVES_WAIT);
+				addStep(AutoMethod.HATCH_SHOOTFLIP);
+				addStep(AutoMethod.AUTO_DELAY, 0.2);
+				addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
+				addStep(AutoMethod.AUTO_STOP);
+				break;
+			default: 
+				break;
+			}
 		}
 	}
 
 	@Override
 	public void execute() {
-		if(DriverStation.getInstance().isEnabled()) {
+		if(DriverStation.getInstance().isEnabled() && DriverStation.getInstance().isAutonomous() && !firstRun) {
 			runAuto();
+			System.out.println(currentAuto.toString());
 		} else {
 			setAuto(autoSelector.getSelected());
 		}
@@ -272,8 +284,10 @@ public class Autonomous implements Controls{
 			delayTime = -1;
 			currentStep++;
 		}
+		System.out.println(currentStep);
 		if(currentStep < currentAuto.size()) {
 			currentStepData = currentAutoParams.get(currentStep);
+			System.out.println(currentAuto.get(currentStep));
 			switch(currentAuto.get(currentStep)) {
 			case DRIVES_FORWARD:
 				drives.move(currentStepData[0], currentStepData[1]);
@@ -324,6 +338,7 @@ public class Autonomous implements Controls{
 				delayTime = currentStepData[0];
 				break;
 			case AUTO_STOP:
+//				drives.stopMotors();
 				currentStep = currentAuto.size() + 1;
 				break;
 			default:
@@ -332,7 +347,7 @@ public class Autonomous implements Controls{
 			}
 		}
 	}
-
+/*
 	public class AutoSendable extends SendableBase {
 
 		public String[] displayAuto() {
@@ -353,6 +368,6 @@ public class Autonomous implements Controls{
 //			builder.addDoubleArrayProperty("Autonomous parameters", getter, setter);
 		}
 		
-	}
+	}*/
 	
 }

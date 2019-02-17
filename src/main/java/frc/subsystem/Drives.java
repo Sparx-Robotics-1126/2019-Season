@@ -121,8 +121,8 @@ public class Drives extends GenericSubsystem{
         leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
         rightEnc = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
         leftEnc = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
-        rightEnc.setDistancePerPulse(-0.07897476);
-        leftEnc.setDistancePerPulse(0.07897476);
+        rightEnc.setDistancePerPulse(-0.02110013);
+        leftEnc.setDistancePerPulse(0.02110013);
         rightMtrs.setInverted(true);
         gyro = new AHRS(SerialPort.Port.kUSB);
         gyro.reset();
@@ -318,12 +318,11 @@ public class Drives extends GenericSubsystem{
                 
         }
       //  System.out.println("State: " + )
-        // System.out.println("Right Encoder: " + rightEnc.getdista;
-        // System.out.println("Left Encoder: " + leftEnc.getRaw());
-        // System.out.println("Gyro: " + getAngle());
+//         System.out.println("Right Encoder: " + rightEnc.getDistance());
+//         System.out.println("Left Encoder: " + leftEnc.getDistance());
+         System.out.println("Gyro: " + getAngle());
         //  System.out.println("left rate: " + leftEnc.getRate());
         //  System.out.println("right rate: " + rightEnc.getRate());
-         System.out.println("rate: " + getAverageRate());
         // System.out.println("GetDistance: " + getDistance());
         // System.out.println("RightMtr" + wantedSpeedRight + " LeftMtr: " + wantedSpeedLeft);
     }
@@ -453,6 +452,7 @@ public class Drives extends GenericSubsystem{
     }
 
     public void findLine(){
+    	isMoving = true;
         vision.reset();
         changeState(DriveState.FINDING_LINE);
     }
