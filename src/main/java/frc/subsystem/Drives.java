@@ -126,6 +126,7 @@ public class Drives extends GenericSubsystem {
 		drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID);
 		shiftingPosition = false;
 		isMoving = false;
+		arms = new Arms(rightMtrs, leftMtrs, rightEnc, leftEnc);
 	}
 
 	public enum DriveState {
@@ -274,8 +275,8 @@ public class Drives extends GenericSubsystem {
 
 		}
 		// System.out.println("State: " + )
-		// System.out.println("Right Encoder: " + rightEnc.getdista;
-		// System.out.println("Left Encoder: " + leftEnc.getRaw());
+		 System.out.println("Right Encoder: " + rightEnc.getDistance());
+		 System.out.println("Left Encoder: " + leftEnc.getDistance());
 		// System.out.println("Gyro: " + getAngle());
 		// System.out.println("left rate: " + leftEnc.getRate());
 		// System.out.println("right rate: " + rightEnc.getRate());
@@ -322,6 +323,11 @@ public class Drives extends GenericSubsystem {
 	public void joystickRight(double speed) {
 		speedRight = speed;
 		// rightMtrs.set(speed);
+	}
+	
+	public void toArms() {
+		arms.reset();
+		changeState(DriveState.ARMS);
 	}
 
 	public void lowShift() {

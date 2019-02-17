@@ -104,7 +104,7 @@ public class TeleOP implements Controls {
 			drives.toTeleop();
 		}
 		if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)) {
-			drives.changeState(Drives.DriveState.ARMS);
+			drives.toArms();
 		}
 		if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_START)) {
 			hab.ctrlDown();
