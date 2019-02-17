@@ -1,4 +1,4 @@
-    /*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
@@ -30,17 +30,17 @@ import edu.wpi.first.wpilibj.Servo;
  */
 public class Drives extends GenericSubsystem{
 
-    //----------------------------------------Motors/Sensors----------------------------------------
+	//----------------------------------------Motors/Sensors----------------------------------------
 
-    private WPI_TalonSRX rightMtr1;
+	private WPI_TalonSRX rightMtr1;
 
-    private WPI_TalonSRX rightMtr2;
+	private WPI_TalonSRX rightMtr2;
 
     private WPI_TalonSRX rightMtr3;
 
-    private WPI_TalonSRX leftMtr1;
+	private WPI_TalonSRX leftMtr1;
 
-    private WPI_TalonSRX leftMtr2;
+	private WPI_TalonSRX leftMtr2;
 
     private WPI_TalonSRX leftMtr3;
 
@@ -50,33 +50,34 @@ public class Drives extends GenericSubsystem{
 
     private AHRS gyro;
 
-    private MotorGroup rightMtrs;
+	private MotorGroup rightMtrs;
 
-    private MotorGroup leftMtrs;
+	private MotorGroup leftMtrs;
 
     private Servo rightServo;
 
     private Servo leftServo;
 
     private Solenoid shifter;
+	private Arms arms;
 
-    //----------------------------------------Variable----------------------------------------
+	//----------------------------------------Variable----------------------------------------
 
-    private double lastAngle;
+	private double lastAngle;
 
-    private double speedRight;
+	private double speedRight;
 
-    private double speedLeft;
+	private double speedLeft;
 
-    private double turnAngle;
+	private double turnAngle;
 
-    private double turnSpeed;
+	private double turnSpeed;
 
-    private double moveSpeed;
+	private double moveSpeed;
 
-    private double moveDist;
-
-    private DriveState state;
+	private double moveDist;
+	
+	private DriveState state;
 
     private Vision vision;
 
@@ -287,6 +288,10 @@ public class Drives extends GenericSubsystem{
                 }
                 break;
             case ARMS:
+                arms.armsDown();
+                if(arms.isDone() {
+                    toTeleop();
+                }
                 break;
             case FINDING_LINE: 
                 vision.getDirection();
@@ -307,25 +312,19 @@ public class Drives extends GenericSubsystem{
         // System.out.println("Gyro: " + getAngle());
         //  System.out.println("left rate: " + leftEnc.getRate());
         //  System.out.println("right rate: " + rightEnc.getRate());
-         System.out.println("rate: " + getAverageRate());
         // System.out.println("GetDistance: " + getDistance());
         // System.out.println("RightMtr" + wantedSpeedRight + " LeftMtr: " + wantedSpeedLeft);
+        System.out.println("rate: " + getAverageRate());
     }
+         
 
-    //debugs all the possible problems in drives
-    public void debug(){
 
-    }
 
     //checks if drives is done with its autonomous code
     public boolean isDone(){
         return !isMoving;
     }
 
-    //the time in milliseconds between each call to execute
-    public long sleepTime(){
-        return 20;
-    }
 
     //move the robot at a given speed and distance
     public void move(double speed, double dist){
@@ -341,6 +340,10 @@ public class Drives extends GenericSubsystem{
         }
     }
 
+	//debugs all the possible problems in drives
+	public void debug(){
+	    
+	}
     public void stopMotors(){
         isMoving = false;
         leftMtrs.stopMotors();
@@ -418,12 +421,12 @@ public class Drives extends GenericSubsystem{
             changeState(DriveState.TURN_LEFT);
         }
 
-    }
+	}
 
-    //changes the state of the robot to what is given as a parameter
-    private void changeState(DriveState st){
-        state = st;
-    }
+	//changes the state of the robot to what is given as a parameter
+	public void changeState(DriveState st){
+		state = st;
+	}
 
     //used by RobotSystem to put the robot in the teleop state
     public void toTeleop(){
@@ -441,4 +444,7 @@ public class Drives extends GenericSubsystem{
         changeState(DriveState.FINDING_LINE);
     }
 
+	public Arms getArms(){
+		return arms;
+	}
 }

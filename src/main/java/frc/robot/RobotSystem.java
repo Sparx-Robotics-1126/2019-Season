@@ -31,8 +31,8 @@ public class RobotSystem extends Thread{
     public RobotSystem(){
         drives = new Drives();
         drives.init();
-        // hab = new HAB();
-        // hab.init();
+        hab = new HAB();
+        hab.init();
         hatch = new Hatch();
         hatch.init();
         teleop = new TeleOP(drives, hatch);
@@ -62,7 +62,7 @@ public class RobotSystem extends Thread{
     
     public void init(){
         drives.start();
-        //hab.start();
+        hab.start();
         hatch.start();
     }
 
