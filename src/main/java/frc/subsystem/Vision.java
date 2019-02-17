@@ -8,76 +8,101 @@
 
 package frc.subsystem;
 
+import java.util.OptionalInt;
+
 import javax.lang.model.util.ElementScanner6;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.IO;
 
 /**
  * Add your docs here.
  */
-public class Vision extends GenericSubsystem {
+public class Vision{
 
     private directions direction;
 
     private DigitalInput leftIR;
     
-    private DigitalInput centerIR;
+    private DigitalInput centerLeftIR;
     
+    private DigitalInput centerRightIR;
+
     private DigitalInput rightIR;
 
-    int firstHit;
+    private Drives drives;
 
-    public Vision()
+    private boolean hitLine, centerHit, rightHitFirst;
+    
+	public Vision()
     {
-        super("Vision");
+        leftIR = new DigitalInput(IO.VISION_LEFTFOLLOWINGSENSOR);
+        centerLeftIR = new DigitalInput(IO.VISION_CENTERLEFTFOLLOWINGSENSOR);
+        centerRightIR = new DigitalInput(IO.VISION_CENTERRIGHTFOLLOWINGSENSOR);
+        rightIR = new DigitalInput(IO.VISION_RIGHTFOLLOWINGSENSOR);
+        direction  = directions.STANDBY;
     }
 
-    public void init()
+    public void reset()
     {
-        leftIR = new DigitalInput(0);
-        centerIR = new DigitalInput(1);
-        rightIR = new DigitalInput(2);
+        hitLine = false;
+		rightHitFirst = false;
+		centerHit = false;
+        System.out.println("Vision reset");
     }
 
     public enum directions
     {
         LEFT,
+        SLIGHTLEFT,
         STANDBY,
-        RIGHT    
+        FORWARD,
+        RIGHT,
+        SLIGHTRIGHT
     }
 
-    @Override
-    public void execute() 
-    {
-        if(leftIR.get() && !centerIR.get() && !rightIR.get() && firstHit == -1)
-            firstHit = 0;
-        else if(rightIR.get() && !centerIR.get() && !leftIR.get() && firstHit == -1)
-            firstHit = 2;
-        else if(!rightIR.get() && !centerIR.get() && !leftIR.get())
-            firstHit = -1;
-
-        if(firstHit == 0)
-            direction = directions.LEFT;
-        else if(firstHit == 2)
+    public directions getDirection(){
+        boolean left = !leftIR.get();
+		boolean right = !rightIR.get();
+        boolean centerLeft = !centerLeftIR.get();
+		boolean centerRight = !centerRightIR.get();
+		
+		//If we've hit right turn right
+		if(right){
             direction = directions.RIGHT;
-        else
-            direction = directions.STANDBY;
-        System.out.println(direction);
+            hitLine = true;
+			rightHitFirst = true;
+			
+		//If we've hit left turn left
+        }else if(left){
+			direction = directions.LEFT;
+            hitLine = true;
+			rightHitFirst = false;
+		}
+		
+		//We'ver hit line on side now we turn until center line hit.
+        if(hitLine && !centerHit){
+			//Waiting for the middle to be found
+			if((rightHitFirst && centerLeft) || (!rightHitFirst && centerRight)){
+				centerHit = true;
+			}
+        }else{
+			//Still Searching for line
+			direction = directions.FORWARD;
+		}
+		
+		//We've found line now we must stay on it
+		if(hitLine && centerHit){
+			if(centerLeft){
+				direction = directions.SLIGHTLEFT;
+			}else{
+				direction = directions.SLIGHTRIGHT;
+			}	
+		}
+        return direction;
     }
 
-    @Override
-    public void debug() {
-
+    public boolean triggered(){
+        return hitLine;
     }
-
-    @Override
-    public boolean isDone() {
-        return false;
-    }
-
-    @Override
-    public long sleepTime() {
-        return 0;
-    }
-
 }

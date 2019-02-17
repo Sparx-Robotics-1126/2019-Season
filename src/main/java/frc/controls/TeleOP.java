@@ -10,6 +10,7 @@ package frc.controls;
 import edu.wpi.first.wpilibj.Joystick;
 import frc.subsystem.Drives;
 import frc.subsystem.HAB;
+import frc.subsystem.Hatch;
 
 /**
  * Add your docs here.
@@ -21,6 +22,8 @@ public class TeleOP implements Controls{
 	private Drives drives;
 
 	private HAB hab;
+	
+	private Hatch hatch;
 
 	private boolean[][] buttonStates =
 		{{false, false}, //LEFTJOY_LEFT
@@ -56,13 +59,14 @@ public class TeleOP implements Controls{
 				{false, false},  //XBOX_UP
 				{false, false},  //XBOX_RIGHT
 				{false, false},  //XBOX_DOWN
-				{false, false}};  //XBOX_LEFT
-
-	public TeleOP(Drives drives, HAB hab){
+                {false, false}};  //XBOX_LEFT
+                
+    public TeleOP(Drives drives, HAB hab, Hatch hatch){
 		this.drives = drives;
 		this.hab = hab;
-		joysticks = new Joystick[] {new Joystick(CtrlMap.RIGHTJOYSTICK), new Joystick(CtrlMap.LEFTJOYSTICK), new Joystick(CtrlMap.XBOXCONTROLLER)};
-	}
+		this.hatch = hatch;
+        joysticks = new Joystick[] {new Joystick(CtrlMap.RIGHTJOYSTICK), new Joystick(CtrlMap.LEFTJOYSTICK), new Joystick(CtrlMap.XBOXCONTROLLER)};
+    }
 
 	@Override
 	public void execute(){
@@ -77,11 +81,19 @@ public class TeleOP implements Controls{
 		} else {
 			hab.setHabSpeedLeft(0);
 		}
-		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)){
-		// 	drives.buttonB(true);
-		// }else{
-		// 	drives.buttonB(false);
-		// }
+		if(isRisingEdgeButton(13)){
+			hatch.flipperButton();
+		}else if(isRisingEdgeButton(12)){
+			hatch.shooterButton();
+		}else if(isFallingEdgeButton(13) || isFallingEdgeButton(12)){
+			hatch.homeButton();
+		}
+		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_A)){
+			drives.findLine();
+		}
+		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)){
+			drives.toTeleop();
+		}
 		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)){
 			drives.changeState(Drives.DriveState.ARMS);
 		}

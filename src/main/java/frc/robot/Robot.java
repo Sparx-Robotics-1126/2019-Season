@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Robot extends TimedRobot {
   private RobotSystem system;
 
+
   /**
    * This function is run when the robot is first started up and should be
    * used for any initialization code.
@@ -30,12 +31,13 @@ public class Robot extends TimedRobot {
     system = new RobotSystem();
     system.init();
     system.start();
+  //  CameraServer.getInstance().startAutomaticCapture();
     System.out.println("***INIT ROBOT COMPLETE***");
   }
   
   public void teleopInit() {
-
-	  system.teleop();
+    system.resetVision();
+    system.teleop();
   }
   
   /**
