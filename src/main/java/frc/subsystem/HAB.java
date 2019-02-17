@@ -5,7 +5,6 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-
 package frc.subsystem;
 
 import frc.robot.IO;
@@ -13,13 +12,12 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.DigitalInput;
 
-
 /**
  * Add your docs here.
  */
-public class HAB extends GenericSubsystem{
+public class HAB extends GenericSubsystem {
 
-	//----------------------------------------Motors/Sensors----------------------------------------
+	// ----------------------------------------Motors/Sensors----------------------------------------
 
 	private WPI_TalonSRX leadScrewMtr;
 	private Encoder leadScrewEncRaw;
@@ -28,22 +26,19 @@ public class HAB extends GenericSubsystem{
 	private WPI_TalonSRX habLeft;
 	private WPI_TalonSRX habRight;
 
-	//----------------------------------------Variables---------------------------------------------
+	// ----------------------------------------Variables---------------------------------------------
 
 	private double wantedSpeedLeft;
 	private double wantedSpeedRight;
 
+	// ----------------------------------------Constants---------------------------------------------
 
-	//----------------------------------------Constants---------------------------------------------
-
-
-
-	public HAB(){
+	public HAB() {
 		super("Hab");
 	}
 
 	@Override
-	public void init(){
+	public void init() {
 		leadScrewMtr = new WPI_TalonSRX(IO.HAB_LEADSCREWMOTOR);
 		leadScrewEncRaw = new Encoder(IO.HAB_LEADSCREWENCODER_CH1, IO.HAB_LEADSCREWENCODER_CH2);
 		leadScrewEncRaw.setDistancePerPulse(0.0006227134739628);
@@ -52,42 +47,39 @@ public class HAB extends GenericSubsystem{
 		habRight = new WPI_TalonSRX(IO.HAB_RIGHTMOTOR);
 		wantedSpeedLeft = 0;
 		wantedSpeedRight = 0;
-		//        bottomSensor = new DigitalInput(14);
+		// bottomSensor = new DigitalInput(14);
 		state = LeadScrewState.STANDBY;
 	}
 
-	public enum LeadScrewState{
-		STANDBY,
-		UP,
-		DOWN,
-		HOME;
+	public enum LeadScrewState {
+		STANDBY, UP, DOWN, HOME;
 	}
 
 	@Override
-	public void execute(){
-		switch(state){
+	public void execute() {
+		switch (state) {
 		case STANDBY:
 			break;
 		case UP:
-			if(leadScrewEncRaw.getDistance() < 0){
+			if (leadScrewEncRaw.getDistance() < 0) {
 				leadScrewMtr.set(0.75);
-			}else{
+			} else {
 				leadScrewMtr.set(0.0);
 				state = LeadScrewState.STANDBY;
 			}
 			break;
 		case DOWN:
-			if(leadScrewEncRaw.getDistance() > -21){ 
-				leadScrewMtr.set(-1); 
-			}else{
+			if (leadScrewEncRaw.getDistance() > -21) {
+				leadScrewMtr.set(-1);
+			} else {
 				leadScrewMtr.set(0.0);
 				state = LeadScrewState.STANDBY;
 			}
 			break;
 		case HOME:
-			if(bottomSensor.get()){
-				leadScrewMtr.set(0.3); 
-			}else{
+			if (bottomSensor.get()) {
+				leadScrewMtr.set(0.3);
+			} else {
 				leadScrewMtr.set(0.0);
 				leadScrewEncRaw.reset();
 				state = LeadScrewState.STANDBY;
@@ -99,11 +91,11 @@ public class HAB extends GenericSubsystem{
 		System.out.println("Lead screw: " + leadScrewEncRaw.getDistance());
 	}
 
-	public void ctrlDown(){
+	public void ctrlDown() {
 		state = LeadScrewState.DOWN;
 	}
 
-	public void ctrlUP(){
+	public void ctrlUP() {
 		state = LeadScrewState.UP;
 	}
 
@@ -116,17 +108,17 @@ public class HAB extends GenericSubsystem{
 	}
 
 	@Override
-	public void debug(){
+	public void debug() {
 
 	}
 
 	@Override
-	public boolean isDone(){
+	public boolean isDone() {
 		return false;
 	}
 
 	@Override
-	public long sleepTime(){
+	public long sleepTime() {
 		return 20;
 	}
 

@@ -14,89 +14,81 @@ import frc.robot.IO;
 /**
  * Add your docs here.
  */
-public class Vision{
+public class Vision {
 
-    private directions direction;
+	private directions direction;
 
-    private DigitalInput leftIR;
-    
-    private DigitalInput centerLeftIR;
-    
-    private DigitalInput centerRightIR;
+	private DigitalInput leftIR;
 
-    private DigitalInput rightIR;
+	private DigitalInput centerLeftIR;
 
-    private boolean hitLine, centerHit, rightHitFirst;
-    
-	public Vision()
-    {
-        leftIR = new DigitalInput(IO.VISION_LEFTFOLLOWINGSENSOR);
-        centerLeftIR = new DigitalInput(IO.VISION_CENTERLEFTFOLLOWINGSENSOR);
-        centerRightIR = new DigitalInput(IO.VISION_CENTERRIGHTFOLLOWINGSENSOR);
-        rightIR = new DigitalInput(IO.VISION_RIGHTFOLLOWINGSENSOR);
-        direction  = directions.STANDBY;
-    }
+	private DigitalInput centerRightIR;
 
-    public void reset()
-    {
-        hitLine = false;
+	private DigitalInput rightIR;
+
+	private boolean hitLine, centerHit, rightHitFirst;
+
+	public Vision() {
+		leftIR = new DigitalInput(IO.VISION_LEFTFOLLOWINGSENSOR);
+		centerLeftIR = new DigitalInput(IO.VISION_CENTERLEFTFOLLOWINGSENSOR);
+		centerRightIR = new DigitalInput(IO.VISION_CENTERRIGHTFOLLOWINGSENSOR);
+		rightIR = new DigitalInput(IO.VISION_RIGHTFOLLOWINGSENSOR);
+		direction = directions.STANDBY;
+	}
+
+	public void reset() {
+		hitLine = false;
 		rightHitFirst = false;
 		centerHit = false;
-        System.out.println("Vision reset");
-    }
+		System.out.println("Vision reset");
+	}
 
-    public enum directions
-    {
-        LEFT,
-        SLIGHTLEFT,
-        STANDBY,
-        FORWARD,
-        RIGHT,
-        SLIGHTRIGHT
-    }
+	public enum directions {
+		LEFT, SLIGHTLEFT, STANDBY, FORWARD, RIGHT, SLIGHTRIGHT
+	}
 
-    public directions getDirection(){
-        boolean left = !leftIR.get();
+	public directions getDirection() {
+		boolean left = !leftIR.get();
 		boolean right = !rightIR.get();
-        boolean centerLeft = !centerLeftIR.get();
+		boolean centerLeft = !centerLeftIR.get();
 		boolean centerRight = !centerRightIR.get();
-		
-		//If we've hit right turn right
-		if(right){
-            direction = directions.RIGHT;
-            hitLine = true;
+
+		// If we've hit right turn right
+		if (right) {
+			direction = directions.RIGHT;
+			hitLine = true;
 			rightHitFirst = true;
-			
-		//If we've hit left turn left
-        }else if(left){
+
+			// If we've hit left turn left
+		} else if (left) {
 			direction = directions.LEFT;
-            hitLine = true;
+			hitLine = true;
 			rightHitFirst = false;
 		}
-		
-		//We'ver hit line on side now we turn until center line hit.
-        if(hitLine && !centerHit){
-			//Waiting for the middle to be found
-			if((rightHitFirst && centerLeft) || (!rightHitFirst && centerRight)){
+
+		// We'ver hit line on side now we turn until center line hit.
+		if (hitLine && !centerHit) {
+			// Waiting for the middle to be found
+			if ((rightHitFirst && centerLeft) || (!rightHitFirst && centerRight)) {
 				centerHit = true;
 			}
-        }else{
-			//Still Searching for line
+		} else {
+			// Still Searching for line
 			direction = directions.FORWARD;
 		}
-		
-		//We've found line now we must stay on it
-		if(hitLine && centerHit){
-			if(centerLeft){
-				direction = directions.SLIGHTLEFT;
-			}else{
-				direction = directions.SLIGHTRIGHT;
-			}	
-		}
-        return direction;
-    }
 
-    public boolean triggered(){
-        return hitLine;
-    }
+		// We've found line now we must stay on it
+		if (hitLine && centerHit) {
+			if (centerLeft) {
+				direction = directions.SLIGHTLEFT;
+			} else {
+				direction = directions.SLIGHTRIGHT;
+			}
+		}
+		return direction;
+	}
+
+	public boolean triggered() {
+		return hitLine;
+	}
 }

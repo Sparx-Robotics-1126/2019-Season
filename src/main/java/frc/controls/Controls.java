@@ -11,5 +11,5 @@ package frc.controls;
  * Add your docs here.
  */
 public interface Controls {
-    public abstract void execute();
+	public abstract void execute();
 }
