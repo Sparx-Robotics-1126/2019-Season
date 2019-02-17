@@ -59,6 +59,22 @@ public class MotorGroup extends SpeedControllerGroup{
 	public int getMtrCount() {
 		return speedControllers.length;
     }
+	
+	public double getCurrent() {
+		double avg = 0;
+		for(SpeedController spd: speedControllers) {
+			avg += ((WPI_TalonSRX)spd).getOutputCurrent();
+		}
+		return avg / speedControllers.length;
+	}
+	
+	public double getVoltage() {
+		double avg = 0;
+		for(SpeedController spd: speedControllers) {
+			avg += ((WPI_TalonSRX)spd).getMotorOutputVoltage();
+		}
+		return avg / speedControllers.length;
+	}
     
     /**
 	 * Sets the mode of operation during neutral throttle output for each speedController that is a WPI_TalonSRX 

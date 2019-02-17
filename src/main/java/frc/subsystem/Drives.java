@@ -224,9 +224,17 @@ public class Drives extends GenericSubsystem {
 				leftMtrs.set(0.3);
 				rightMtrs.set(0.3);
 			} else if (st == directions.SLIGHTLEFT) {
+				System.out.println("Left Motors current: " + leftMtrs.getCurrent());
+				System.out.println("Left Motors voltage: " + leftMtrs.getVoltage());
+				System.out.println("Right Motors current: " + rightMtrs.getCurrent());
+				System.out.println("Right Motors voltage: " + rightMtrs.getVoltage());
 				leftMtrs.set(0.00);
 				rightMtrs.set(0.30);
 			} else if (st == directions.SLIGHTRIGHT) {
+				System.out.println("Left Motors current: " + leftMtrs.getCurrent());
+				System.out.println("Left Motors voltage: " + leftMtrs.getVoltage());
+				System.out.println("Right Motors current: " + rightMtrs.getCurrent());
+				System.out.println("Right Motors voltage: " + rightMtrs.getVoltage());
 				leftMtrs.set(0.30);
 				rightMtrs.set(0.10);
 			} else if (st == directions.STANDBY) {
