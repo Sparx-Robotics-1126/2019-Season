@@ -39,7 +39,7 @@ public class Drives extends GenericSubsystem{
     private WPI_TalonSRX leftMtr2;
 
     //private WPI_TalonSRX leftMtr3;
-
+    
     private Encoder rawRight;
 
     private Encoder rawLeft;
@@ -59,7 +59,7 @@ public class Drives extends GenericSubsystem{
     private CameraServer delete;
 
     private Arms arms;
-
+    
     //----------------------------------------Variable----------------------------------------
 
     private double lastAngle;
@@ -77,7 +77,7 @@ public class Drives extends GenericSubsystem{
     private double moveDist;
 
     private DriveState state;
-
+    
     //----------------------------------------Constants----------------------------------------
 
     private final double ANGLE_OFF_BY = .1;
@@ -134,6 +134,8 @@ public class Drives extends GenericSubsystem{
         ARMS,
         SENSOR_RIGHT;
     }
+    
+   
 
     //does all the code for drives
     public void execute(){
@@ -213,9 +215,9 @@ public class Drives extends GenericSubsystem{
         // }
         // // System.out.println("Right Encoder: " + leftEncoder.getDistance());
         // // System.out.println("Left Encoder: " + rightEncoder.getDistance());
-        System.out.println("right enc: " + rawRight.getDistance() + " left enc: " + rawLeft.getDistance());
-     // System.out.println("left enc: " + rawLeft.getDistance());
-        System.out.println("left rate: " + rawLeft.getRate() + " right rate: " + rawRight.getRate());
+//        System.out.println("right enc: " + rawRight.getDistance() + " left enc: " + rawLeft.getDistance());
+//      System.out.println("left enc: " + rawLeft.getDistance());
+//        System.out.println("left rate: " + rawLeft.getRate() + " right rate: " + rawRight.getRate());
     }
 
     //debugs all the possible problems in drives

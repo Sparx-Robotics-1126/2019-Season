@@ -19,96 +19,115 @@ import edu.wpi.first.wpilibj.DigitalInput;
  */
 public class HAB extends GenericSubsystem{
 
-    //----------------------------------------Motors/Sensors----------------------------------------
+	//----------------------------------------Motors/Sensors----------------------------------------
 
-    private WPI_TalonSRX leadScrewMtr;
-    private Encoder leadScrewEncRaw;
-    private LeadScrewState state;
-    private DigitalInput bottomSensor;
+	private WPI_TalonSRX leadScrewMtr;
+	private Encoder leadScrewEncRaw;
+	private LeadScrewState state;
+	private DigitalInput bottomSensor;
+	private WPI_TalonSRX habLeft;
+	private WPI_TalonSRX habRight;
 
-    //----------------------------------------Variables---------------------------------------------
+	//----------------------------------------Variables---------------------------------------------
+
+	private double wantedSpeedLeft;
+	private double wantedSpeedRight;
+
+
+	//----------------------------------------Constants---------------------------------------------
 
 
 
+	public HAB(){
+		super("Hab");
+	}
 
-    //----------------------------------------Constants---------------------------------------------
+	@Override
+	public void init(){
+		leadScrewMtr = new WPI_TalonSRX(4);
+		leadScrewEncRaw = new Encoder(24, 25);
+		leadScrewEncRaw.setDistancePerPulse(0.0006227134739628);
+		leadScrewEncRaw.reset();
+		habLeft = new WPI_TalonSRX(6);
+		habRight = new WPI_TalonSRX(7);
+		wantedSpeedLeft = 0;
+		wantedSpeedRight = 0;
+		//        bottomSensor = new DigitalInput(14);
+		state = LeadScrewState.STANDBY;
+	}
 
+	public enum LeadScrewState{
+		STANDBY,
+		UP,
+		DOWN,
+		HOME;
+	}
 
+	@Override
+	public void execute(){
+		switch(state){
+		case STANDBY:
+			break;
+		case UP:
+			if(leadScrewEncRaw.getDistance() < 0){
+				leadScrewMtr.set(0.75);
+			}else{
+				leadScrewMtr.set(0.0);
+				state = LeadScrewState.STANDBY;
+			}
+			break;
+		case DOWN:
+			if(leadScrewEncRaw.getDistance() > -21){ 
+				leadScrewMtr.set(-1); 
+			}else{
+				leadScrewMtr.set(0.0);
+				state = LeadScrewState.STANDBY;
+			}
+			break;
+		case HOME:
+			if(bottomSensor.get()){
+				leadScrewMtr.set(0.3); 
+			}else{
+				leadScrewMtr.set(0.0);
+				leadScrewEncRaw.reset();
+				state = LeadScrewState.STANDBY;
+			}
+			break;
+		}
+		habLeft.set(wantedSpeedLeft);
+		habRight.set(wantedSpeedRight);
+		System.out.println("Lead screw: " + leadScrewEncRaw.getDistance());
+	}
 
-    public HAB(){
-        super("Hab");
-    }
+	public void ctrlDown(){
+		state = LeadScrewState.DOWN;
+	}
 
-    @Override
-    public void init(){
-        leadScrewMtr = new WPI_TalonSRX(9);
-        leadScrewEncRaw = new Encoder(23, 22);
-        leadScrewEncRaw.setDistancePerPulse(0.03103);
-        leadScrewEncRaw.reset();
-        bottomSensor = new DigitalInput(14);
-        state = LeadScrewState.HOME;
-    }
-   
-    public enum LeadScrewState{
-        STANDBY,
-        UP,
-        DOWN,
-        HOME;
-    }
-    
-    @Override
-    public void execute(){
-        switch(state){
-            case STANDBY:
-                break;
-            case UP:
-                if(leadScrewEncRaw.getDistance() > 0){
-                    leadScrewMtr.set(0.3);
-                }else{
-                    leadScrewMtr.set(0.0);
-                }
-                break;
-            case DOWN:
-                if(leadScrewEncRaw.getDistance()< 24){ //gav
-                    leadScrewMtr.set(-0.3); //gav
-                }else{
-                    leadScrewMtr.set(0.0);
-                }
-                break;
-            case HOME:
-                if(bottomSensor.get()){
-                    leadScrewMtr.set(0.3); 
-                }else{
-                    leadScrewMtr.set(0.0);
-                    leadScrewEncRaw.reset();
-                    state = LeadScrewState.STANDBY;
-                }
-                break;
-        }
+	public void ctrlUP(){
+		state = LeadScrewState.UP;
+	}
 
-    }
+	public void setHabSpeedLeft(double speed) {
+		wantedSpeedLeft = speed;
+	}
 
-    public void ctrlDown(){
-        state = LeadScrewState.DOWN;
-    }
+	public void setHabSpeedRight(double speed) {
+		wantedSpeedRight = speed;
+	}
 
-    public void ctrlUP(){
-        state = LeadScrewState.UP;
-    }
+	@Override
+	public void debug(){
 
-    @Override
-    public void debug(){
+	}
 
-    }
- 
-    @Override
-    public boolean isDone(){
-        return false;
-    }
-  
-    @Override
-    public long sleepTime(){
-        return 20;
-    }
+	@Override
+	public boolean isDone(){
+		return false;
+	}
+
+	@Override
+	public long sleepTime(){
+		return 20;
+	}
 
 }
