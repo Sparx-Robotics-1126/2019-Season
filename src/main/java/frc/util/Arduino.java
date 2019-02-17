@@ -24,36 +24,76 @@ public class Arduino {
     midDist = Double.MAX_VALUE;
   }
 
-  private void updateDistances()
-  {
-    if(!waiting)
-    {
-      byte[] buffer = {42};
-      arduino.write(buffer, 1);
-      waiting = true;
-    }
-    else
-    {
-      if(arduino.getBytesReceived() >= 13)
-      {
-        String temp;
-        temp = arduino.readString();
-        if(temp.substring(0, 6).equals("XX.XXX"))
-          edgeDist = Double.MAX_VALUE;
-        else
-          edgeDist = Double.parseDouble(temp.substring(0, 6));
-        if(temp.substring(7, 13).equals("XX.XXX"))
-          edgeDist = Double.MAX_VALUE;
-        else
-          midDist = Double.parseDouble(temp.substring(7, 13));
-        waiting = false;
-      }
-    }
+public void reset()
+{
+  byte[] buffer = {'R'};
+  arduino.write(buffer, 1);
+}
+
+  public void updateDistances()
+       {
+        byte[] buffer = {42};
+        arduino.write(buffer, 1);
+        out += arduino.readString();
+        if(out.indexOf("Arduino Starting") != -1)
+          out = "";
+        int pos = -1;
+        if(out.length() >= 13)
+        {
+          for(int i = out.length() - 7; i >= 6; i--)
+          {
+            if(out.charAt(i) == '-')
+            {
+              pos = i;
+            }
+          }
+          if(pos != -1)
+          {
+            if(out.substring(pos - 6, pos).equals("XX.XXX"))
+              midDist = Double.MAX_VALUE;
+            else
+              midDist = Double.parseDouble(out.substring(pos - 6, pos));
+            if(out.substring(pos + 1, pos + 7).equals("XX.XXX"))
+              edgeDist = Double.MAX_VALUE;
+            else
+              edgeDist = Double.parseDouble(out.substring(pos + 1, pos + 7));  
+          out = out.substring(pos + 7);
+          }
+        }
+        
+
+
+    // System.out.println("here 1");
+    // if(!waiting)
+    // {
+    //   System.out.println("here 2");
+    //   byte[] buffer = {42};
+    //   arduino.write(buffer, 1);
+    //   waiting = true;
+    // }
+    // else
+    // {
+    //   if(arduino.getBytesReceived() >= 13)
+    //   {
+    //     System.out.println("here 3");
+    //     String temp;
+    //     temp = arduino.readString();
+    //     System.out.println(temp);
+        // if(temp.substring(0, 6).equals("XX.XXX"))
+        //   edgeDist = Double.MAX_VALUE;
+        // else
+        //   edgeDist = Double.parseDouble(temp.substring(0, 6));
+        // if(temp.substring(7, 13).equals("XX.XXX"))
+        //   edgeDist = Double.MAX_VALUE;
+        // else
+        //   midDist = Double.parseDouble(temp.substring(7, 13));
+        // waiting = false;
+      
+    
   }
 
   public double getEdgeDist()
   {
-    updateDistances();
     double toReturn = edgeDist;
     edgeDist = -1.0;
     return toReturn;
@@ -61,14 +101,13 @@ public class Arduino {
 
   public double getmidDist()
   {
-    updateDistances();
     double toReturn = midDist;
     midDist = -1.0;
     return toReturn;
   }
   
 
-  /*
+  
   public double getDistance() {
     double distance = -1.0;
     String temp;
@@ -97,5 +136,5 @@ public class Arduino {
     }
     return distance;
   }
-  */
+  
 }

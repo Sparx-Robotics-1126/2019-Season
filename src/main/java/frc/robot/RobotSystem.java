@@ -13,7 +13,7 @@ import frc.subsystem.Drives;
 import frc.subsystem.HAB;
 import frc.subsystem.Hatch;
 import frc.subsystem.Vision;
-import edu.wpi.first.wpilibj.Compressor;
+//import edu.wpi.first.wpilibj.Compressor;
 
 /**
  * Add your docs here.
@@ -30,19 +30,17 @@ public class RobotSystem extends Thread{
     
 
     public RobotSystem(){
-        //drives = new Drives();
-        //drives.init();
+        drives = new Drives();
+        drives.init();
         // hab = new HAB();
         // hab.init();
-        vision = new Vision();
-        vision.init();
-        hatch = new Hatch();
-        hatch.init();
-        teleop = new TeleOP(drives, hatch);
+        // hatch = new Hatch();
+      // hatch.init();
+        teleop = new TeleOP(drives);
         currentState = RobotState.STANDBY;
         currentControl = teleop;
-        Compressor compress = new Compressor(IO.compressor);
-        compress.setClosedLoopControl(true);
+     //  Compressor compress = new Compressor(IO.compressor);
+       // compress.setClosedLoopControl(true);
     }
 
     
@@ -60,14 +58,13 @@ public class RobotSystem extends Thread{
     public void teleop() {
     	currentControl = teleop;
         currentState = RobotState.TELE;
-        //drives.toTeleop();
+        drives.toTeleop();
     }
     
     public void init(){
-        vision.start();
-        //drives.start();
+        drives.start();
         //hab.start();
-        hatch.start();
+    //    hatch.start();
     }
 
     @Override
@@ -78,7 +75,7 @@ public class RobotSystem extends Thread{
 					break;
 				case AUTO:
 				case TELE:
-					currentControl.execute();
+					 currentControl.execute();
 			}
 			
 			try {

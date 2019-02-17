@@ -63,9 +63,8 @@ public class TeleOP implements Controls{
 				{false, false},  //XBOX_DOWN
                 {false, false}};  //XBOX_LEFT
                 
-    public TeleOP(Drives drives, Hatch hatch){
+    public TeleOP(Drives drives){
 		this.drives = drives;
-		this.hatch = hatch;
         joysticks = new Joystick[] {new Joystick(CtrlMap.RIGHTJOYSTICK), new Joystick(CtrlMap.LEFTJOYSTICK), new Joystick(CtrlMap.XBOXCONTROLLER)};
     }
 
@@ -102,15 +101,15 @@ public class TeleOP implements Controls{
 		}else{
 			drives.joystickRight(0);
 		}
-		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1)){
-			hatch.flipperButton();
-		}
-		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L1)){
-			hatch.shooterButton();
-		}
-		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)){
-			hatch.homeButton();
-		}
+		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1)){
+		// 	hatch.flipperButton();
+		// }
+		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L1)){
+		// 	hatch.shooterButton();
+		// }
+		// if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)){
+		// 	hatch.homeButton();
+		// }
 		if(isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_A)){
 			drives.findLine();
 		}

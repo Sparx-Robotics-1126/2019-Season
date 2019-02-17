@@ -8,11 +8,8 @@
 
 package frc.subsystem;
 
-import javax.lang.model.util.ElementScanner6;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.IO;
-import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.SerialPort.Parity;
 import edu.wpi.first.wpilibj.SerialPort.Port;
 import edu.wpi.first.wpilibj.SerialPort.StopBits;
@@ -21,13 +18,13 @@ import frc.util.Arduino;
 /**
  * Add your docs here.
  */
-public class Vision extends GenericSubsystem {
+public class Vision {
 
     private Arduino arduinoLeft;
 
     private Arduino arduinoRight;
 
-    private double d1, d2;
+    private double d1, d2, edgeDist, midDist;
 
     private boolean clockWise, firstIt, onRight;
 
@@ -41,7 +38,7 @@ public class Vision extends GenericSubsystem {
   
     private DigitalInput irLC;
 
-    private VisionState1 vState;
+    private VisionState vState;
 
     public MoveState DriveState;
 
@@ -49,39 +46,33 @@ public class Vision extends GenericSubsystem {
 
     public Vision()
     {
-        super("Vision");
-        DEADBAND = 0.1;
+        DEADBAND = .75;
+        irRM = new DigitalInput(7);
+        irLC = new DigitalInput(8);
+        arduinoRight = new Arduino(115200, Port.kUSB, 8, Parity.kSpace, StopBits.kOne);
     }
 
     public void reset()
     {
-
+        vState = VisionState.SENSING;
+        firstIt = true;
+        DriveState = MoveState.STANDBY;
     }
 
-    /*
-    private static enum VisionState
-    {
-      SENSING,
-      FIRSTTURN,
-      SECONDTURN,
-      CORRECTING,
-      LINEUP,
-      DRIVE;
-    }
-    */
-
-    private static enum VisionState1
+    public static enum VisionState
     {
         SENSING,
         PARALING,
         REALIGNING,
         QUARTERTURN,
         DRIVE,
-        SCORE;
+        SCORE,
+        NOTHING;
     }
 
     public static enum MoveState
     {
+        DRIVER,
         SLOWRIGHT,
         RIGHT,
         SLOWLEFT,
@@ -92,148 +83,184 @@ public class Vision extends GenericSubsystem {
         STANDBY;
     }
 
-    public void init()
-    {
-        arduinoLeft = new Arduino(115200, Port.kUSB1, 8, Parity.kSpace, StopBits.kOne);
-        arduinoRight = new Arduino(115200, Port.kUSB2, 8, Parity.kSpace, StopBits.kOne);
-    
-        vState = VisionState1.SENSING;
-        firstIt = true;
-        DriveState = MoveState.STANDBY;
-        irLC = new DigitalInput(IO.centerLeftFollowingSensor);
-        irRC = new DigitalInput(IO.centerRightFollowingSensor);
-        irLM = new DigitalInput(IO.leftFollowingSensor);
-        irRM = new DigitalInput(IO.rightFollowingSensor);
-        /*
-        count = 0;
-        minDist = Double.MAX_VALUE;
-        irLM = new DigitalInput(IO.leftFollowingSensor);
-        irLE = new DigitalInput(IO.centerLeftFollowingSensor);
-        irRE = new DigitalInput(IO.centerRightFollowingSensor);
-        irRM = new DigitalInput(IO.rightFollowingSensor);
-        vState = VisionState.SENSING;
-        dState = MoveState.STANDBY;
-        try
-        {
-            arduino = new SerialPort(115200, Port.kUSB, 8, Parity.kSpace, StopBits.kOne);
-        }
-        catch(Exception e){}
-        */
-
-     }
-
      public MoveState getDirection()
      {
          return DriveState;
      }
-
-    @Override
-    public void execute() 
-        {
-        // double num, num2;
-        // num = arduinoLE.getDistance();
-        // if(num != -1.0 && num != Double.MAX_VALUE)
-        //     System.out.println("Arduino 1: " + num);
-        // num2 = arduinoLM.getDistance();
-        // if(num2 != -1.0 && num2 != Double.MAX_VALUE)
-        // System.out.println("Arduino 2: " + num);
-
-        double distance;
-        distance = arduinoLeft.getEdgeDist();
-        if(distance != -1.0)
-            System.out.println("Distance 1: " + distance);
-        distance = arduinoLeft.getmidDist();
-        if(distance != -1.0)
-            System.out.println("Distance 2: " + distance);
-        //paraliningMethod();
+      
+      public void test()
+      {
+          paraliningMethodOneSide();
       }
 
-      private void paraliningMethod()
+      public void paraliningMethodOneSide()
       {
-
-        switch(vState)
+          
+    switch(vState)
       {
         case SENSING:
-            if(!irRM.get() || !irLM.get())
-                if(!irRM.get())
-                    onRight = true;
-                vState = VisionState1.PARALING;
-            break;
-        case PARALING:
-            double distance;
-
-            if(onRight)
+            if(firstIt)
+                arduinoRight.reset();
+            DriveState = MoveState.DRIVER;
+            if(!irRM.get())
             {
-                onRightSetDistances();
-            }
-            else
-            {
-                onLeftSetDistances();
-            }
-
-            distance = d1 - d2;
-
-            if(Math.abs(distance) < DEADBAND)
-            {
-                if(firstIt)
-                    vState = VisionState1.QUARTERTURN;
-                else
-                    vState = VisionState1.REALIGNING;
+                firstIt = true;
+                vState = VisionState.PARALING;
                 DriveState = MoveState.STANDBY;
-            }
-            else
-            {
-                if(d1 > d2)
-                {
-                    if(firstIt)
-                        clockWise = true;
-                    DriveState = MoveState.SLOWRIGHT;
-                }
-                else
-                {
-                    if(firstIt)
-                        clockWise = false;
-                    DriveState = MoveState.SLOWLEFT;
-                }
             }
             firstIt = false;
             break;
+        case PARALING:
+            double distance;
+            arduinoRight.updateDistances();
+            onRightSetDistances();
+
+            distance = edgeDist - midDist;
+
+            if(edgeDist == Double.MAX_VALUE && midDist == Double.MAX_VALUE)
+                arduinoRight.reset();
+            if(Math.abs(distance) < DEADBAND && edgeDist != Double.MAX_VALUE)
+            {
+                 vState = VisionState.REALIGNING;
+            }
+            else
+            {
+                if(edgeDist > midDist)
+                {
+                    if(firstIt)
+                    {
+                        clockWise = true;
+                        firstIt = false;
+                    }
+                    DriveState = MoveState.SLOWRIGHT;
+                }
+                else if(midDist > edgeDist)
+                {
+                    if(firstIt)
+                    {
+                        clockWise = false;
+                        firstIt = false;
+                    }
+                    DriveState = MoveState.SLOWLEFT;
+                }
+            }
+            break;
         case REALIGNING:
-            if((onRight && clockWise) || (!onRight && !clockWise))
+            if(clockWise)
                 DriveState = MoveState.FORWARD;
             else
                 DriveState = MoveState.BACKWARD;
-            if(!irLM.get() || !irRM.get())
+            if(!irRM.get())
                 {
                     DriveState = MoveState.STANDBY;
-                    vState = VisionState1.QUARTERTURN;
+                    vState = VisionState.QUARTERTURN;
                 }
             break;
         case QUARTERTURN:
-            if(onRight)
-            {
                 DriveState = MoveState.RIGHT;
                 if(!irLC.get())
                     {
                         DriveState = MoveState.STANDBY;
-                        vState = VisionState1.DRIVE;
+                        vState = VisionState.DRIVE;
                     }
-            }
-            else
-            {
-                DriveState = MoveState.LEFT;
-                if(!irRC.get())
-                {
-                    DriveState = MoveState.STANDBY;
-                    vState = VisionState1.DRIVE;
-                }
-            }
                 break;
         case DRIVE:
                 DriveState = MoveState.FORWARD;
                 break;
+        default:
+                System.out.println("default");
         }
       }
+
+
+    //   private void paraliningMethod()
+    //   {
+
+    //     switch(vState)
+    //   {
+    //     case SENSING:
+    //         if(!irRM.get() || !irLM.get())
+    //             if(!irRM.get())
+    //                 onRight = true;
+    //             vState = VisionState1.PARALING;
+    //         break;
+    //     case PARALING:
+    //         double distance;
+
+    //         if(onRight)
+    //         {
+    //             arduinoRight.updateDistances();
+    //             onRightSetDistances();
+    //         }
+    //         else
+    //         {
+    //             arduinoLeft.updateDistances();
+    //             onLeftSetDistances();
+    //         }
+
+    //         distance = d1 - d2;
+
+    //         if(Math.abs(distance) < DEADBAND)
+    //         {
+    //             if(firstIt)
+    //                 vState = VisionState1.QUARTERTURN;
+    //             else
+    //                 vState = VisionState1.REALIGNING;
+    //             DriveState = MoveState.STANDBY;
+    //         }
+    //         else
+    //         {
+    //             if(d1 > d2)
+    //             {
+    //                 if(firstIt)
+    //                     clockWise = true;
+    //                 DriveState = MoveState.SLOWRIGHT;
+    //             }
+    //             else
+    //             {
+    //                 if(firstIt)
+    //                     clockWise = false;
+    //                 DriveState = MoveState.SLOWLEFT;
+    //             }
+    //         }
+    //         firstIt = false;
+    //         break;
+    //     case REALIGNING:
+    //         if((onRight && clockWise) || (!onRight && !clockWise))
+    //             DriveState = MoveState.FORWARD;
+    //         else
+    //             DriveState = MoveState.BACKWARD;
+    //         if(!irLM.get() || !irRM.get())
+    //             {
+    //                 DriveState = MoveState.STANDBY;
+    //                 vState = VisionState1.QUARTERTURN;
+    //             }
+    //         break;
+    //     case QUARTERTURN:
+    //         if(onRight)
+    //         {
+    //             DriveState = MoveState.RIGHT;
+    //             if(!irLC.get())
+    //                 {
+    //                     DriveState = MoveState.STANDBY;
+    //                     vState = VisionState1.DRIVE;
+    //                 }
+    //         }
+    //         else
+    //         {
+    //             DriveState = MoveState.LEFT;
+    //             if(!irRC.get())
+    //             {
+    //                 DriveState = MoveState.STANDBY;
+    //                 vState = VisionState1.DRIVE;
+    //             }
+    //         }
+    //             break;
+    //     case DRIVE:
+    //             DriveState = MoveState.FORWARD;
+    //             break;
+    //     }
+    //   }
 
       private void onRightSetDistances()
       {
@@ -241,25 +268,25 @@ public class Vision extends GenericSubsystem {
 
         distance = arduinoRight.getEdgeDist();
         if(distance != -1)
-            d1 = distance;
+            edgeDist = distance;
 
         distance = arduinoRight.getmidDist();
         if(distance != -1)
-            d2 = distance;
+            midDist = distance;
       }
 
-      private void onLeftSetDistances()
-      {
-        double distance;
+    //   private void onLeftSetDistances()
+    //   {
+    //     double distance;
 
-        distance = arduinoLeft.getEdgeDist();
-        if(distance != -1)
-            d1 = distance;
+    //     distance = arduinoLeft.getEdgeDist();
+    //     if(distance != -1)
+    //         d1 = distance;
 
-        distance = arduinoLeft.getmidDist();
-        if(distance != -1)
-            d2 = distance;
-      }
+    //     distance = arduinoLeft.getmidDist();
+    //     if(distance != -1)
+    //         d2 = distance;
+    //   }
         /*
     if(arduino == null)
     {
@@ -305,19 +332,5 @@ public class Vision extends GenericSubsystem {
       
     }*/
 
-    @Override
-    public void debug() {
-
-    }
-
-    @Override
-    public boolean isDone() {
-        return false;
-    }
-
-    @Override
-    public long sleepTime() {
-        return 0;
-    }
 
 }

@@ -111,21 +111,21 @@ public class Drives extends GenericSubsystem{
         leftMtr1 = new WPI_TalonSRX(IO.leftDriveCIM1);
         leftMtr2 = new WPI_TalonSRX(IO.leftDriveCIM2);
         leftMtr3 = new WPI_TalonSRX(IO.leftDriveCIM3);
-        rightMtrs = new MotorGroup(rightMtr1, rightMtr2, rightMtr3);
-        leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
+        rightMtrs = new MotorGroup(rightMtr1, rightMtr2);
+        leftMtrs = new MotorGroup(leftMtr1, leftMtr2);
         rightEnc = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
         leftEnc = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
         rightEnc.setDistancePerPulse(-0.04837204);
         leftEnc.setDistancePerPulse(0.04837204);
         rightMtrs.setInverted(true);
-        gyro = new AHRS(SerialPort.Port.kUSB);
-        gyro.reset();
-        rightServo = new Servo(0);
-        leftServo = new Servo(1);
+        // gyro = new AHRS(SerialPort.Port.kUSB);
+        // gyro.reset();
+        // rightServo = new Servo(0);
+        // leftServo = new Servo(1);
         lastAngle = 0;
         speedLeft = 0;
         speedRight = 0;
-        resetGyroAngle();
+        //resetGyroAngle();
         moveDist = 0;
         moveSpeed = 0; 
         turnAngle = 0;
@@ -165,12 +165,12 @@ public class Drives extends GenericSubsystem{
                 //System.out.println("You are a bold one");
                 break;
             case TELEOP:
-                //System.out.println("Drives SpeedRight: " + speedRight + " speedLeft: " + speedLeft);
-                rightMtrs.set(speedRight);
-                leftMtrs.set(speedLeft);
+                System.out.println("Drives SpeedRight: " + speedRight + " speedLeft: " + speedLeft);
+                rightMtrs.set(-speedRight);
+                leftMtrs.set(-speedLeft);
                 break;
             case MOVE_FORWARD:
-                System.out.println("Hello");
+                //System.out.println("Hello");
                 if(getDistance() > moveDist){
                     System.out.println("There");
                     rightMtrs.stopMotors();
@@ -222,25 +222,32 @@ public class Drives extends GenericSubsystem{
                // System.out.println("turn left");
                 break;
             case LINE_FOLLOWER: 
-            
+               
+                //vision.paraliningMethodOneSide();
+                vision.test();
                 MoveState st = vision.getDirection();
+                System.out.println(st);
                 // System.out.println("Left motor power = " + leftMtr1.getBusVoltage());
                 //System.out.println("right motor power = " + rightMtr1.getBusVoltage());
-                if(st == MoveState.LEFT){
-                    leftMtrs.set(-0.5);
-                    rightMtrs.set(0.5);
-                }else if(st == MoveState.RIGHT){
+                if(st == MoveState.DRIVER){
+                    leftMtrs.set(-speedLeft);
+                    rightMtrs.set(-speedRight);
+                }else if(st == MoveState.LEFT){
                     leftMtrs.set(0.5);
                     rightMtrs.set(-0.5);
+                }else if(st == MoveState.RIGHT){
+                    leftMtrs.set(-0.5);
+                    rightMtrs.set(0.5);
                 }else if(st == MoveState.FORWARD){
-                    leftMtrs.set(0.3);
-                    rightMtrs.set(0.3);
+                    leftMtrs.set(-0.3);
+                    rightMtrs.set(-0.3);
                 }else if(st == MoveState.SLOWLEFT){
-                    leftMtrs.set(-0.2);
-                    rightMtrs.set(0.2);
+                    leftMtrs.set(0.4);
+                    rightMtrs.set(-0.4);
                 }else if(st == MoveState.SLOWRIGHT){
-                    leftMtrs.set(0.2);
-                    rightMtrs.set(-0.2);
+                    System.out.println("test1");
+                    leftMtrs.set(-0.4);
+                    rightMtrs.set(0.4);
                 }
                 else if(st == MoveState.STANDBY)
                 {
@@ -249,13 +256,13 @@ public class Drives extends GenericSubsystem{
                 }
                 else if(st == MoveState.FORWARD)
                 {
-                    leftMtrs.set(.3);
-                    rightMtrs.set(.3);
+                    leftMtrs.set(-.3);
+                    rightMtrs.set(-.3);
                 }
                 else if(st == MoveState.BACKWARD)
                 {
-                    leftMtrs.set(-.3);
-                    rightMtrs.set(-.3);
+                    leftMtrs.set(.3);
+                    rightMtrs.set(.3);
                 }
                 
                 break;
@@ -306,11 +313,12 @@ public class Drives extends GenericSubsystem{
                 
                 
         }
+       // System.out.println(state + ":Right motors: " + rightMtrs.get() + "\nLeft motors: " + leftMtrs.get());
       //  System.out.println("State: " + )
         // System.out.println("Right Encoder: " + rightEnc.getdista;
         // System.out.println("Left Encoder: " + leftEnc.getRaw());
          //System.out.println("Gyro: " + getAngle());
-        System.out.println("GetDistance: " + getDistance());
+        //System.out.println("GetDistance: " + getDistance());
     }
 
     //debugs all the possible problems in drives
@@ -412,14 +420,14 @@ public class Drives extends GenericSubsystem{
 
     //used by RobotSystem to put the robot in the teleop state
     public void toTeleop(){
-       // changeState(DriveState.TELEOP);
+       changeState(DriveState.TELEOP);
        //turn(0.5, 90);
-       move(0.5, 120);
+       //move(0.5, 120);
     }
 
     public void findLine(){
         vision.reset();
-        changeState(DriveState.FINDING_LINE);
+        changeState(DriveState.LINE_FOLLOWER);
     }
 
 }
