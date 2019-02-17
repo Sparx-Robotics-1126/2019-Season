@@ -1,4 +1,4 @@
-    /*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
@@ -26,313 +26,321 @@ import edu.wpi.first.wpilibj.SerialPort;
  */
 public class Drives extends GenericSubsystem{
 
-    //----------------------------------------Motors/Sensors----------------------------------------
+	//----------------------------------------Motors/Sensors----------------------------------------
 
-    private WPI_TalonSRX rightMtr1;
+	private WPI_TalonSRX rightMtr1;
 
-    private WPI_TalonSRX rightMtr2;
+	private WPI_TalonSRX rightMtr2;
 
-    //private WPI_TalonSRX rightMtr3;
+	//private WPI_TalonSRX rightMtr3;
 
-    private WPI_TalonSRX leftMtr1;
+	private WPI_TalonSRX leftMtr1;
 
-    private WPI_TalonSRX leftMtr2;
+	private WPI_TalonSRX leftMtr2;
 
-    //private WPI_TalonSRX leftMtr3;
-    
-    private Encoder rawRight;
+	//private WPI_TalonSRX leftMtr3;
 
-    private Encoder rawLeft;
+	private Encoder rawRight;
 
-    private EncoderData rightEncoder; 
+	private Encoder rawLeft;
 
-    private EncoderData leftEncoder;
+	private EncoderData rightEncoder; 
 
-    private AHRS gyro;
+	private EncoderData leftEncoder;
 
-    private MotorGroup rightMtrs;
+	private AHRS gyro;
 
-    private MotorGroup leftMtrs;
+	private MotorGroup rightMtrs;
 
-    private Solenoid drivesPTO;
+	private MotorGroup leftMtrs;
 
-    private CameraServer delete;
+	private Solenoid drivesPTO;
 
-    private Arms arms;
-    
-    //----------------------------------------Variable----------------------------------------
+	private CameraServer delete;
 
-    private double lastAngle;
+	private Arms arms;
 
-    private double speedRight;
+	//----------------------------------------Variable----------------------------------------
 
-    private double speedLeft;
+	private double lastAngle;
 
-    private double turnAngle;
+	private double speedRight;
 
-    private double turnSpeed;
+	private double speedLeft;
 
-    private double moveSpeed;
+	private double turnAngle;
 
-    private double moveDist;
+	private double turnSpeed;
 
-    private DriveState state;
-    
-    //----------------------------------------Constants----------------------------------------
+	private double moveSpeed;
 
-    private final double ANGLE_OFF_BY = .1;
+	private double moveDist;
 
-    private final double SPEED_PERCENTAGE = .8;
+	private DriveState state;
 
-    //create a drives object
-    public Drives(){
-        super("Drives");
-    }
+	//----------------------------------------Constants----------------------------------------
 
-    //initialized all the variable in drives
-    public void init(){
-        rightMtr1 = new WPI_TalonSRX(IO.rightDriveCIM1);
-        rightMtr2 = new WPI_TalonSRX(IO.rightDriveCIM2);
-        leftMtr1 = new WPI_TalonSRX(IO.leftDriveCIM1);
-        leftMtr2 = new WPI_TalonSRX(IO.leftDriveCIM2);
-        rightMtrs = new MotorGroup(rightMtr1, rightMtr2);
-        leftMtrs = new MotorGroup(leftMtr1, leftMtr2);
-        rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
-        rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
-        rawRight.setDistancePerPulse(0.033860431);
-        rawLeft.setDistancePerPulse(0.033860431);
-        // leftEncoder = new EncoderData(rawLeft, 0.033860431);
-        // rightEncoder = new EncoderData(rawRight, 0.033860431);
-        // rightEncoder.reset();
-        // leftEncoder.reset();
-         leftMtrs.setInverted(true);
-        // gyro = new AHRS(SerialPort.Port.kUSB);
-        // lastAngle = 0;
-        // speedLeft = 0;
-        // speedRight = 0;
-        // resetGyroAngle();
-        // moveDist = 0;
-        // moveSpeed = 0;
-        // turnAngle = 0;
-        // turnSpeed = 0;
-        drivesPTO = new Solenoid(1);
-        drivesPTO.set(true);
-        arms = new Arms(rightMtrs, leftMtrs, rawRight, rawLeft);
-        state = DriveState.STANDBY;
+	private final double ANGLE_OFF_BY = .1;
 
-    }
+	private final double SPEED_PERCENTAGE = .8;
 
-    public enum DriveState{
-        STANDBY,
-        TELEOP,
-        MOVE_FORWARD,
-        MOVE_BACKWARD,
-        TURN_RIGHT,
-        TURN_LEFT,
-        SENSOR_LEFT,
-        SENSOR_MID,
-        ARMS,
-        SENSOR_RIGHT;
-    }
-    
-   
+	//create a drives object
+	public Drives(){
+		super("Drives");
+	}
 
-    //does all the code for drives
-    public void execute(){
-        switch(state){
-            case ARMS:
-                arms.armsDown();
-                break;
-            case STANDBY:   
-                break;
-        }
-        //move(0.8, 150);
-        //turn(0.5, 90);
-        // changeState(DriveState.STANDBY);
-        // switch(state){
-        //     case STANDBY:
-        //         arms.armsDown();
-        //         break;
-        //     case TELEOP:
-        //         rightMtrs.set(speedRight);
-        //         leftMtrs.set(speedLeft);
-        //         break;
-        //     case MOVE_FORWARD:
-        //         if(getDistance() > moveDist){
-        //             rightMtrs.stopMotors();
-        //             leftMtrs.stopMotors();
-        //             changeState(DriveState.STANDBY);
-        //         }else{
-        //             rightMtrs.set(speedRight);
-        //             leftMtrs.set(speedLeft);
-        //         }
-        //         break;
-        //     case MOVE_BACKWARD:
-        //         if(getDistance() < moveDist){
-        //             rightMtrs.stopMotors();
-        //             leftMtrs.stopMotors();
-        //             changeState(DriveState.STANDBY);
-        //         }else{
-        //             rightMtrs.set(-speedRight);
-        //             leftMtrs.set(-speedLeft);
-        //         }
-        //         break;
-        //     case TURN_RIGHT:
-        //         if(getAngle() > turnAngle){
-        //             rightMtrs.stopMotors();
-        //             leftMtrs.stopMotors();
-        //             changeState(DriveState.STANDBY);
-        //         }else{
-        //             rightMtrs.set(speedRight);
-        //             leftMtrs.set(-speedLeft);
-        //         }
-        //         break;
-        //     case TURN_LEFT:
-        //         if(getAngle() < turnAngle){
-        //             rightMtrs.stopMotors();
-        //             leftMtrs.stopMotors();
-        //             changeState(DriveState.STANDBY);
-        //         }else{
-        //             rightMtrs.set(-speedRight);
-        //             leftMtrs.set(speedLeft);
-        //         }
-        //         break;
-        //     case SENSOR_LEFT:
-        //         leftMtrs.stopMotors();
-        //         rightMtrs.set(0.4);
-        //         break;
-        //     case SENSOR_MID:
-        //         leftMtrs.set(0.4);
-        //         rightMtrs.set(0.4);
-        //         break;
-        //     case SENSOR_RIGHT:
-        //         leftMtrs.set(0.4);
-        //         rightMtrs.stopMotors();
-        //         break;
-        //     case ARMS:
-                
+	//initialized all the variable in drives
+	public void init(){
+		rightMtr1 = new WPI_TalonSRX(IO.rightDriveCIM1);
+		rightMtr2 = new WPI_TalonSRX(IO.rightDriveCIM2);
+		leftMtr1 = new WPI_TalonSRX(IO.leftDriveCIM1);
+		leftMtr2 = new WPI_TalonSRX(IO.leftDriveCIM2);
+		rightMtrs = new MotorGroup(rightMtr1, rightMtr2);
+		leftMtrs = new MotorGroup(leftMtr1, leftMtr2);
+		rawRight = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
+		rawLeft = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
+		rawRight.setDistancePerPulse(0.033860431);
+		rawLeft.setDistancePerPulse(0.033860431);
+		// leftEncoder = new EncoderData(rawLeft, 0.033860431);
+		// rightEncoder = new EncoderData(rawRight, 0.033860431);
+		// rightEncoder.reset();
+		// leftEncoder.reset();
+		leftMtrs.setInverted(true);
+		// gyro = new AHRS(SerialPort.Port.kUSB);
+		// lastAngle = 0;
+		// speedLeft = 0;
+		// speedRight = 0;
+		// resetGyroAngle();
+		// moveDist = 0;
+		// moveSpeed = 0;
+		// turnAngle = 0;
+		// turnSpeed = 0;
+		drivesPTO = new Solenoid(IO.DRIVES_PTO);
+		drivesPTO.set(false);
+		arms = new Arms(rightMtrs, leftMtrs, rawRight, rawLeft);
+		state = DriveState.STANDBY;
 
-        // }
-        // // System.out.println("Right Encoder: " + leftEncoder.getDistance());
-        // // System.out.println("Left Encoder: " + rightEncoder.getDistance());
-//        System.out.println("right enc: " + rawRight.getDistance() + " left enc: " + rawLeft.getDistance());
-//      System.out.println("left enc: " + rawLeft.getDistance());
-//        System.out.println("left rate: " + rawLeft.getRate() + " right rate: " + rawRight.getRate());
-    }
+	}
 
-    //debugs all the possible problems in drives
-    public void debug(){
+	public enum DriveState{
+		STANDBY,
+		TELEOP,
+		MOVE_FORWARD,
+		MOVE_BACKWARD,
+		TURN_RIGHT,
+		TURN_LEFT,
+		SENSOR_LEFT,
+		SENSOR_MID,
+		ARMS,
+		SENSOR_RIGHT;
+	}
 
-    }
 
-    public void helper(){
-        drivesPTO.set(true);
-    }
 
-    //checks if drives is done with its autonomous code
-    public boolean isDone(){
-        return false;
-    }
+	//does all the code for drives
+	public void execute(){
+		if(state != DriveState.ARMS && drivesPTO.get()) {
+			drivesPTO.set(false);
+		}
+		switch(state){
+		case STANDBY:   
+			break;
+		case TELEOP:
+			rightMtrs.set(speedRight);
+			leftMtrs.set(speedLeft);
+			break;
+		case ARMS:
+			arms.armsDown();
+			if(arms.isDone()) {
+				toTeleop();
+			}
+			break;
+		default:
+			break;
+		}
+		//move(0.8, 150);
+		//turn(0.5, 90);
+		// changeState(DriveState.STANDBY);
+		// switch(state){
+		//     case STANDBY:
+		//         arms.armsDown();
+		//         break;
+		//     case TELEOP:
+		//         rightMtrs.set(speedRight);
+		//         leftMtrs.set(speedLeft);
+		//         break;
+		//     case MOVE_FORWARD:
+		//         if(getDistance() > moveDist){
+		//             rightMtrs.stopMotors();
+		//             leftMtrs.stopMotors();
+		//             changeState(DriveState.STANDBY);
+		//         }else{
+		//             rightMtrs.set(speedRight);
+		//             leftMtrs.set(speedLeft);
+		//         }
+		//         break;
+		//     case MOVE_BACKWARD:
+		//         if(getDistance() < moveDist){
+		//             rightMtrs.stopMotors();
+		//             leftMtrs.stopMotors();
+		//             changeState(DriveState.STANDBY);
+		//         }else{
+		//             rightMtrs.set(-speedRight);
+		//             leftMtrs.set(-speedLeft);
+		//         }
+		//         break;
+		//     case TURN_RIGHT:
+		//         if(getAngle() > turnAngle){
+		//             rightMtrs.stopMotors();
+		//             leftMtrs.stopMotors();
+		//             changeState(DriveState.STANDBY);
+		//         }else{
+		//             rightMtrs.set(speedRight);
+		//             leftMtrs.set(-speedLeft);
+		//         }
+		//         break;
+		//     case TURN_LEFT:
+		//         if(getAngle() < turnAngle){
+		//             rightMtrs.stopMotors();
+		//             leftMtrs.stopMotors();
+		//             changeState(DriveState.STANDBY);
+		//         }else{
+		//             rightMtrs.set(-speedRight);
+		//             leftMtrs.set(speedLeft);
+		//         }
+		//         break;
+		//     case SENSOR_LEFT:
+		//         leftMtrs.stopMotors();
+		//         rightMtrs.set(0.4);
+		//         break;
+		//     case SENSOR_MID:
+		//         leftMtrs.set(0.4);
+		//         rightMtrs.set(0.4);
+		//         break;
+		//     case SENSOR_RIGHT:
+		//         leftMtrs.set(0.4);
+		//         rightMtrs.stopMotors();
+		//         break;
+		//     case ARMS:
 
-    //the time in milliseconds between each call to execute
-    public long sleepTime(){
-        return 20;
-    }
 
-    //move the robot at a given speed and distance
-    public void move(double speed, double dist){
-        moveSpeed = speed;
-        moveDist = dist;
-        speedRight = moveSpeed;
-        speedLeft = moveSpeed;
-        if(moveDist > 0){
-            changeState(DriveState.MOVE_FORWARD);
-        }else{
-            changeState(DriveState.MOVE_BACKWARD);
-        }
-    }
+		// }
+		// // System.out.println("Right Encoder: " + leftEncoder.getDistance());
+		// // System.out.println("Left Encoder: " + rightEncoder.getDistance());
+		//        System.out.println("right enc: " + rawRight.getDistance() + " left enc: " + rawLeft.getDistance());
+		//      System.out.println("left enc: " + rawLeft.getDistance());
+		//        System.out.println("left rate: " + rawLeft.getRate() + " right rate: " + rawRight.getRate());
+	}
 
-    public void joystickLeft(double speed) {
-        speedLeft = speed;
-    }
+	//debugs all the possible problems in drives
+	public void debug(){
 
-    public void joystickRight(double speed) {
-        speedRight = speed;
-    }
+	}
 
-    public void buttonB(boolean a){
-        drivesPTO.set(a);
-    }
+	//checks if drives is done with its autonomous code
+	public boolean isDone(){
+		return false;
+	}
 
-    //straightens the robot
-    private void straightenForward(){
-        if(getAngle() > ANGLE_OFF_BY){
-            speedRight *= SPEED_PERCENTAGE; 
-        }else if(getAngle() < ANGLE_OFF_BY){
-            speedLeft *= SPEED_PERCENTAGE;
-        }
-    }
+	//the time in milliseconds between each call to execute
+	public long sleepTime(){
+		return 20;
+	}
 
-    //gets the distance the robot has travelled since the last time the encoders were reset
-    private double getDistance() {
+	//move the robot at a given speed and distance
+	public void move(double speed, double dist){
+		moveSpeed = speed;
+		moveDist = dist;
+		speedRight = moveSpeed;
+		speedLeft = moveSpeed;
+		if(moveDist > 0){
+			changeState(DriveState.MOVE_FORWARD);
+		}else{
+			changeState(DriveState.MOVE_BACKWARD);
+		}
+	}
+
+	public void joystickLeft(double speed) {
+		speedLeft = speed;
+	}
+
+	public void joystickRight(double speed) {
+		speedRight = speed;
+	}
+
+	public void buttonB(boolean a){
+		drivesPTO.set(a);
+	}
+
+	//straightens the robot
+	private void straightenForward(){
+		if(getAngle() > ANGLE_OFF_BY){
+			speedRight *= SPEED_PERCENTAGE; 
+		}else if(getAngle() < ANGLE_OFF_BY){
+			speedLeft *= SPEED_PERCENTAGE;
+		}
+	}
+
+	//gets the distance the robot has travelled since the last time the encoders were reset
+	private double getDistance() {
 		rightEncoder.calculateSpeed();
 		leftEncoder.calculateSpeed();
 		return (rightEncoder.getDistance() + leftEncoder.getDistance())/2;
-    }
+	}
 
-    //gets the angle the robot has turned since the last time the gyro was reset 
-    private double getAngle(){
-        return gyro.getAngle() - lastAngle;
-    }
+	//gets the angle the robot has turned since the last time the gyro was reset 
+	private double getAngle(){
+		return gyro.getAngle() - lastAngle;
+	}
 
-    //resets the gyro's angle so the robot turns to the angle from where the robot is currently facing
-    private void resetGyroAngle(){
-        lastAngle = gyro.getAngle();
-    }
+	//resets the gyro's angle so the robot turns to the angle from where the robot is currently facing
+	private void resetGyroAngle(){
+		lastAngle = gyro.getAngle();
+	}
 
-    //turns the robot a specified angle 
-    public void turn(double speed, double angle){
-        turnAngle = angle;
-        turnSpeed = speed;
-        if(angle > 0){
-          changeState(DriveState.TURN_RIGHT);
-        }else{
-            if(getAngle() < angle){
-                rightMtrs.stopMotors();
-                leftMtrs.stopMotors();
-            }else{
-                rightMtrs.set(-speed);
-                leftMtrs.set(speed);
-            }
-        }
+	//turns the robot a specified angle 
+	public void turn(double speed, double angle){
+		turnAngle = angle;
+		turnSpeed = speed;
+		if(angle > 0){
+			changeState(DriveState.TURN_RIGHT);
+		}else{
+			if(getAngle() < angle){
+				rightMtrs.stopMotors();
+				leftMtrs.stopMotors();
+			}else{
+				rightMtrs.set(-speed);
+				leftMtrs.set(speed);
+			}
+		}
 
-    }
+	}
 
-    //changes the state of the robot to what is given as a parameter
-    public void changeState(DriveState st){
-        state = st;
-    }
+	//changes the state of the robot to what is given as a parameter
+	public void changeState(DriveState st){
+		state = st;
+	}
 
-    //used by RobotSystem to put the robot in the teleop state
-    public void toTeleop(){
-        changeState(DriveState.TELEOP);
-    }
+	//used by RobotSystem to put the robot in the teleop state
+	public void toTeleop(){
+		changeState(DriveState.TELEOP);
+	}
 
-    //vision call this class to tell the robot what to do when it hits the line
-    public void visionSenses(int st){
-        if(st == -1){
-            changeState(DriveState.SENSOR_LEFT);
-        }else if(st == 0){
-            changeState(DriveState.SENSOR_MID);
-        }else if(st == 1){
-            changeState(DriveState.SENSOR_RIGHT);
-        }else{
-            changeState(DriveState.STANDBY);
-        }
-    }
+	//vision call this class to tell the robot what to do when it hits the line
+	public void visionSenses(int st){
+		if(st == -1){
+			changeState(DriveState.SENSOR_LEFT);
+		}else if(st == 0){
+			changeState(DriveState.SENSOR_MID);
+		}else if(st == 1){
+			changeState(DriveState.SENSOR_RIGHT);
+		}else{
+			changeState(DriveState.STANDBY);
+		}
+	}
 
-    public Arms getArms(){
-        return arms;
-    }
-    
+	public Arms getArms(){
+		return arms;
+	}
+
 }

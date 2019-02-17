@@ -73,7 +73,7 @@ public class TeleOP implements Controls{
 			hab.setHabSpeedRight(0);
 		}
 		if(isOffZeroAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
-			hab.setHabSpeedLeft(getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
+			hab.setHabSpeedLeft(-getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
 		} else {
 			hab.setHabSpeedLeft(0);
 		}

@@ -32,7 +32,7 @@ public class Arms {
     private WPI_TalonSRX rightArmMtr;
     private Encoder leftArmEnc;
     private Encoder rightArmEnc;
-    
+    private boolean isDone;
 
     public Arms(MotorGroup rightMtrs, MotorGroup leftMtrs, Encoder rightEnc, Encoder leftEnc){
         this.rightMtrs = rightMtrs;
@@ -43,9 +43,9 @@ public class Arms {
 
     public void armsDown(){
         if(wantedDegree > actualDegree){
+        	isDone = false;
             leftMtrSpeed = -leftArmEnc.getRate();
             rightMtrSpeed = -rightArmEnc.getRate();
-          
 
             if(leftMtrSpeed < wantedSpeed){
                 wantedLeftMtrPwr += 0.01; //gav
@@ -68,13 +68,17 @@ public class Arms {
             //     }
             // }
             actualDegree = (-leftArmEnc.getDistance() + rightArmEnc.getDistance()) / 2;
+            rightMtrs.set(wantedRightMtrPwr);
+            leftMtrs.set(wantedLeftMtrPwr);
+        } else {
+        	 rightMtrs.set(0);
+             leftMtrs.set(0);
+             isDone = true;
         }
-        rightMtrs.set(wantedRightMtrPwr);
-        leftMtrs.set(wantedLeftMtrPwr);
-
-        
-       // System.out.println("right power: " + wantedRightMtrPwr  + " right distance: " + rightArmEnc.getDistance() + " right speed " + rightArmEnc.getRate());
-       // System.out.println("left power: " + wantedLeftMtrPwr  + " left distance: " + leftArmEnc.getDistance() + " left speed " + leftArmEnc.getRate());
+    }
+    
+    public boolean isDone() {
+    	return isDone;
     }
 
     public void armMtrs(){
