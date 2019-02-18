@@ -20,21 +20,30 @@ public class HAB extends GenericSubsystem {
 	// ----------------------------------------Motors/Sensors----------------------------------------
 
 	private WPI_TalonSRX leadScrewMtr;
+
 	private Encoder leadScrewEncRaw;
-	private LeadScrewState state;
+
 	private DigitalInput bottomSensor;
+
 	private WPI_TalonSRX habLeft;
+
 	private WPI_TalonSRX habRight;
 
 	// ----------------------------------------Variables---------------------------------------------
 
 	private double wantedSpeedLeft;
+
 	private double wantedSpeedRight;
+
+	private LeadScrewState state;
 
 	// ----------------------------------------Constants---------------------------------------------
 
-	private boolean isDone;
-	private boolean runHabWheels;
+	private boolean isDone = false;
+
+	private boolean runHabWheels = false;
+
+	// ------------------------------------------Code-------------------------------------------
 	
 	public HAB() {
 		super("Hab");
@@ -51,9 +60,7 @@ public class HAB extends GenericSubsystem {
 		wantedSpeedLeft = 0;
 		wantedSpeedRight = 0;
 		// bottomSensor = new DigitalInput(14);
-		runHabWheels = false;
 		state = LeadScrewState.STANDBY;
-		isDone = false;
 	}
 
 	public enum LeadScrewState {

@@ -19,28 +19,57 @@ import frc.util.MotorGroup;
  */
 public class Arms {
 
-	final double wantedDegree = 17;
-	final double wantedSpeed = 10; // gav
-	double armOffset;
-	double actualDegreeLeft = 0;
-	double actualDegreeRight = 0;
-	double leftMtrSpeed;
-	double rightMtrSpeed;
-	double wantedRightMtrPwr;
-	double wantedLeftMtrPwr;
-	private DigitalInput leftInput;
-	private DigitalInput rightInput;
+	// --------------------------------------Motors/Sensors-------------------------------------
+
 	private MotorGroup rightMtrs;
+
 	private MotorGroup leftMtrs;
+
 	private WPI_TalonSRX leftArmMtr;
+
 	private WPI_TalonSRX rightArmMtr;
+
 	private Encoder leftArmEnc;
+
 	private Encoder rightArmEnc;
+
+	private DigitalInput leftInput;
+
+	private DigitalInput rightInput;
+
+	// ----------------------------------------Variable-----------------------------------------
+
+	private double armOffset;
+
+	private double actualDegreeLeft = 0;
+
+	private double actualDegreeRight = 0;
+
+	private double leftMtrSpeed;
+
+	private double rightMtrSpeed;
+
+	private double wantedRightMtrPwr;
+
+	private double wantedLeftMtrPwr;
+	
 	private boolean isDone;
+
 	private boolean stopLeft;
+
 	private boolean stopRight;
+
 	private double stopLeftTimer;
+
 	private double stopRightTimer;
+
+	// ----------------------------------------Constants----------------------------------------
+
+	final double wantedDegree = 17;
+
+	final double wantedSpeed = 10; 
+
+	// ------------------------------------------Code-------------------------------------------
 
 	public Arms(MotorGroup rightMtrs, MotorGroup leftMtrs, Encoder rightEnc, Encoder leftEnc) {
 		this.rightMtrs = rightMtrs;

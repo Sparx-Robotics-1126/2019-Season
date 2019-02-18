@@ -22,7 +22,7 @@ import frc.util.MotorGroup;
  */
 public class Drives extends GenericSubsystem {
 
-	// ----------------------------------------Motors/Sensors----------------------------------------
+	// --------------------------------------Motors/Sensors-------------------------------------
 
 	private WPI_TalonSRX rightMtr1;
 
@@ -56,7 +56,7 @@ public class Drives extends GenericSubsystem {
 
 	private Vision vision;
 
-	// ----------------------------------------Variable----------------------------------------
+	// ----------------------------------------Variable-----------------------------------------
 
 	private double lastAngle;
 
