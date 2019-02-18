@@ -20,7 +20,7 @@ import frc.util.MotorGroup;
 public class Arms {
 
 	final double wantedDegree = 17;
-	final double wantedSpeed = 1; // gav
+	final double wantedSpeed = 10; // gav
 	double armOffset;
 	double actualDegreeLeft = 0;
 	double actualDegreeRight = 0;

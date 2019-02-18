@@ -33,6 +33,9 @@ public class HAB extends GenericSubsystem {
 
 	// ----------------------------------------Constants---------------------------------------------
 
+	private boolean isDone;
+	private boolean runHabWheels;
+	
 	public HAB() {
 		super("Hab");
 	}
@@ -48,7 +51,9 @@ public class HAB extends GenericSubsystem {
 		wantedSpeedLeft = 0;
 		wantedSpeedRight = 0;
 		// bottomSensor = new DigitalInput(14);
+		runHabWheels = false;
 		state = LeadScrewState.STANDBY;
+		isDone = false;
 	}
 
 	public enum LeadScrewState {
@@ -64,50 +69,75 @@ public class HAB extends GenericSubsystem {
 			if (leadScrewEncRaw.getDistance() < 0) {
 				leadScrewMtr.set(0.75);
 			} else {
-				leadScrewMtr.set(0.0);
-				state = LeadScrewState.STANDBY;
+				stopHab();
 			}
 			break;
 		case DOWN:
-			if (leadScrewEncRaw.getDistance() > -21) {
+			if (leadScrewEncRaw.getDistance() > -22) {
 				leadScrewMtr.set(-1);
 			} else {
-				leadScrewMtr.set(0.0);
-				state = LeadScrewState.STANDBY;
+				stopHab();
 			}
 			break;
 		case PRE_ARMS:
 			if(leadScrewEncRaw.getDistance() > -2.5) {
 				leadScrewMtr.set(-1);
 			} else {
-				leadScrewMtr.set(0);
-				state = LeadScrewState.STANDBY;
+				stopHab();
 			}
+			break;
 		case HOME:
 			if (bottomSensor.get()) {
 				leadScrewMtr.set(0.3);
 			} else {
-				leadScrewMtr.set(0.0);
+				stopHab();
 				leadScrewEncRaw.reset();
-				state = LeadScrewState.STANDBY;
 			}
 			break;
+		}
+		if(runHabWheels) {
+			
 		}
 		habLeft.set(wantedSpeedLeft);
 		habRight.set(wantedSpeedRight);
 		System.out.println("Lead screw: " + leadScrewEncRaw.getDistance());
 	}
+	
+	public void stopHab() {
+		leadScrewMtr.set(0);
+		isDone = true;
+		state = LeadScrewState.STANDBY;
+	}
 
 	public void ctrlDown() {
 		state = LeadScrewState.DOWN;
+		isDone = false;
 	}
 
 	public void ctrlUP() {
 		state = LeadScrewState.UP;
+		isDone = false;
 	}
 	
 	public void ctrlPreArms() {
 		state = LeadScrewState.PRE_ARMS;
+		isDone = false;
+	}
+	
+	public void setHabWheelsSpeed(double speed) {
+		setHabSpeedLeft(speed);
+		setHabSpeedRight(speed);
+		runHabWheels = true;
+	}
+	
+	public void stopHabWheels() {
+		setHabSpeedLeft(0);
+		setHabSpeedRight(0);
+		runHabWheels = false;
+	}
+	
+	public boolean onPlatform() {
+		return true;
 	}
 
 	public void setHabSpeedLeft(double speed) {
@@ -125,7 +155,7 @@ public class HAB extends GenericSubsystem {
 
 	@Override
 	public boolean isDone() {
-		return false;
+		return isDone;
 	}
 
 	@Override

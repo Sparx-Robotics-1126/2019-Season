@@ -175,7 +175,7 @@ public class Drives extends GenericSubsystem {
 				wantedSpeedRight = moveSpeed;
 				wantedSpeedLeft = moveSpeed;
 				straightenForward();
-				rightMtrs.set(wantedSpeedRight);
+				rightMtrs.set(-wantedSpeedRight);
 				leftMtrs.set(wantedSpeedLeft);
 			}
 			break;
@@ -191,8 +191,8 @@ public class Drives extends GenericSubsystem {
 				wantedSpeedRight = moveSpeed;
 				wantedSpeedLeft = moveSpeed;
 				straightenForward();
-				rightMtrs.set(-speedRight);
-				leftMtrs.set(-speedLeft);
+				rightMtrs.set(wantedSpeedRight);
+				leftMtrs.set(-wantedSpeedLeft);
 			}
 			break;
 		case TURN_RIGHT:
@@ -270,6 +270,7 @@ public class Drives extends GenericSubsystem {
 			arms.armsDown();
 			if (arms.isDone()) {
 				toTeleop();
+				isMoving = false;
 			}
 			break;
 		case FINDING_LINE:
@@ -284,14 +285,14 @@ public class Drives extends GenericSubsystem {
 
 		}
 		// System.out.println("State: " + )
-		 System.out.println("Right Encoder rates: " + rightEnc.getRate());
-		 System.out.println("Left Encoder rates: " + leftEnc.getRate());
-		 if(Math.abs(rightEnc.getRate()) > highestRight) {
-			 highestRight = Math.abs(rightEnc.getRate());
-		 }
-		 if(Math.abs(leftEnc.getRate()) > highestLeft) {
-			 highestLeft = Math.abs(leftEnc.getRate());
-		 }
+//		 System.out.println("Right Encoder rates: " + rightEnc.getRate());
+//		 System.out.println("Left Encoder rates: " + leftEnc.getRate());
+//		 if(Math.abs(rightEnc.getRate()) > highestRight) {
+//			 highestRight = Math.abs(rightEnc.getRate());
+//		 }
+//		 if(Math.abs(leftEnc.getRate()) > highestLeft) {
+//			 highestLeft = Math.abs(leftEnc.getRate());
+//		 }
 		// System.out.println("Gyro: " + getAngle());
 		// System.out.println("left rate: " + leftEnc.getRate());
 		// System.out.println("right rate: " + rightEnc.getRate());
@@ -341,6 +342,7 @@ public class Drives extends GenericSubsystem {
 	}
 	
 	public void toArms() {
+		isMoving = true;
 		arms.reset();
 		unsnappy.set(true);
 		changeState(DriveState.ARMS);
