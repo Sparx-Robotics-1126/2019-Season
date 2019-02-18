@@ -59,7 +59,7 @@ public class Arms {
 
 	// ----------------------------------------Constants----------------------------------------
 
-	final double wantedDegree = 17;
+	final double wantedDegree = 1;
 
 	final double wantedSpeed = 10; 
 
@@ -97,9 +97,9 @@ public class Arms {
 			leftMtrSpeed = -leftArmEnc.getRate();
 
 			if (leftMtrSpeed < wantedSpeed) {
-				wantedLeftMtrPwr += 0.02; // gav
+				wantedLeftMtrPwr -= 0.02; // gav
 			} else if (leftMtrSpeed > wantedSpeed) {
-				wantedLeftMtrPwr -= 0.01; // gav
+				wantedLeftMtrPwr += 0.01; // gav
 			}
 			wantedLeftMtrPwr = wantedLeftMtrPwr > 1 ? 1 : wantedLeftMtrPwr;
 			actualDegreeLeft = -leftArmEnc.getDistance();
@@ -114,9 +114,9 @@ public class Arms {
 			}
 			rightMtrSpeed = -rightArmEnc.getRate();
 			if (rightMtrSpeed < wantedSpeed) {
-				wantedRightMtrPwr += 0.02; // gav
+				wantedRightMtrPwr -= 0.02; // gav
 			} else if (rightMtrSpeed > wantedSpeed) {
-				wantedRightMtrPwr -= 0.01; // gav
+				wantedRightMtrPwr += 0.01; // gav
 			}
 			wantedRightMtrPwr = wantedRightMtrPwr > 1 ? 1 : wantedRightMtrPwr;
 			actualDegreeRight = rightArmEnc.getDistance();

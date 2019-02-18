@@ -118,7 +118,6 @@ public class Drives extends GenericSubsystem {
 		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
 		rightEnc.setDistancePerPulse(-0.02110013);// 0.07897476
 		leftEnc.setDistancePerPulse(0.02110013);
-		
 		gyro = new AHRS(SerialPort.Port.kUSB);
 		gyro.reset();
 		resetGyroAngle();

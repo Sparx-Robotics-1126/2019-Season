@@ -254,7 +254,6 @@ public class Automation {
 			startTime = Timer.getFPGATimestamp();
 			clearData();
 			firstRun = false;
-			time = Timer.getFPGATimestamp();
 		}
 		if(delayTimeStart != -1) {
 			if(delayTimeStart + delayTime > Timer.getFPGATimestamp()) {
