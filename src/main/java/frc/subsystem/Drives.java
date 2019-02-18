@@ -84,7 +84,7 @@ public class Drives extends GenericSubsystem {
 
 	// ----------------------------------------Constants----------------------------------------
 
-	private final double ANGLE_OFF_BY = 2;
+	private final double ANGLE_OFF_BY = 1;
 
 	private final double SPEED_PERCENTAGE = .5;
 
@@ -173,7 +173,7 @@ public class Drives extends GenericSubsystem {
 			break;
 		case MOVE_BACKWARD:
 			// System.out.println("General");
-			if (getDistance() > moveDist) {
+			if (getDistance() < moveDist) {
 				// System.out.println("Kenobi");
 				rightMtrs.stopMotors();
 				leftMtrs.stopMotors();
@@ -225,19 +225,13 @@ public class Drives extends GenericSubsystem {
 				leftMtrs.set(0.3);
 				rightMtrs.set(0.3);
 			} else if (st == directions.SLIGHTLEFT) {
-				System.out.println("Left Motors current: " + leftMtrs.getCurrent());
-				System.out.println("Left Motors voltage: " + leftMtrs.getVoltage());
-				System.out.println("Right Motors current: " + rightMtrs.getCurrent());
-				System.out.println("Right Motors voltage: " + rightMtrs.getVoltage());
+				isMoving = false;
 				leftMtrs.set(0.00);
-				rightMtrs.set(0.30);
+				rightMtrs.set(0.40);
 			} else if (st == directions.SLIGHTRIGHT) {
-				System.out.println("Left Motors current: " + leftMtrs.getCurrent());
-				System.out.println("Left Motors voltage: " + leftMtrs.getVoltage());
-				System.out.println("Right Motors current: " + rightMtrs.getCurrent());
-				System.out.println("Right Motors voltage: " + rightMtrs.getVoltage());
-				leftMtrs.set(0.30);
-				rightMtrs.set(0.10);
+				isMoving = false;
+				leftMtrs.set(0.40);
+				rightMtrs.set(0.00);
 			} else if (st == directions.STANDBY) {
 				leftMtrs.set(0);
 				rightMtrs.set(0);
@@ -301,6 +295,7 @@ public class Drives extends GenericSubsystem {
 
 	// move the robot at a given speed and distance
 	public void move(double speed, double dist) {
+		resetEncoders();
 		moveSpeed = speed;
 		moveDist = dist;
 		resetGyroAngle();
@@ -311,6 +306,11 @@ public class Drives extends GenericSubsystem {
 			changeState(DriveState.MOVE_BACKWARD);
 
 		}
+	}
+	
+	public void resetEncoders() {
+		leftEnc.reset();
+		rightEnc.reset();
 	}
 
 	// debugs all the possible problems in drives

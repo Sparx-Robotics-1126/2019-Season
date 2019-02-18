@@ -76,17 +76,17 @@ public class TeleOP implements Controls {
 			hab.setHabSpeedRight(0);
 		}
 		if (isOffZeroAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
-			hab.setHabSpeedLeft(-getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
+			hab.setHabSpeedLeft(getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
 		} else {
 			hab.setHabSpeedLeft(0);
 		}
 		if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y)) {
-			drives.joystickLeft(-getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y));
+			drives.joystickLeft(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y));
 		} else {
 			drives.joystickLeft(0);
 		}
 		if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y)) {
-			drives.joystickRight(-getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y));
+			drives.joystickRight(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y));
 		} else {
 			drives.joystickRight(0);
 		}

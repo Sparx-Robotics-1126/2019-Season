@@ -32,6 +32,8 @@ public class Autonomous implements Controls{
 	public boolean runAuto;
 
 	private SendableChooser<Autos> autoSelector;
+	
+	private final double DISTANCE_MULITPLIER = 1;
 
 	/**
 	 * Autos
@@ -233,9 +235,11 @@ public class Autonomous implements Controls{
 				addStep(AutoMethod.DRIVES_WAIT);
 				addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				addStep(AutoMethod.DRIVES_WAIT);
-//				addStep(AutoMethod.HATCH_SHOOTFLIP);
-//				addStep(AutoMethod.AUTO_DELAY, 0.2);
-//				addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
+				addStep(AutoMethod.AUTO_DELAY, 1);
+				addStep(AutoMethod.HATCH_SHOOTFLIP);	
+				addStep(AutoMethod.AUTO_DELAY, 0.25);
+				addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
+				addStep(AutoMethod.DRIVES_WAIT);
 				addStep(AutoMethod.AUTO_STOP);
 				break;
 			case HAB_ONE_TO_LEFT_HATCH_MIDDLE:
@@ -278,7 +282,7 @@ public class Autonomous implements Controls{
 
 	private void runAuto() {
 		if(delayTimeStart != -1) {
-			if(delayTimeStart + delayTime < Timer.getFPGATimestamp()) {
+			if(delayTimeStart + delayTime > Timer.getFPGATimestamp()) {
 				return;
 			}
 			delayTimeStart = -1;
@@ -291,11 +295,11 @@ public class Autonomous implements Controls{
 			System.out.println(currentAuto.get(currentStep));
 			switch(currentAuto.get(currentStep)) {
 			case DRIVES_FORWARD:
-				drives.move(currentStepData[0], currentStepData[1]);
+				drives.move(currentStepData[0], currentStepData[1]*DISTANCE_MULITPLIER);
 				currentStep++;
 				break;
 			case DRIVES_BACKWARD:
-				drives.move(currentStepData[0], -currentStepData[1]);
+				drives.move(currentStepData[0], -currentStepData[1]*DISTANCE_MULITPLIER);
 				currentStep++;
 				break;
 			case DRIVES_TIMED:
