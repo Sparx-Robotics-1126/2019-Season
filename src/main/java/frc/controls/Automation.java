@@ -18,19 +18,14 @@ public class Automation {
 	private int currentStep;
 	private double delayTimeStart;
 	private double delayTime;
-	
-	private Autos selectedAuto;
 
 	private Drives drives;
 	private HAB hab;
+	private Hatch hatch;
 	
 	private boolean firstRun;
-	private Hatch hatch;
+	private boolean isDone;
 
-	public boolean runAuto;
-
-	private SendableChooser<Autos> autoSelector;
-	
 	private final double DISTANCE_MULITPLIER = 1;
 
 	/**
@@ -39,91 +34,82 @@ public class Automation {
 	 *
 	 */
 
-	private enum Autos{
-		DO_NOTHING,
-		AUTO,
-		CLIMBING;
-	}
-
-	private enum AutoMethod {
+	public enum AutoMethod {
 		/**
 		 * Moves forward with a given distance at a given speed.
 		 * @param speed - speed to go (in inches/second)
 		 * @param distance - distance to go (in inches)
 		 */
-		DRIVES_FORWARD(0, 2),	
+		DRIVES_FORWARD(2),	
 		/**
 		 * Moves backward with a given distance at a given speed.
 		 * @param speed - speed to go (in inches/second)
 		 * @param distance - distance to go (in inches)
 		 */
-		DRIVES_BACKWARD(1, 2),
+		DRIVES_BACKWARD(2),
 		/**
 		 * Moves forward for a period of time at a given speed.
 		 * @param time - time to move (seconds)
 		 * @param speed - speed to go (inches/second)
 		 */
-		DRIVES_TIMED(2, 2),		
+		DRIVES_TIMED(2),		
 		/**
 		 * Turns left x degrees at a given speed.
 		 * @param degree - degrees to go (degrees)
 		 * @param speed - speed to go (inches/second)
 		 */
-		DRIVES_TURNLEFT(3, 2),
+		DRIVES_TURNLEFT(2),
 		/**
 		 * Turns right x degrees at a given speed.
 		 * @param degree - degrees to go (degrees)
 		 * @param speed - speed to go (inches/second)
 		 */
-		DRIVES_TURNRIGHT(4, 2),
+		DRIVES_TURNRIGHT(2),
 		/**
 		 * Starts vision following using line sensors.
 		 */
-		DRIVES_FOLLOWLINE(5, 0),
+		DRIVES_FOLLOWLINE(0),
 		/**
 		 * Waits until any autonomous drive functions have finished.
 		 */
-		DRIVES_WAIT(6, 0),
+		DRIVES_WAIT(0),
 		/**
 		 * Stops drives.
 		 */
-		DRIVES_STOP(7, 0),
+		DRIVES_STOP(0),
 		/**
 		 * Returns the hatch to home.
 		 */
-		HATCH_HOME(20, 0),
+		HATCH_HOME(0),
 		/**
 		 * Shoots and flips the hatch.
 		 */
-		HATCH_SHOOTFLIP(21, 0),
+		HATCH_SHOOTFLIP(0),
 		/**
 		 * Flips the hatch.
 		 */
-		HATCH_FLIP(22, 0),
-		DRIVES_ARMS_DOWN(40, 0),
-		HAB_WHEELS_FORWARD(41, 1),
-		HAB_WAIT_PLATFORM(42, 0),
-		HAB_UP(60, 0),
-		HAB_DOWN(61, 0),
-		HAB_PREARMS(62, 0),
-		HAB_WAIT(63, 0),
-		
+		HATCH_FLIP(0),
+		DRIVES_ARMS_DOWN(0),
+		HAB_WHEELS_FORWARD(1),
+		HAB_WAIT_PLATFORM(0),
+		HAB_UP(0),
+		HAB_DOWN(0),
+		HAB_PREARMS(0),
+		HAB_WAIT(0),
+
 		/**
 		 * Pauses the auto for x seconds
 		 * @param seconds - the number of seconds to pause the auto for.
 		 */
-		AUTO_DELAY(99, 1),
+		AUTO_DELAY(1),
 		/**
 		 * Kills the auto.
 		 */
-		AUTO_STOP(100, 0),
-		AUTO_EXIT(101, 0);
+		AUTO_STOP(0);
 
-		private final int id;
 		private final int parameterCount;
 
-		private AutoMethod(int id, int parameterCount) {
-			this.id = id;
+		private AutoMethod(int parameterCount) {
 			this.parameterCount = parameterCount;
 		}
 
@@ -159,15 +145,6 @@ public class Automation {
 			return null;
 		}
 
-		private static AutoMethod toAutoMethod(int id) {
-			for(AutoMethod auto: AutoMethod.values()) {
-				if(auto.id == id) {
-					return auto;
-				}
-			}
-			return null;
-		}
-
 	}
 
 	public Automation(Drives drives, Hatch hatch, HAB hab) {
@@ -176,29 +153,35 @@ public class Automation {
 		this.hab = hab;
 		currentAuto = new Vector<AutoMethod>();
 		currentAutoParams = new Vector<double[]>();
-		
-		selectedAuto = Autos.DO_NOTHING;
-		firstRun = true;
-	}
 
-	public void printCurrentAuto() {
+		firstRun = true;
+		currentStepData = null;
+		currentStep = 0;
+		delayTime = -1;
+		delayTimeStart = -1;
+		isDone = false;
 	}
 
 	public void reset() {
 		firstRun = true;
-		currentStepData = null;
 		currentAuto.clear();
 		currentAutoParams.clear();
+		clearData();
+	}
+	
+	public void clearData() {
+		currentStepData = null;
 		currentStep = 0;
 		delayTime = -1;
 		delayTimeStart = -1;
+		isDone = false;
 	}
 
-	public void setRunAuto(boolean runAuto) {
-		this.runAuto = runAuto;
-	}
-
-	private boolean addStep(AutoMethod autoMethod, double... parameters) {
+	public boolean addStep(AutoMethod autoMethod, double... parameters) {
+		if(!firstRun) {
+			System.out.println("Dirty run - call reset() on Automation before adding anything else!");
+			return false;
+		}
 		if(parameters != null) {
 			if(parameters.length != autoMethod.parameterCount) {
 				System.out.println("Invalid number of parameters passed in - expected " + autoMethod.parameterCount + " but got " + parameters.length);
@@ -213,6 +196,10 @@ public class Automation {
 	}
 
 	private boolean removeStep(int index) {
+		if(!firstRun) {
+			System.out.println("Dirty run - call reset() on Automation before changing anything else!");
+			return false;
+		}
 		if(currentAuto.size() - 1 > index) {
 			System.out.println("Selected index for auto does not exist.");
 			return false;
@@ -222,42 +209,16 @@ public class Automation {
 		//		System.out.println("Removed step " + );
 		return true;
 	}
-
-	public void setAuto(Autos auto) {
-		firstRun = false;
-		if(auto != selectedAuto) {
-			currentAuto.clear();
-			switch(auto) {
-			case CLIMBING:
-				addStep(AutoMethod.HAB_PREARMS); //-
-				addStep(AutoMethod.HAB_WAIT);
-				addStep(AutoMethod.DRIVES_ARMS_DOWN);
-				addStep(AutoMethod.DRIVES_WAIT);
-				addStep(AutoMethod.HAB_DOWN);
-				addStep(AutoMethod.HAB_WAIT);	
-				addStep(AutoMethod.HAB_WHEELS_FORWARD, 0.5);
-				addStep(AutoMethod.HAB_WAIT_PLATFORM); //UNFINISHED, NEEDS SENSORS -> DO NOT USE
-				addStep(AutoMethod.HAB_UP);
-				addStep(AutoMethod.HAB_WAIT);
-				addStep(AutoMethod.AUTO_STOP);
-				break;
-			default: 
-				System.out.println("haHAA its not working");
-				break;
-			}
-		}
+	
+	public boolean isDone() {
+		return isDone();
 	}
 
 	public void execute() {
-		if(DriverStation.getInstance().isEnabled() && DriverStation.getInstance().isAutonomous() && !firstRun) {
-			runAuto();
-			System.out.println(currentAuto.toString());
-		} else {
-			setAuto(autoSelector.getSelected());
+		if(firstRun) {
+			clearData();
+			firstRun = false;
 		}
-	}
-
-	private void runAuto() {
 		if(delayTimeStart != -1) {
 			if(delayTimeStart + delayTime > Timer.getFPGATimestamp()) {
 				return;
@@ -351,36 +312,17 @@ public class Automation {
 				delayTime = currentStepData[0];
 				break;
 			case AUTO_STOP:
-//				drives.stopMotors();
+				drives.stopMotors();
 				currentStep = currentAuto.size() + 1;
 				break;
 			default:
 				System.out.println("Invalid auto (" + currentAuto.get(currentStep) + ")");
 				break;
 			}
+		} else {
+			isDone = true;
 		}
 	}
-/*
-	public class AutoSendable extends SendableBase {
-		public String[] displayAuto() {
-			String[] str = new String[currentAuto.size()];
-			for(int i = 0; i < currentAuto.size(); i++) {
-				str[i] = currentAuto.get(i).printer(currentAutoParams.get(i));
-			}
-			return str;
-		}
-		
-		public double[] getAuto() {
-			return null;
-		}
-		
-		@Override
-		public void initSendable(SendableBuilder builder) {
-			builder.addStringArrayProperty("Autonomous", this::displayAuto, null);
-//			builder.addDoubleArrayProperty("Autonomous parameters", getter, setter);
-		}
-		
-	}*/
-	
+
 }
 

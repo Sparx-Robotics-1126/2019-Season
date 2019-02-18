@@ -52,5 +52,17 @@ public class CtrlMap {
 	public static final int POV_RIGHT = 1;
 	public static final int POV_DOWN = 2;
 	public static final int POV_LEFT = 3;
+	
+	//
+	public static final int LEFTJOYBUTTONOFFSET = 0;
+	public static final int RIGHTJOYBUTTONOFFSET = 4;
+	public static final int XBOXBUTTONOFFSET = 8;
+	
+	public static final int LEFTJOYPOVOFFSET = 0;
+	public static final int RIGHTJOYPOVOFFSET = 4;
+	public static final int XBOXPOVOFFSET = 8;
 
+
+	
+	
 }
