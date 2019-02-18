@@ -25,6 +25,8 @@ public class Automation {
 	
 	private boolean firstRun;
 	private boolean isDone;
+	
+	private double time;
 
 	private final double DISTANCE_MULITPLIER = 1;
 
@@ -123,10 +125,13 @@ public class Automation {
 		 * @param seconds - the number of seconds to pause the auto for.
 		 */
 		AUTO_DELAY(1),
+		AUTO_STARTTIMER(1),
+		AUTO_ENDTIMER(1),
 		/**
 		 * Kills the auto.
 		 */
-		AUTO_STOP(0);
+		AUTO_STOP(0),
+		AUTO_KILL(0);
 
 		private final int parameterCount;
 
@@ -239,6 +244,7 @@ public class Automation {
 		if(firstRun) {
 			clearData();
 			firstRun = false;
+			time = Timer.getFPGATimestamp();
 		}
 		if(delayTimeStart != -1) {
 			if(delayTimeStart + delayTime > Timer.getFPGATimestamp()) {
@@ -332,9 +338,14 @@ public class Automation {
 				delayTimeStart = Timer.getFPGATimestamp();
 				delayTime = currentStepData[0];
 				break;
+			case AUTO_STARTTIMER:
+				time = Timer.getFPGATimestamp();
+				return;
 			case AUTO_STOP:
 				drives.stopMotors();
 				currentStep = currentAuto.size() + 1;
+				break;
+			case AUTO_KILL:
 				break;
 			default:
 				System.out.println("Invalid auto (" + currentAuto.get(currentStep) + ")");
