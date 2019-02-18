@@ -32,11 +32,8 @@ public class RobotSystem extends Thread{
 
     public RobotSystem(){
         drives = new Drives();
-        drives.init();
         hab = new HAB();
-        hab.init();
         hatch = new Hatch();
-        hatch.init();
         teleop = new TeleOP(drives, hab, hatch);
         autonomous = new Autonomous(drives, hatch);
         currentState = RobotState.STANDBY;
@@ -54,6 +51,7 @@ public class RobotSystem extends Thread{
 
     public void resetVision()
     {
+    	if(drives != null)
         drives.resetVision();
     }
 

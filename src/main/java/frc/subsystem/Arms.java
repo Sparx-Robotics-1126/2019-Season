@@ -19,28 +19,51 @@ import frc.util.MotorGroup;
  */
 public class Arms {
 
-	final double wantedDegree = 17;
-	final double wantedSpeed = 1; // gav
-	double armOffset;
-	double actualDegreeLeft = 0;
-	double actualDegreeRight = 0;
-	double leftMtrSpeed;
-	double rightMtrSpeed;
-	double wantedRightMtrPwr;
-	double wantedLeftMtrPwr;
-	private DigitalInput leftInput;
-	private DigitalInput rightInput;
+	// --------------------------------------Motors/Sensors-------------------------------------
+
 	private MotorGroup rightMtrs;
+
 	private MotorGroup leftMtrs;
+
 	private WPI_TalonSRX leftArmMtr;
+
 	private WPI_TalonSRX rightArmMtr;
+
 	private Encoder leftArmEnc;
+
 	private Encoder rightArmEnc;
+
+	private DigitalInput leftInput;
+
+	private DigitalInput rightInput;
+
+	// ----------------------------------------Variable-----------------------------------------
+
+	private double actualDegreeLeft = 0;
+
+	private double actualDegreeRight = 0;
+
+	private double leftMtrSpeed;
+
+	private double rightMtrSpeed;
+
+	private double wantedRightMtrPwr;
+
+	private double wantedLeftMtrPwr;
+	
 	private boolean isDone;
+
 	private boolean stopLeft;
+
 	private boolean stopRight;
-	private double stopLeftTimer;
-	private double stopRightTimer;
+
+	// ----------------------------------------Constants----------------------------------------
+
+	final double wantedDegree = 17;
+
+	final double wantedSpeed = 10; 
+
+	// ------------------------------------------Code-------------------------------------------
 
 	public Arms(MotorGroup rightMtrs, MotorGroup leftMtrs, Encoder rightEnc, Encoder leftEnc) {
 		this.rightMtrs = rightMtrs;
@@ -49,6 +72,8 @@ public class Arms {
 		leftArmEnc = leftEnc;
 		leftInput = new DigitalInput(IO.ARMS_LIMITSWITCH_LEFT);
 		rightInput = new DigitalInput(IO.ARMS_LIMITSWITCH_RIGHT);
+		GenericSubsystem.addToTables(leftInput, "Arms", "Left Limit Switch");
+		GenericSubsystem.addToTables(rightInput, "Arms", "Right Limit Switch");
 	}
 
 	public void reset() {
@@ -56,8 +81,8 @@ public class Arms {
 		stopRight = false;
 		actualDegreeLeft = 0;
 		actualDegreeRight = 0;
-		stopLeftTimer = -1;
-		stopRightTimer = -1;
+		leftInput.setName("Arms", "Left Limit Switch");
+		rightInput.setName("Arms", "Right Limit Switch");
 	}
 
 	public void armsDown() {
