@@ -107,6 +107,7 @@ public class Drives extends GenericSubsystem {
 		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
 		rightEnc.setDistancePerPulse(-0.02110013);// 0.07897476
 		leftEnc.setDistancePerPulse(0.02110013);
+		rightMtrs.setInverted(true);
 		gyro = new AHRS(SerialPort.Port.kUSB);
 		gyro.reset();
 		lastAngle = 0;
@@ -283,9 +284,9 @@ public class Drives extends GenericSubsystem {
 
 		}
 		// System.out.println("State: " + )
-		 System.out.println("Right Encoder: " + rightEnc.getDistance());
-		 System.out.println("Left Encoder: " + leftEnc.getDistance());
-		// System.out.println("Gyro: " + getAngle());
+//		 System.out.println("Right Encoder: " + rightEnc.getDistance());
+//		 System.out.println("Left Encoder: " + leftEnc.getDistance());
+//		 System.out.println("Gyro: " + getAngle());
 		// System.out.println("left rate: " + leftEnc.getRate());
 		// System.out.println("right rate: " + rightEnc.getRate());
 		// System.out.println("GetDistance: " + getDistance());

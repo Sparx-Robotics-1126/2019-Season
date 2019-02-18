@@ -184,6 +184,7 @@ public class Autonomous implements Controls{
 	}
 
 	public void reset() {
+		firstRun = true;
 		currentStepData = null;
 		currentAuto.clear();
 		currentAutoParams.clear();

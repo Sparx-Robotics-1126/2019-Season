@@ -95,7 +95,7 @@ public class HAB extends GenericSubsystem {
 		}
 		habLeft.set(wantedSpeedLeft);
 		habRight.set(wantedSpeedRight);
-		System.out.println("Lead screw: " + leadScrewEncRaw.getDistance());
+//		System.out.println("Lead screw: " + leadScrewEncRaw.getDistance());
 	}
 
 	public void ctrlDown() {
