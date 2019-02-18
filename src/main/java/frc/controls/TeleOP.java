@@ -120,7 +120,7 @@ public class TeleOP implements Controls {
 				drives.joystickLeft(0);
 			}
 			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y)) {
-				drives.joystickRight(-getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y));
+				drives.joystickRight(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y));
 			} else {
 				drives.joystickRight(0);
 			}

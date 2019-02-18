@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import frc.controls.Autonomous;
 import edu.wpi.first.wpilibj.Compressor;
 import frc.controls.Controls;
 import frc.controls.TeleOP;
@@ -19,67 +20,77 @@ import frc.subsystem.Hatch;
  */
 public class RobotSystem extends Thread{
 
-    private RobotState currentState;
-    private Controls teleop;
-    private Controls currentControl; 
-    private Drives drives;
-    private HAB hab;
-    private Hatch hatch;
-    
-    private Compressor compress;
+	private RobotState currentState;
+	private TeleOP teleop;
+	private Autonomous autonomous;
+	private Controls currentControl; 
+	private Drives drives;
+	private HAB hab;
+	private Hatch hatch;
 
-    public RobotSystem(){
-        drives = new Drives();
-        hab = new HAB();
-        hatch = new Hatch();
-        teleop = new TeleOP(drives, hab, hatch);
-        currentState = RobotState.STANDBY;
-        currentControl = teleop;
-        compress = new Compressor(IO.ROBOT_COMPRESSOR);
-        compress.setClosedLoopControl(true);
-    }
+	private Compressor compress;
 
-    
-    public enum RobotState{
+	public RobotSystem(){
+		drives = new Drives();
+		hab = new HAB();
+		hatch = new Hatch();
+		teleop = new TeleOP(drives, hab, hatch);
+		autonomous = new Autonomous(drives, hatch, hab);
+		currentState = RobotState.STANDBY;
+		currentControl = teleop;
+		compress = new Compressor(IO.ROBOT_COMPRESSOR);
+		compress.setClosedLoopControl(true);
+	}
+
+
+	public enum RobotState{
 		STANDBY,
 		AUTO,
 		TELE;
-    }
+	}
 
-    public void resetVision()
-    {
-    	if(drives != null)
-        drives.resetVision();
-    }
+	public void resetVision()
+	{
+		if(drives != null) {
+			drives.resetVision();
+		}
+	}
 
-    public void teleop() {
-    	currentControl = teleop;
-        currentState = RobotState.TELE;
-        drives.toTeleop();
-    }
-    
-    public void init(){
-        drives.start();
-        hab.start();
-        hatch.start();
-    }
+	public void teleop() {
+		currentControl = teleop;
+		currentState = RobotState.TELE;
+		drives.toTeleop();
+	}
 
-    @Override
-    public void run(){
-        while(true){
+	public void autonomous() {
+		System.out.println("Starting autonomous");
+		autonomous.reset();
+		currentControl = autonomous;
+		currentState = RobotState.AUTO;
+	}
+
+	public void init(){
+		drives.start();
+		hab.start();
+		hatch.start();
+	}
+
+	@Override
+	public void run(){
+		while(true){
 			switch(currentState){
-				case STANDBY:
-					break;
-				case AUTO:
-				case TELE:
-					currentControl.execute();
+			case STANDBY:
+				break;
+			case AUTO:
+			case TELE:
+				currentControl.execute();
 			}
-			
+
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {
 			}
 		}
-    }
+	}
 
 }

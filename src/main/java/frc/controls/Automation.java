@@ -23,6 +23,8 @@ public class Automation {
 	private HAB hab;
 	private Hatch hatch;
 	
+	private double startTime;
+	
 	private boolean firstRun;
 	private boolean isDone;
 	
@@ -95,6 +97,8 @@ public class Automation {
 		 * Moves arms down to latch onto the HAB.
 		 */
 		DRIVES_ARMS_DOWN(0),
+		DRIVES_HIGHGEAR(0),
+		DRIVES_LOWGEAR(0),
 		/**
 		 * Moves hab wheels forward (or backwards with -) at a given speed.
 		 * @param speed - the speed at which to move the HAB wheels forward.
@@ -127,6 +131,11 @@ public class Automation {
 		AUTO_DELAY(1),
 		AUTO_STARTTIMER(1),
 		AUTO_ENDTIMER(1),
+		/**
+		 * Records the auto time at the moment, storing it into SmartDashboard.
+		 * @param 
+		 */
+		AUTO_RECORD(1),
 		/**
 		 * Kills the auto.
 		 */
@@ -242,6 +251,7 @@ public class Automation {
 
 	public void execute() {
 		if(firstRun) {
+			startTime = Timer.getFPGATimestamp();
 			clearData();
 			firstRun = false;
 			time = Timer.getFPGATimestamp();
@@ -271,15 +281,23 @@ public class Automation {
 				currentStep++;
 				break;
 			case DRIVES_TURNLEFT:
-				drives.turn(currentStepData[0], currentStepData[1]);
+				drives.turn(currentStepData[0], -currentStepData[1]);
 				currentStep++;
 				break;
 			case DRIVES_TURNRIGHT:
-				drives.turn(currentStepData[0], -currentStepData[1]);
+				drives.turn(currentStepData[0], currentStepData[1]);
 				currentStep++;
 				break;
 			case DRIVES_FOLLOWLINE:
 				drives.findLine();
+				currentStep++;
+				break;
+			case DRIVES_LOWGEAR:
+				drives.lowShift();
+				currentStep++;
+				break;
+			case DRIVES_HIGHGEAR:
+				drives.highShift();
 				currentStep++;
 				break;
 			case DRIVES_WAIT:
@@ -342,6 +360,7 @@ public class Automation {
 				time = Timer.getFPGATimestamp();
 				return;
 			case AUTO_STOP:
+				SmartDashboard.putNumber("Auto time", Timer.getFPGATimestamp() - startTime);
 				drives.stopMotors();
 				currentStep = currentAuto.size() + 1;
 				break;

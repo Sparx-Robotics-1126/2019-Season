@@ -97,9 +97,9 @@ public class Arms {
 			leftMtrSpeed = -leftArmEnc.getRate();
 
 			if (leftMtrSpeed < wantedSpeed) {
-				wantedLeftMtrPwr -= 0.02; // gav
+				wantedLeftMtrPwr += 0.02; // gav
 			} else if (leftMtrSpeed > wantedSpeed) {
-				wantedLeftMtrPwr += 0.01; // gav
+				wantedLeftMtrPwr -= 0.01; // gav
 			}
 			wantedLeftMtrPwr = wantedLeftMtrPwr > 1 ? 1 : wantedLeftMtrPwr;
 			actualDegreeLeft = -leftArmEnc.getDistance();
@@ -124,7 +124,7 @@ public class Arms {
 		} else {
 			rightMtrs.set(0);
 		}
-		if(isDone) {
+		if (isDone) {
 			rightMtrs.set(0);
 			leftMtrs.set(0);
 		}

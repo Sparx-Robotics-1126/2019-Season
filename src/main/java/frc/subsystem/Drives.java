@@ -76,6 +76,8 @@ public class Drives extends GenericSubsystem {
 	private double moveSpeed;
 
 	private DriveState state;
+	
+	private DriveState prevState;
 
 	private double timer;
 
@@ -93,9 +95,9 @@ public class Drives extends GenericSubsystem {
 
 	// ----------------------------------------Constants----------------------------------------
 
-	private final double ANGLE_OFF_BY = 2;
+	private final double ANGLE_OFF_BY = 1;
 
-	private final double SPEED_PERCENTAGE = .5;
+	private final double SPEED_PERCENTAGE = .7;
 
 	// ------------------------------------------Code-------------------------------------------
 	
@@ -116,10 +118,12 @@ public class Drives extends GenericSubsystem {
 		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
 		rightEnc.setDistancePerPulse(-0.02110013);// 0.07897476
 		leftEnc.setDistancePerPulse(0.02110013);
+		
 		gyro = new AHRS(SerialPort.Port.kUSB);
 		gyro.reset();
 		resetGyroAngle();
 		rightMtrs = new MotorGroup(rightMtr1, rightMtr2, rightMtr3);
+		rightMtrs.setInverted(true);
 		leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
 		shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID);
 		drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID);
@@ -185,12 +189,12 @@ public class Drives extends GenericSubsystem {
 				wantedSpeedRight = moveSpeed;
 				wantedSpeedLeft = moveSpeed;
 				straightenForward();
-				rightMtrs.set(-wantedSpeedRight);
+				rightMtrs.set(wantedSpeedRight);
 				leftMtrs.set(wantedSpeedLeft);
 			}
 			break;
 		case MOVE_BACKWARD:
-			if (getDistance() > moveDist) {
+			if (getDistance() < moveDist) {
 				rightMtrs.stopMotors();
 				leftMtrs.stopMotors();
 				isMoving = false;
@@ -199,8 +203,8 @@ public class Drives extends GenericSubsystem {
 				wantedSpeedRight = moveSpeed;
 				wantedSpeedLeft = moveSpeed;
 				straightenForward();
-				rightMtrs.set(wantedSpeedRight);
-				leftMtrs.set(-wantedSpeedLeft);
+				rightMtrs.set(-wantedSpeedLeft);
+				leftMtrs.set(-wantedSpeedRight);
 			}
 			break;
 		case TURN_RIGHT:
@@ -239,11 +243,13 @@ public class Drives extends GenericSubsystem {
 				leftMtrs.set(0.3);
 				rightMtrs.set(0.3);
 			} else if (st == directions.SLIGHTLEFT) {
+				isMoving = false;
 				leftMtrs.set(0.00);
-				rightMtrs.set(0.30);
+				rightMtrs.set(0.40);
 			} else if (st == directions.SLIGHTRIGHT) {
-				leftMtrs.set(0.30);
-				rightMtrs.set(0.10);
+				isMoving = false;
+				leftMtrs.set(0.40);
+				rightMtrs.set(0.00);
 			} else if (st == directions.STANDBY) {
 				leftMtrs.set(0);
 				rightMtrs.set(0);
@@ -256,8 +262,9 @@ public class Drives extends GenericSubsystem {
 			shiftingPosition = false;
 			if (timer + 400 < System.currentTimeMillis()) {
 				leftMtrs.set(speedLeft);
-				rightMtrs.set(speedLeft);
-				changeState(DriveState.TELEOP);
+				rightMtrs.set(speedRight);
+				isMoving = false;
+				changeState(prevState);
 			}
 			break;
 		case SHIFT_HIGH:
@@ -268,7 +275,7 @@ public class Drives extends GenericSubsystem {
 			if (timer + 400 < System.currentTimeMillis()) {
 				leftMtrs.set(speedLeft);
 				rightMtrs.set(speedRight);
-				changeState(DriveState.TELEOP);
+				changeState(prevState);
 			}
 			break;
 		case ARMS:
@@ -292,15 +299,10 @@ public class Drives extends GenericSubsystem {
 			break;
 
 		}
-		// System.out.println("Right Encoder rates: " + rightEnc.getRate());
-		// System.out.println("Left Encoder rates: " + leftEnc.getRate());
-		// if(Math.abs(rightEnc.getRate()) > highestRight) {
-		// 	highestRight = Math.abs(rightEnc.getRate());
-		// }
-		// if(Math.abs(leftEnc.getRate()) > highestLeft) {
-		// 	 highestLeft = Math.abs(leftEnc.getRate());
-		// }
-		// System.out.println("Gyro: " + getAngle());
+		// System.out.println("State: " + )
+//		 System.out.println("Right Encoder: " + rightEnc.getDistance());
+//		 System.out.println("Left Encoder: " + leftEnc.getDistance());
+//		 System.out.println("Gyro: " + getAngle());
 		// System.out.println("left rate: " + leftEnc.getRate());
 		// System.out.println("right rate: " + rightEnc.getRate());
 		// System.out.println("GetDistance: " + getDistance());
@@ -323,6 +325,7 @@ public class Drives extends GenericSubsystem {
 
 	// move the robot at a given speed and distance
 	public void move(double speed, double dist) {
+		resetEncoders();
 		moveSpeed = speed;
 		moveDist = dist;
 		resetGyroAngle();
@@ -333,6 +336,11 @@ public class Drives extends GenericSubsystem {
 			changeState(DriveState.MOVE_BACKWARD);
 
 		}
+	}
+	
+	public void resetEncoders() {
+		leftEnc.reset();
+		rightEnc.reset();
 	}
 
 	// stops all the motors in drives
@@ -363,12 +371,20 @@ public class Drives extends GenericSubsystem {
 
 	// shifts the robot into low gear
 	public void lowShift() {
+		speedLeft = 0;
+		speedRight = 0;
+		isMoving = true;
+		prevState = state;
 		timer = System.currentTimeMillis();
 		changeState(DriveState.SHIFT_LOW);
 	}
 
 	// shifts the robot into high gear
 	public void highShift() {
+		speedRight = 0;
+		speedLeft = 0;
+		isMoving = true;
+		prevState = state;
 		timer = System.currentTimeMillis();
 		changeState(DriveState.SHIFT_HIGH);
 	}
@@ -439,11 +455,11 @@ public class Drives extends GenericSubsystem {
 		move(1, 120);
 	}
 
-	// attempts to find the line for vision
-	public void findLine() {
-		vision.reset();
-		changeState(DriveState.FINDING_LINE);
-	}
+    public void findLine(){
+    	isMoving = true;
+        vision.reset();
+        changeState(DriveState.FINDING_LINE);
+    }
 
 	// retruns the Arms object
 	public Arms getArms() {
