@@ -51,6 +51,8 @@ public class Drives extends GenericSubsystem {
 	private Solenoid drivesPTOArms;
 
 	private Arms arms;
+	
+	private Solenoid unsnappy;
 
 	// ----------------------------------------Variable----------------------------------------
 
@@ -87,6 +89,10 @@ public class Drives extends GenericSubsystem {
 	private final double ANGLE_OFF_BY = 2;
 
 	private final double SPEED_PERCENTAGE = .5;
+	
+	private double highestLeft;
+	
+	private double highestRight;
 
 	// create a drives object
 	public Drives() {
@@ -124,9 +130,12 @@ public class Drives extends GenericSubsystem {
 		wantedSpeedLeft = 0;
 		shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID);
 		drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID);
+		unsnappy = new Solenoid(IO.DRIVES_UNSNAPPY);
 		shiftingPosition = false;
 		isMoving = false;
 		arms = new Arms(rightMtrs, leftMtrs, rightEnc, leftEnc);
+		highestLeft = 0;
+		highestRight = 0;
 	}
 
 	public enum DriveState {
@@ -275,8 +284,14 @@ public class Drives extends GenericSubsystem {
 
 		}
 		// System.out.println("State: " + )
-		 System.out.println("Right Encoder: " + rightEnc.getDistance());
-		 System.out.println("Left Encoder: " + leftEnc.getDistance());
+		 System.out.println("Right Encoder rates: " + rightEnc.getRate());
+		 System.out.println("Left Encoder rates: " + leftEnc.getRate());
+		 if(Math.abs(rightEnc.getRate()) > highestRight) {
+			 highestRight = Math.abs(rightEnc.getRate());
+		 }
+		 if(Math.abs(leftEnc.getRate()) > highestLeft) {
+			 highestLeft = Math.abs(leftEnc.getRate());
+		 }
 		// System.out.println("Gyro: " + getAngle());
 		// System.out.println("left rate: " + leftEnc.getRate());
 		// System.out.println("right rate: " + rightEnc.getRate());
@@ -327,6 +342,7 @@ public class Drives extends GenericSubsystem {
 	
 	public void toArms() {
 		arms.reset();
+		unsnappy.set(true);
 		changeState(DriveState.ARMS);
 	}
 
