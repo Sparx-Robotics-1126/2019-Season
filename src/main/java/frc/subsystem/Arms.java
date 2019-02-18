@@ -79,6 +79,8 @@ public class Arms {
 	public void reset() {
 		stopLeft = false;
 		stopRight = false;
+		rightArmEnc.reset();
+		leftArmEnc.reset();
 		actualDegreeLeft = 0;
 		actualDegreeRight = 0;
 		leftInput.setName("Arms", "Left Limit Switch");

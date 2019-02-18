@@ -272,7 +272,7 @@ public class Drives extends GenericSubsystem {
 			}
 			break;
 		case ARMS:
-			if(timer + 1 < Timer.getFPGATimestamp()) {
+			if(timer + 2 < Timer.getFPGATimestamp()) {
 				drivesPTOArms.set(true);
 				arms.armsDown();
 				if (arms.isDone()) {
