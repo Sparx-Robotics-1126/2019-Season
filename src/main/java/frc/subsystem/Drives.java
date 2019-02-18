@@ -76,6 +76,8 @@ public class Drives extends GenericSubsystem {
 	private double moveSpeed;
 
 	private DriveState state;
+	
+	private DriveState prevState;
 
 	private double timer;
 
@@ -95,7 +97,7 @@ public class Drives extends GenericSubsystem {
 
 	private final double ANGLE_OFF_BY = 1;
 
-	private final double SPEED_PERCENTAGE = .5;
+	private final double SPEED_PERCENTAGE = .7;
 
 	// ------------------------------------------Code-------------------------------------------
 	
@@ -260,8 +262,9 @@ public class Drives extends GenericSubsystem {
 			shiftingPosition = false;
 			if (timer + 400 < System.currentTimeMillis()) {
 				leftMtrs.set(speedLeft);
-				rightMtrs.set(speedLeft);
-				changeState(DriveState.TELEOP);
+				rightMtrs.set(speedRight);
+				isMoving = false;
+				changeState(prevState);
 			}
 			break;
 		case SHIFT_HIGH:
@@ -272,7 +275,7 @@ public class Drives extends GenericSubsystem {
 			if (timer + 400 < System.currentTimeMillis()) {
 				leftMtrs.set(speedLeft);
 				rightMtrs.set(speedRight);
-				changeState(DriveState.TELEOP);
+				changeState(prevState);
 			}
 			break;
 		case ARMS:
@@ -368,12 +371,20 @@ public class Drives extends GenericSubsystem {
 
 	// shifts the robot into low gear
 	public void lowShift() {
+		speedLeft = 0;
+		speedRight = 0;
+		isMoving = true;
+		prevState = state;
 		timer = System.currentTimeMillis();
 		changeState(DriveState.SHIFT_LOW);
 	}
 
 	// shifts the robot into high gear
 	public void highShift() {
+		speedRight = 0;
+		speedLeft = 0;
+		isMoving = true;
+		prevState = state;
 		timer = System.currentTimeMillis();
 		changeState(DriveState.SHIFT_HIGH);
 	}
