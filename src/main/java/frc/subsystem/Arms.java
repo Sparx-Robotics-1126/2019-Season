@@ -39,8 +39,6 @@ public class Arms {
 
 	// ----------------------------------------Variable-----------------------------------------
 
-	private double armOffset;
-
 	private double actualDegreeLeft = 0;
 
 	private double actualDegreeRight = 0;
@@ -59,10 +57,6 @@ public class Arms {
 
 	private boolean stopRight;
 
-	private double stopLeftTimer;
-
-	private double stopRightTimer;
-
 	// ----------------------------------------Constants----------------------------------------
 
 	final double wantedDegree = 17;
@@ -78,6 +72,8 @@ public class Arms {
 		leftArmEnc = leftEnc;
 		leftInput = new DigitalInput(IO.ARMS_LIMITSWITCH_LEFT);
 		rightInput = new DigitalInput(IO.ARMS_LIMITSWITCH_RIGHT);
+		GenericSubsystem.addToTables(leftInput, "Arms", "Left Limit Switch");
+		GenericSubsystem.addToTables(rightInput, "Arms", "Right Limit Switch");
 	}
 
 	public void reset() {
@@ -85,8 +81,8 @@ public class Arms {
 		stopRight = false;
 		actualDegreeLeft = 0;
 		actualDegreeRight = 0;
-		stopLeftTimer = -1;
-		stopRightTimer = -1;
+		leftInput.setName("Arms", "Left Limit Switch");
+		rightInput.setName("Arms", "Right Limit Switch");
 	}
 
 	public void armsDown() {

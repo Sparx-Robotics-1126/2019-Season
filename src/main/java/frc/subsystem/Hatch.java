@@ -8,6 +8,7 @@
 package frc.subsystem;
 
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 
 /**
@@ -83,16 +84,24 @@ public class Hatch extends GenericSubsystem {
 		state = HatchState.HOME;
 	}
 
-	public void debug() {
-
-	}
-
 	public boolean isDone() {
 		return false;
 	}
 
 	public long sleepTime() {
 		return 20;
+	}
+
+	@Override
+	public void delayedPrints() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void smartDashboardInit() {
+		addToTables(flipper, "Flipper");
+		addToTables(shooter, "Shooter");
 	}
 
 }

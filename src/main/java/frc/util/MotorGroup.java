@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Add your docs here.
@@ -109,6 +110,12 @@ public class MotorGroup extends SpeedControllerGroup{
         }
 	}
 
+	@Override
+	public void initSendable(SendableBuilder builder) {
+		builder.setSmartDashboardType("Motor Group");
+		builder.setSafeState(this::stopMotor);
+		builder.addDoubleProperty("Value", this::get, this::set);
+	}
 
 
 }

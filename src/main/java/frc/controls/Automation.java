@@ -55,14 +55,14 @@ public class Automation {
 		DRIVES_TIMED(2),		
 		/**
 		 * Turns left x degrees at a given speed.
-		 * @param degree - degrees to go (degrees)
 		 * @param speed - speed to go (inches/second)
+		 * @param degree - degrees to go (degrees)
 		 */
 		DRIVES_TURNLEFT(2),
 		/**
 		 * Turns right x degrees at a given speed.
-		 * @param degree - degrees to go (degrees)
 		 * @param speed - speed to go (inches/second)
+		 * @param degree - degrees to go (degrees)
 		 */
 		DRIVES_TURNRIGHT(2),
 		/**
@@ -89,14 +89,35 @@ public class Automation {
 		 * Flips the hatch.
 		 */
 		HATCH_FLIP(0),
+		/**
+		 * Moves arms down to latch onto the HAB.
+		 */
 		DRIVES_ARMS_DOWN(0),
+		/**
+		 * Moves hab wheels forward (or backwards with -) at a given speed.
+		 * @param speed - the speed at which to move the HAB wheels forward.
+		 */
 		HAB_WHEELS_FORWARD(1),
+		/**
+		 * Waits until the sensor on the robot detects that we are on the platform (safe to move)
+		 */
 		HAB_WAIT_PLATFORM(0),
+		/**
+		 * Moves the hab screw up completely into the robot.
+		 */
 		HAB_UP(0),
+		/**
+		 * Moves the hab screw down such that it extends around the height of the HAB.
+		 */
 		HAB_DOWN(0),
+		/**
+		 * Moves the hab screw just enough so that the arms can go safely onto the HAB.
+		 */
 		HAB_PREARMS(0),
+		/**
+		 * Waits until the hab screw has finished moving.
+		 */
 		HAB_WAIT(0),
-
 		/**
 		 * Pauses the auto for x seconds
 		 * @param seconds - the number of seconds to pause the auto for.
@@ -211,7 +232,7 @@ public class Automation {
 	}
 	
 	public boolean isDone() {
-		return isDone();
+		return isDone;
 	}
 
 	public void execute() {

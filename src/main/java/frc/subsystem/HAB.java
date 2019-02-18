@@ -10,6 +10,7 @@ package frc.subsystem;
 import frc.robot.IO;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 /**
@@ -41,12 +42,10 @@ public class HAB extends GenericSubsystem {
 
 	private boolean isDone = false;
 
-	private boolean runHabWheels = false;
-
 	// ------------------------------------------Code-------------------------------------------
 	
 	public HAB() {
-		super("Hab");
+		super("HAB");
 	}
 
 	@Override
@@ -102,11 +101,12 @@ public class HAB extends GenericSubsystem {
 			}
 			break;
 		}
-		if(runHabWheels) {
-			
-		}
 		habLeft.set(wantedSpeedLeft);
 		habRight.set(wantedSpeedRight);
+	}
+	
+	@Override
+	public void delayedPrints() {
 		System.out.println("Lead screw: " + leadScrewEncRaw.getDistance());
 	}
 	
@@ -132,15 +132,13 @@ public class HAB extends GenericSubsystem {
 	}
 	
 	public void setHabWheelsSpeed(double speed) {
-		setHabSpeedLeft(speed);
+		setHabSpeedLeft(-speed);
 		setHabSpeedRight(speed);
-		runHabWheels = true;
 	}
 	
 	public void stopHabWheels() {
 		setHabSpeedLeft(0);
 		setHabSpeedRight(0);
-		runHabWheels = false;
 	}
 	
 	public boolean onPlatform() {
@@ -156,11 +154,6 @@ public class HAB extends GenericSubsystem {
 	}
 
 	@Override
-	public void debug() {
-
-	}
-
-	@Override
 	public boolean isDone() {
 		return isDone;
 	}
@@ -168,6 +161,14 @@ public class HAB extends GenericSubsystem {
 	@Override
 	public long sleepTime() {
 		return 20;
+	}
+
+	@Override
+	public void smartDashboardInit() {
+		addToTables(leadScrewMtr, "Lead Screw Motor");
+		addToTables(leadScrewEncRaw, "Lead Screw Encoder");
+		addToTables(habLeft, "Arms", "Arms Left Wheels");
+		addToTables(habRight, "Arms", "Arms Right Wheels");
 	}
 
 }

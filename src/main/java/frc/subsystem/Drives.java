@@ -13,6 +13,9 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.subsystem.Vision.directions;
 import frc.util.MotorGroup;
@@ -74,7 +77,7 @@ public class Drives extends GenericSubsystem {
 
 	private DriveState state;
 
-	private double shiftingTime;
+	private double timer;
 
 	private double wantedSpeedRight;
 
@@ -131,7 +134,7 @@ public class Drives extends GenericSubsystem {
 		moveDist = 0;
 		moveSpeed = 0;
 		state = DriveState.STANDBY;
-		shiftingTime = 0;
+		timer = 0;
 		wantedSpeedRight = 0;
 		wantedSpeedLeft = 0;
 		shiftingPosition = false;
@@ -251,7 +254,7 @@ public class Drives extends GenericSubsystem {
 			rightMtrs.set(0.2);
 			shifter.set(false);
 			shiftingPosition = false;
-			if (shiftingTime + 400 < System.currentTimeMillis()) {
+			if (timer + 400 < System.currentTimeMillis()) {
 				leftMtrs.set(speedLeft);
 				rightMtrs.set(speedLeft);
 				changeState(DriveState.TELEOP);
@@ -262,18 +265,20 @@ public class Drives extends GenericSubsystem {
 			rightMtrs.set(0.2);
 			shifter.set(true);
 			shiftingPosition = true;
-			if (shiftingTime + 400 < System.currentTimeMillis()) {
+			if (timer + 400 < System.currentTimeMillis()) {
 				leftMtrs.set(speedLeft);
 				rightMtrs.set(speedRight);
 				changeState(DriveState.TELEOP);
 			}
 			break;
 		case ARMS:
-			drivesPTOArms.set(true);
-			arms.armsDown();
-			if (arms.isDone()) {
-				toTeleop();
-				isMoving = false;
+			if(timer + 1 < Timer.getFPGATimestamp()) {
+				drivesPTOArms.set(true);
+				arms.armsDown();
+				if (arms.isDone()) {
+					toTeleop();
+					isMoving = false;
+				}
 			}
 			break;
 		case FINDING_LINE:
@@ -301,7 +306,16 @@ public class Drives extends GenericSubsystem {
 		// System.out.println("GetDistance: " + getDistance());
 		// System.out.println("RightMtr" + wantedSpeedRight + " LeftMtr: " + wantedSpeedLeft);
 	}
+	
+	@Override
+	public void delayedPrints() {
+		
+	}
 
+	public void flipUnsnappy() {
+		unsnappy.set(!unsnappy.get());
+	}
+	
 	// checks if drives is done with its autonomous code
 	public boolean isDone() {
 		return !isMoving;
@@ -319,11 +333,6 @@ public class Drives extends GenericSubsystem {
 			changeState(DriveState.MOVE_BACKWARD);
 
 		}
-	}
-
-	// debugs all the possible problems in drives
-	public void debug() {
-
 	}
 
 	// stops all the motors in drives
@@ -348,18 +357,19 @@ public class Drives extends GenericSubsystem {
 		isMoving = true;
 		arms.reset();
 		unsnappy.set(true);
+		timer = Timer.getFPGATimestamp();
 		changeState(DriveState.ARMS);
 	}
 
 	// shifts the robot into low gear
 	public void lowShift() {
-		shiftingTime = System.currentTimeMillis();
+		timer = System.currentTimeMillis();
 		changeState(DriveState.SHIFT_LOW);
 	}
 
 	// shifts the robot into high gear
 	public void highShift() {
-		shiftingTime = System.currentTimeMillis();
+		timer = System.currentTimeMillis();
 		changeState(DriveState.SHIFT_HIGH);
 	}
 
@@ -449,4 +459,29 @@ public class Drives extends GenericSubsystem {
 	public long sleepTime() {
 		return 20;
 	}
+
+	@Override
+	public void smartDashboardInit() {
+//		rightMtr1.setName("Drives", "Right motor 1");
+//		rightMtr2.setName("Drives", "Right motor 2");
+//		rightMtr3.setName("Drives", "Right motor 3");
+//		lightMtr1.setName("Drives", "Left motor 1");
+//		leftMtr2.setName("Drives", "Left motor 2");
+//		leftMtr3.setName("Drives", "Left motor 3");
+		addToTables(rightMtrs, "Right drives");
+		addToTables(leftMtrs, "Left drives");
+		addToTables(rightEnc, "Right drives encoder");
+		addToTables(leftEnc, "Left drives encoder");
+		addToTables(shifter, "Shifter");
+		addToTables(drivesPTOArms, "Arms", "Drives PTO (Arms)");
+		addToTables(unsnappy, "Arms", "Unsnappy");
+		addToTables(gyro, "Gyro");
+		LiveWindow.remove(rightMtr1);
+		LiveWindow.remove(rightMtr2);
+		LiveWindow.remove(rightMtr3);
+		LiveWindow.remove(leftMtr1);
+		LiveWindow.remove(leftMtr2);
+		LiveWindow.remove(leftMtr3);
+	}
+
 }

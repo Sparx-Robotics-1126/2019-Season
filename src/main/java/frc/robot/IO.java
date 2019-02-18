@@ -26,7 +26,7 @@ public class IO {
     
     public static final int DRIVES_PTOSOLENOID =							1;
     public static final int DRIVES_SHIFTINGSOLENOID =						0;
-    public static final int DRIVES_UNSNAPPY = 							3;
+    public static final int DRIVES_UNSNAPPY = 								2;
     
     public static final int ARMS_LIMITSWITCH_LEFT =							6;
     public static final int ARMS_LIMITSWITCH_RIGHT = 						5;
