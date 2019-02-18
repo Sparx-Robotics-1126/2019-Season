@@ -54,6 +54,8 @@ public class Drives extends GenericSubsystem {
 	
 	private Solenoid unsnappy;
 
+	private Vision vision;
+
 	// ----------------------------------------Variable----------------------------------------
 
 	private double lastAngle;
@@ -66,13 +68,11 @@ public class Drives extends GenericSubsystem {
 
 	private double turnSpeed;
 
-	private double moveSpeed;
-
 	private double moveDist;
 
-	private DriveState state;
+	private double moveSpeed;
 
-	private Vision vision;
+	private DriveState state;
 
 	private double shiftingTime;
 
@@ -84,16 +84,18 @@ public class Drives extends GenericSubsystem {
 
 	private boolean isMoving;
 
+	private double highestLeft;
+	
+	private double highestRight;
+
 	// ----------------------------------------Constants----------------------------------------
 
 	private final double ANGLE_OFF_BY = 2;
 
 	private final double SPEED_PERCENTAGE = .5;
-	
-	private double highestLeft;
-	
-	private double highestRight;
 
+	// ------------------------------------------Code-------------------------------------------
+	
 	// create a drives object
 	public Drives() {
 		super("Drives");
@@ -107,39 +109,49 @@ public class Drives extends GenericSubsystem {
 		leftMtr1 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_1);
 		leftMtr2 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_2);
 		leftMtr3 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_3);
-		rightMtrs = new MotorGroup(rightMtr1, rightMtr2, rightMtr3);
-		leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
 		rightEnc = new Encoder(IO.DRIVES_RIGHTENCODER_CH1, IO.DRIVES_RIGHTENCODER_CH2);
 		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
 		rightEnc.setDistancePerPulse(-0.02110013);// 0.07897476
 		leftEnc.setDistancePerPulse(0.02110013);
 		gyro = new AHRS(SerialPort.Port.kUSB);
 		gyro.reset();
-		lastAngle = 0;
-		speedLeft = 0;
-		speedRight = 0;
 		resetGyroAngle();
-		moveDist = 0;
-		moveSpeed = 0;
+		rightMtrs = new MotorGroup(rightMtr1, rightMtr2, rightMtr3);
+		leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
+		shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID);
+		drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID);
+		arms = new Arms(rightMtrs, leftMtrs, rightEnc, leftEnc);
+		unsnappy = new Solenoid(IO.DRIVES_UNSNAPPY);
+		vision = new Vision();
+		lastAngle = 0;
+		speedRight = 0;
+		speedLeft = 0;
 		turnAngle = 0;
 		turnSpeed = 0;
+		moveDist = 0;
+		moveSpeed = 0;
 		state = DriveState.STANDBY;
-		vision = new Vision();
 		shiftingTime = 0;
 		wantedSpeedRight = 0;
 		wantedSpeedLeft = 0;
-		shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID);
-		drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID);
-		unsnappy = new Solenoid(IO.DRIVES_UNSNAPPY);
 		shiftingPosition = false;
 		isMoving = false;
-		arms = new Arms(rightMtrs, leftMtrs, rightEnc, leftEnc);
 		highestLeft = 0;
 		highestRight = 0;
 	}
 
+	// all the states drives can be in
 	public enum DriveState {
-		STANDBY, TELEOP, MOVE_FORWARD, MOVE_BACKWARD, TURN_RIGHT, TURN_LEFT, SHIFT_LOW, SHIFT_HIGH, ARMS, FINDING_LINE,
+		STANDBY, 
+		TELEOP, 
+		MOVE_FORWARD, 
+		MOVE_BACKWARD, 
+		TURN_RIGHT, 
+		TURN_LEFT, 
+		SHIFT_LOW, 
+		SHIFT_HIGH, 
+		ARMS, 
+		FINDING_LINE,
 		LINE_FOLLOWER;
 	}
 
@@ -150,11 +162,8 @@ public class Drives extends GenericSubsystem {
 		}
 		switch (state) {
 		case STANDBY:
-			// System.out.println("You are a bold one");
 			break;
 		case TELEOP:
-			// System.out.println("Drives SpeedRight: " + speedRight + " speedLeft: " +
-			// speedLeft);
 			if (!shiftingPosition && (getAverageRate() > 275)) {
 				highShift();
 			} else if (shiftingPosition && (getAverageRate() < 150)) {
@@ -164,9 +173,7 @@ public class Drives extends GenericSubsystem {
 			leftMtrs.set(speedLeft);
 			break;
 		case MOVE_FORWARD:
-			// System.out.println("Hello");
 			if (getDistance() > moveDist) {
-				// System.out.println("There");
 				rightMtrs.stopMotors();
 				leftMtrs.stopMotors();
 				isMoving = false;
@@ -180,9 +187,7 @@ public class Drives extends GenericSubsystem {
 			}
 			break;
 		case MOVE_BACKWARD:
-			// System.out.println("General");
 			if (getDistance() > moveDist) {
-				// System.out.println("Kenobi");
 				rightMtrs.stopMotors();
 				leftMtrs.stopMotors();
 				isMoving = false;
@@ -205,7 +210,6 @@ public class Drives extends GenericSubsystem {
 				rightMtrs.set(-turnSpeed);
 				leftMtrs.set(turnSpeed);
 			}
-			// System.out.println("turn right");
 			break;
 		case TURN_LEFT:
 			if (getAngle() < turnAngle) {
@@ -217,7 +221,6 @@ public class Drives extends GenericSubsystem {
 				rightMtrs.set(turnSpeed);
 				leftMtrs.set(-turnSpeed);
 			}
-			// System.out.println("turn left");
 			break;
 		case LINE_FOLLOWER:
 			directions st = vision.getDirection();
@@ -284,21 +287,19 @@ public class Drives extends GenericSubsystem {
 			break;
 
 		}
-		// System.out.println("State: " + )
-//		 System.out.println("Right Encoder rates: " + rightEnc.getRate());
-//		 System.out.println("Left Encoder rates: " + leftEnc.getRate());
-//		 if(Math.abs(rightEnc.getRate()) > highestRight) {
-//			 highestRight = Math.abs(rightEnc.getRate());
-//		 }
-//		 if(Math.abs(leftEnc.getRate()) > highestLeft) {
-//			 highestLeft = Math.abs(leftEnc.getRate());
-//		 }
+		// System.out.println("Right Encoder rates: " + rightEnc.getRate());
+		// System.out.println("Left Encoder rates: " + leftEnc.getRate());
+		// if(Math.abs(rightEnc.getRate()) > highestRight) {
+		// 	highestRight = Math.abs(rightEnc.getRate());
+		// }
+		// if(Math.abs(leftEnc.getRate()) > highestLeft) {
+		// 	 highestLeft = Math.abs(leftEnc.getRate());
+		// }
 		// System.out.println("Gyro: " + getAngle());
 		// System.out.println("left rate: " + leftEnc.getRate());
 		// System.out.println("right rate: " + rightEnc.getRate());
 		// System.out.println("GetDistance: " + getDistance());
-		// System.out.println("RightMtr" + wantedSpeedRight + " LeftMtr: " +
-		// wantedSpeedLeft);
+		// System.out.println("RightMtr" + wantedSpeedRight + " LeftMtr: " + wantedSpeedLeft);
 	}
 
 	// checks if drives is done with its autonomous code
@@ -325,22 +326,24 @@ public class Drives extends GenericSubsystem {
 
 	}
 
+	// stops all the motors in drives
 	public void stopMotors() {
 		isMoving = false;
 		leftMtrs.stopMotors();
 		rightMtrs.stopMotors();
 	}
 
+	// finds the value that left joystick is reading
 	public void joystickLeft(double speed) {
 		speedLeft = speed;
-		// leftMtrs.set(speed);
 	}
 
+	// finds the value that the right joystick is reading
 	public void joystickRight(double speed) {
 		speedRight = speed;
-		// rightMtrs.set(speed);
 	}
 	
+	// releases the arms from the robot
 	public void toArms() {
 		isMoving = true;
 		arms.reset();
@@ -348,11 +351,13 @@ public class Drives extends GenericSubsystem {
 		changeState(DriveState.ARMS);
 	}
 
+	// shifts the robot into low gear
 	public void lowShift() {
 		shiftingTime = System.currentTimeMillis();
 		changeState(DriveState.SHIFT_LOW);
 	}
 
+	// shifts the robot into high gear
 	public void highShift() {
 		shiftingTime = System.currentTimeMillis();
 		changeState(DriveState.SHIFT_HIGH);
@@ -370,11 +375,11 @@ public class Drives extends GenericSubsystem {
 	}
 
 	// gets the distance the robot has travelled since the last time the encoders
-	// were reset
 	private double getDistance() {
 		return (rightEnc.getDistance() + leftEnc.getDistance()) / 2;
 	}
 
+	// gets the average rate of the robot
 	private double getAverageRate() {
 		return (rightEnc.getRate() + leftEnc.getRate()) / 2;
 	}
@@ -385,7 +390,6 @@ public class Drives extends GenericSubsystem {
 	}
 
 	// resets the gyro's angle so the robot turns to the angle from where the robot
-	// is currently facing
 	private void resetGyroAngle() {
 		lastAngle = gyro.getAngle();
 		System.out.println("Reset: " + lastAngle);
@@ -420,26 +424,29 @@ public class Drives extends GenericSubsystem {
 		// move(0.5, 240);
 	}
 
+	// moves the robot forward, used to call move once for drives
 	public void moveForward() {
 		move(1, 120);
 	}
 
+	// attempts to find the line for vision
 	public void findLine() {
 		vision.reset();
 		changeState(DriveState.FINDING_LINE);
 	}
 
+	// retruns the Arms object
 	public Arms getArms() {
 		return arms;
 	}
 	
+	// resets vision
 	public void resetVision() {
 		vision.reset();
 	}
 
 	@Override
 	public long sleepTime() {
-		// TODO Auto-generated method stub
 		return 20;
 	}
 }
