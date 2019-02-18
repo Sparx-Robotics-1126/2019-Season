@@ -90,12 +90,15 @@ public class Vision {
       
       public void test()
       {
+        System.out.println("edge distance: " + edgeDist + "\nmid  distance: " + midDist);
           paraliningMethodOneSide();
       }
 
       public void paraliningMethodOneSide()
       {
-          
+        arduinoRight.updateDistances();
+        onRightSetDistances();
+        System.out.println("edge distance: " + edgeDist + "\nmid  distance: " + midDist);
     switch(vState)
       {
         case SENSING:

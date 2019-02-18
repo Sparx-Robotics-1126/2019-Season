@@ -50,13 +50,13 @@ public void reset()
           if(pos != -1)
           {
             if(out.substring(pos - 6, pos).equals("XX.XXX"))
-              midDist = Double.MAX_VALUE;
-            else
-              midDist = Double.parseDouble(out.substring(pos - 6, pos));
-            if(out.substring(pos + 1, pos + 7).equals("XX.XXX"))
               edgeDist = Double.MAX_VALUE;
             else
-              edgeDist = Double.parseDouble(out.substring(pos + 1, pos + 7));  
+              edgeDist = Double.parseDouble(out.substring(pos - 6, pos));
+            if(out.substring(pos + 1, pos + 7).equals("XX.XXX"))
+              midDist = Double.MAX_VALUE;
+            else
+              midDist = Double.parseDouble(out.substring(pos + 1, pos + 7));  
           out = out.substring(pos + 7);
           }
         }

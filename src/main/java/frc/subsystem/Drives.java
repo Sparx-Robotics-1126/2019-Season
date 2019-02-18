@@ -223,8 +223,9 @@ public class Drives extends GenericSubsystem{
                 break;
             case LINE_FOLLOWER: 
                
-                //vision.paraliningMethodOneSide();
-                vision.test();
+                vision.paraliningMethodOneSide();
+                //vision.test();
+                System.out.println("iawubgfaiwfgawiyvfiyawf");
                 MoveState st = vision.getDirection();
                 System.out.println(st);
                 // System.out.println("Left motor power = " + leftMtr1.getBusVoltage());
