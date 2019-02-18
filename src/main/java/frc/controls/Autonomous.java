@@ -38,7 +38,8 @@ public class Autonomous implements Controls{
 		DO_NOTHING,
 		HAB_ONE_TO_LEFT_HATCH_FRONT,
 		HAB_ONE_TO_LEFT_HATCH_MIDDLE,
-		HAB_ONE_TO_LEFT_HATCH_BACK;
+		HAB_ONE_TO_LEFT_HATCH_BACK,
+		HAB_ONE_TO_LEFT_HATCH_FRONT_TO_PICKUP;
 	}
 
 	public Autonomous(Drives drives, Hatch hatch, HAB hab) {
@@ -52,6 +53,7 @@ public class Autonomous implements Controls{
 		autoSelector.addOption("Left side Hab 1 to front hatch", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT);
 		autoSelector.addOption("Left side Hab 1 to middle hatch", Autos.HAB_ONE_TO_LEFT_HATCH_MIDDLE);
 		autoSelector.addOption("Left side Hab 1 to back hatch", Autos.HAB_ONE_TO_LEFT_HATCH_BACK);
+		autoSelector.addOption("Left side Hab 1 to front hatch and to pickup station", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT_TO_PICKUP);
 		SmartDashboard.putData(autoSelector);
 		
 		selectedAuto = Autos.DO_NOTHING;
@@ -73,7 +75,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.AUTO_DELAY, 1);
+				automation.addStep(AutoMethod.AUTO_DELAY, 2);
 				automation.addStep(AutoMethod.HATCH_SHOOTFLIP);	
 				automation.addStep(AutoMethod.AUTO_DELAY, 0.25);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
@@ -102,6 +104,21 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
+			case HAB_ONE_TO_LEFT_HATCH_FRONT_TO_PICKUP:
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.75, 180); //-
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.AUTO_DELAY, 2);
+				automation.addStep(AutoMethod.HATCH_SHOOTFLIP);	
+				automation.addStep(AutoMethod.AUTO_DELAY, 0.25);
+				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 95);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.75, 228);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.AUTO_STOP);
 			default: 
 				break;
 			}

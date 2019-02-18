@@ -116,11 +116,12 @@ public class Drives extends GenericSubsystem {
 		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
 		rightEnc.setDistancePerPulse(-0.02110013);// 0.07897476
 		leftEnc.setDistancePerPulse(0.02110013);
-		rightMtrs.setInverted(true);
+		
 		gyro = new AHRS(SerialPort.Port.kUSB);
 		gyro.reset();
 		resetGyroAngle();
 		rightMtrs = new MotorGroup(rightMtr1, rightMtr2, rightMtr3);
+		rightMtrs.setInverted(true);
 		leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
 		shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID);
 		drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID);
@@ -186,7 +187,7 @@ public class Drives extends GenericSubsystem {
 				wantedSpeedRight = moveSpeed;
 				wantedSpeedLeft = moveSpeed;
 				straightenForward();
-				rightMtrs.set(-wantedSpeedRight);
+				rightMtrs.set(wantedSpeedRight);
 				leftMtrs.set(wantedSpeedLeft);
 			}
 			break;
@@ -200,8 +201,8 @@ public class Drives extends GenericSubsystem {
 				wantedSpeedRight = moveSpeed;
 				wantedSpeedLeft = moveSpeed;
 				straightenForward();
-				rightMtrs.set(wantedSpeedRight);
-				leftMtrs.set(-wantedSpeedLeft);
+				rightMtrs.set(-wantedSpeedLeft);
+				leftMtrs.set(-wantedSpeedRight);
 			}
 			break;
 		case TURN_RIGHT:

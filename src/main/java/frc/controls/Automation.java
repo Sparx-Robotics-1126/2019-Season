@@ -265,11 +265,11 @@ public class Automation {
 				currentStep++;
 				break;
 			case DRIVES_TURNLEFT:
-				drives.turn(currentStepData[0], currentStepData[1]);
+				drives.turn(currentStepData[0], -currentStepData[1]);
 				currentStep++;
 				break;
 			case DRIVES_TURNRIGHT:
-				drives.turn(currentStepData[0], -currentStepData[1]);
+				drives.turn(currentStepData[0], currentStepData[1]);
 				currentStep++;
 				break;
 			case DRIVES_FOLLOWLINE:
