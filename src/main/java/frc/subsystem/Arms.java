@@ -59,9 +59,9 @@ public class Arms {
 
 	// ----------------------------------------Constants----------------------------------------
 
-	final double wantedDegree = 1;
+	final double wantedDegree = 17; //17
 
-	final double wantedSpeed = 10; 
+	final double wantedSpeed = 10;  //10
 
 	// ------------------------------------------Code-------------------------------------------
 

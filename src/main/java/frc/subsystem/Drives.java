@@ -54,7 +54,7 @@ public class Drives extends GenericSubsystem {
 	private Solenoid drivesPTOArms;
 
 	private Arms arms;
-	
+
 	private Solenoid unsnappy;
 
 	private Vision vision;
@@ -76,7 +76,7 @@ public class Drives extends GenericSubsystem {
 	private double moveSpeed;
 
 	private DriveState state;
-	
+
 	private DriveState prevState;
 
 	private double timer;
@@ -89,9 +89,9 @@ public class Drives extends GenericSubsystem {
 
 	private boolean isMoving;
 
-	private double highestLeft;
-	
-	private double highestRight;
+	private double slowPercent;
+
+	private double slowSpeed;
 
 	// ----------------------------------------Constants----------------------------------------
 
@@ -100,7 +100,7 @@ public class Drives extends GenericSubsystem {
 	private final double SPEED_PERCENTAGE = .7;
 
 	// ------------------------------------------Code-------------------------------------------
-	
+
 	// create a drives object
 	public Drives() {
 		super("Drives");
@@ -142,22 +142,13 @@ public class Drives extends GenericSubsystem {
 		wantedSpeedLeft = 0;
 		shiftingPosition = false;
 		isMoving = false;
-		highestLeft = 0;
-		highestRight = 0;
+		slowPercent = 1;
+		slowSpeed = 0;
 	}
 
 	// all the states drives can be in
 	public enum DriveState {
-		STANDBY, 
-		TELEOP, 
-		MOVE_FORWARD, 
-		MOVE_BACKWARD, 
-		TURN_RIGHT, 
-		TURN_LEFT, 
-		SHIFT_LOW, 
-		SHIFT_HIGH, 
-		ARMS, 
-		FINDING_LINE,
+		STANDBY, TELEOP, MOVE_FORWARD, MOVE_BACKWARD, TURN_RIGHT, TURN_LEFT, SHIFT_LOW, SHIFT_HIGH, ARMS, FINDING_LINE,
 		LINE_FOLLOWER;
 	}
 
@@ -185,8 +176,13 @@ public class Drives extends GenericSubsystem {
 				isMoving = false;
 				changeState(DriveState.STANDBY);
 			} else {
-				wantedSpeedRight = moveSpeed;
-				wantedSpeedLeft = moveSpeed;
+				if (getDistance() * slowPercent > moveDist) {
+					wantedSpeedRight = slowSpeed;
+					wantedSpeedLeft = slowSpeed;
+				} else {
+					wantedSpeedRight = moveSpeed;
+					wantedSpeedLeft = moveSpeed;
+				}
 				straightenForward();
 				rightMtrs.set(wantedSpeedRight);
 				leftMtrs.set(wantedSpeedLeft);
@@ -199,8 +195,13 @@ public class Drives extends GenericSubsystem {
 				isMoving = false;
 				changeState(DriveState.STANDBY);
 			} else {
-				wantedSpeedRight = moveSpeed;
-				wantedSpeedLeft = moveSpeed;
+				if (getDistance() * slowPercent < moveDist) {
+					wantedSpeedRight = moveSpeed;
+					wantedSpeedLeft = moveSpeed;
+				} else {
+					wantedSpeedRight = moveSpeed;
+					wantedSpeedLeft = moveSpeed;
+				}
 				straightenForward();
 				rightMtrs.set(-wantedSpeedLeft);
 				leftMtrs.set(-wantedSpeedRight);
@@ -213,8 +214,13 @@ public class Drives extends GenericSubsystem {
 				isMoving = false;
 				changeState(DriveState.STANDBY);
 			} else {
-				rightMtrs.set(-turnSpeed);
-				leftMtrs.set(turnSpeed);
+				if (slowPercent * getAngle() > turnAngle) {
+					rightMtrs.set(-slowSpeed);
+					leftMtrs.set(slowSpeed);
+				} else {
+					rightMtrs.set(-turnSpeed);
+					leftMtrs.set(turnSpeed);
+				}
 			}
 			break;
 		case TURN_LEFT:
@@ -224,8 +230,13 @@ public class Drives extends GenericSubsystem {
 				isMoving = false;
 				changeState(DriveState.STANDBY);
 			} else {
-				rightMtrs.set(turnSpeed);
-				leftMtrs.set(-turnSpeed);
+				if (slowPercent * getAngle() < turnAngle) {
+					rightMtrs.set(slowSpeed);
+					leftMtrs.set(-slowSpeed);
+				} else {
+					rightMtrs.set(turnSpeed);
+					leftMtrs.set(-turnSpeed);
+				}
 			}
 			break;
 		case LINE_FOLLOWER:
@@ -278,7 +289,7 @@ public class Drives extends GenericSubsystem {
 			}
 			break;
 		case ARMS:
-			if(timer + 1.5 < Timer.getFPGATimestamp()) {
+			if (timer + 1.5 < Timer.getFPGATimestamp()) {
 				drivesPTOArms.set(true);
 				arms.armsDown();
 				if (arms.isDone()) {
@@ -299,24 +310,25 @@ public class Drives extends GenericSubsystem {
 
 		}
 		// System.out.println("State: " + )
-//		 System.out.println("Right Encoder: " + rightEnc.getDistance());
-//		 System.out.println("Left Encoder: " + leftEnc.getDistance());
-//		 System.out.println("Gyro: " + getAngle());
+		// System.out.println("Right Encoder: " + rightEnc.getDistance());
+		// System.out.println("Left Encoder: " + leftEnc.getDistance());
+		// System.out.println("Gyro: " + getAngle());
 		// System.out.println("left rate: " + leftEnc.getRate());
 		// System.out.println("right rate: " + rightEnc.getRate());
 		// System.out.println("GetDistance: " + getDistance());
-		// System.out.println("RightMtr" + wantedSpeedRight + " LeftMtr: " + wantedSpeedLeft);
+		// System.out.println("RightMtr" + wantedSpeedRight + " LeftMtr: " +
+		// wantedSpeedLeft);
 	}
-	
+
 	@Override
 	public void delayedPrints() {
-		
+
 	}
 
 	public void flipUnsnappy() {
 		unsnappy.set(!unsnappy.get());
 	}
-	
+
 	// checks if drives is done with its autonomous code
 	public boolean isDone() {
 		return !isMoving;
@@ -324,9 +336,15 @@ public class Drives extends GenericSubsystem {
 
 	// move the robot at a given speed and distance
 	public void move(double speed, double dist) {
+		move(speed, dist, 1, speed);
+	}
+
+	public void move(double speed, double dist, double slowPercent, double slowSpeed) {
 		resetEncoders();
 		moveSpeed = speed;
 		moveDist = dist;
+		this.slowPercent = slowPercent;
+		this.slowSpeed = slowSpeed;
 		resetGyroAngle();
 		isMoving = true;
 		if (moveDist > 0) {
@@ -336,7 +354,7 @@ public class Drives extends GenericSubsystem {
 
 		}
 	}
-	
+
 	public void resetEncoders() {
 		leftEnc.reset();
 		rightEnc.reset();
@@ -358,7 +376,7 @@ public class Drives extends GenericSubsystem {
 	public void joystickRight(double speed) {
 		speedRight = speed;
 	}
-	
+
 	// releases the arms from the robot
 	public void toArms() {
 		isMoving = true;
@@ -422,8 +440,14 @@ public class Drives extends GenericSubsystem {
 
 	// turns the robot a specified angle
 	public void turn(double speed, double angle) {
+		turn(speed, angle, 1, speed);
+	}
+
+	public void turn(double speed, double angle, double slowPercent, double slowSpeed) {
 		turnAngle = angle;
 		turnSpeed = speed;
+		this.slowPercent = slowPercent;
+		this.slowSpeed = slowSpeed;
 		resetGyroAngle();
 		isMoving = true;
 		if (angle > 0) {
@@ -454,17 +478,17 @@ public class Drives extends GenericSubsystem {
 		move(1, 120);
 	}
 
-    public void findLine(){
-    	isMoving = true;
-        vision.reset();
-        changeState(DriveState.FINDING_LINE);
-    }
+	public void findLine() {
+		isMoving = true;
+		vision.reset();
+		changeState(DriveState.FINDING_LINE);
+	}
 
 	// retruns the Arms object
 	public Arms getArms() {
 		return arms;
 	}
-	
+
 	// resets vision
 	public void resetVision() {
 		vision.reset();
@@ -477,12 +501,12 @@ public class Drives extends GenericSubsystem {
 
 	@Override
 	public void smartDashboardInit() {
-//		rightMtr1.setName("Drives", "Right motor 1");
-//		rightMtr2.setName("Drives", "Right motor 2");
-//		rightMtr3.setName("Drives", "Right motor 3");
-//		lightMtr1.setName("Drives", "Left motor 1");
-//		leftMtr2.setName("Drives", "Left motor 2");
-//		leftMtr3.setName("Drives", "Left motor 3");
+		// rightMtr1.setName("Drives", "Right motor 1");
+		// rightMtr2.setName("Drives", "Right motor 2");
+		// rightMtr3.setName("Drives", "Right motor 3");
+		// lightMtr1.setName("Drives", "Left motor 1");
+		// leftMtr2.setName("Drives", "Left motor 2");
+		// leftMtr3.setName("Drives", "Left motor 3");
 		addToTables(rightMtrs, "Right drives");
 		addToTables(leftMtrs, "Left drives");
 		addToTables(rightEnc, "Right drives encoder");

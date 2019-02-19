@@ -104,16 +104,16 @@ public class TeleOP implements Controls {
 		setJoystickStates();
 		switch(state) {
 		case TELEOP:
-			if (isOffZeroAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
-				hab.setHabSpeedRight(getAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS));
-			} else {
-				hab.setHabSpeedRight(0);
-			}
-			if (isOffZeroAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
-				hab.setHabSpeedLeft(-getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
-			} else {
-				hab.setHabSpeedLeft(0);
-			}
+//			if (isOffZeroAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
+//				hab.setHabSpeedRight(getAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS));
+//			} else {
+//				hab.setHabSpeedRight(0);
+//			}
+//			if (isOffZeroAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
+//				hab.setHabSpeedLeft(-getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
+//			} else {
+//				hab.setHabSpeedLeft(0);
+//			}
 			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y)) {
 				drives.joystickLeft(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y));
 			} else {
