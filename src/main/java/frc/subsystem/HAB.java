@@ -7,11 +7,12 @@
 
 package frc.subsystem;
 
-import frc.robot.IO;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.IO;
 
 /**
  * Add your docs here.
@@ -167,6 +168,7 @@ public class HAB extends GenericSubsystem {
 	public void smartDashboardInit() {
 		addToTables(leadScrewMtr, "Lead Screw Motor");
 		addToTables(leadScrewEncRaw, "Lead Screw Encoder");
+		SmartDashboard.putData("Lead Screw Encoder", leadScrewEncRaw);
 		addToTables(habLeft, "Arms", "Arms Left Wheels");
 		addToTables(habRight, "Arms", "Arms Right Wheels");
 	}

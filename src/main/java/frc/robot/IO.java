@@ -47,4 +47,6 @@ public class IO {
     public static final int VISION_CENTERLEFTFOLLOWINGSENSOR =				15;
     public static final int VISION_CENTERRIGHTFOLLOWINGSENSOR =				16;
     public static final int VISION_RIGHTFOLLOWINGSENSOR =					17;
+    
+    public static final int NOISEEEE_SOLENOID = 							3;
 }

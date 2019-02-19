@@ -84,8 +84,6 @@ public class Drives extends GenericSubsystem {
 
 	private double wantedSpeedLeft;
 
-	private boolean shiftingPosition;
-
 	private boolean isMoving;
 
 	private double slowPercent;
@@ -104,12 +102,12 @@ public class Drives extends GenericSubsystem {
 
 	// ------------------------------------------Code-------------------------------------------
 
-	// create a drives object
+	/** Creates a drives object */
 	public Drives() {
 		super("Drives");
 	}
 
-	// initialized all the variable in drives
+	/** Initializes all the variable in drives */
 	public void init() {
 		rightMtr1 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_1);
 		rightMtr2 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_2);
@@ -145,19 +143,18 @@ public class Drives extends GenericSubsystem {
 		timer = 0;
 		wantedSpeedRight = 0;
 		wantedSpeedLeft = 0;
-		shiftingPosition = false;
 		isMoving = false;
 		slowPercent = 1;
 		slowSpeed = 0;
 	}
 
-	// all the states drives can be in
+	/** All the states drives can be in */
 	public enum DriveState {
 		STANDBY, TELEOP, MOVE_FORWARD, MOVE_BACKWARD, TURN_RIGHT, TURN_LEFT, SHIFT_LOW, SHIFT_HIGH, ARMS, FINDING_LINE,
 		LINE_FOLLOWER, AMAZING_STRAIGHTNESS;
 	}
 
-	// does all the code for drives
+	/* Runs all the code for drives */
 	public void execute() {
 		if (state != DriveState.ARMS && drivesPTOArms.get()) {
 			drivesPTOArms.set(false);
@@ -244,8 +241,6 @@ public class Drives extends GenericSubsystem {
 			break;
 		case LINE_FOLLOWER:
 			directions st = vision.getDirection();
-			// System.out.println("Left motor power = " + leftMtr1.getBusVoltage());
-			// System.out.println("right motor power = " + rightMtr1.getBusVoltage());
 			if (st == directions.LEFT) {
 				leftMtrs.set(-0.5);
 				rightMtrs.set(0.5);
@@ -272,7 +267,6 @@ public class Drives extends GenericSubsystem {
 			leftMtrs.set(0.2);
 			rightMtrs.set(0.2);
 			shifter.set(false);
-			shiftingPosition = false;
 			if (timer + 0.1 < Timer.getFPGATimestamp()) {
 				leftMtrs.set(speedLeft);
 				rightMtrs.set(speedRight);
@@ -284,7 +278,6 @@ public class Drives extends GenericSubsystem {
 			leftMtrs.set(0.2);
 			rightMtrs.set(0.2);
 			shifter.set(true);
-			shiftingPosition = true;
 			if (timer + 0.1 < Timer.getFPGATimestamp()) {
 				leftMtrs.set(speedLeft);
 				rightMtrs.set(speedRight);
@@ -322,24 +315,6 @@ public class Drives extends GenericSubsystem {
 			break;
 
 		}
-		// System.out.println("State: " + )
-		// System.out.println("Right Encoder: " + rightEnc.getDistance());
-		// System.out.println("Left Encoder: " + leftEnc.getDistance());
-		// System.out.println("Gyro: " + getAngle());
-		
-		 System.out.println("left rate: " + leftEnc.getRate());
-		 System.out.println("right rate: " + rightEnc.getRate());
-		 if(Math.abs(leftEnc.getRate()) > highestLeft) {
-			 highestLeft = leftEnc.getRate();
-		 }
-		 if(Math.abs(rightEnc.getRate()) > highestRight) {
-			 highestRight = rightEnc.getRate();
-		 }
-		 System.out.println("highest left rate: " + highestLeft);
-		 System.out.println("highest right rate: " + highestRight);
-		// System.out.println("GetDistance: " + getDistance());
-		// System.out.println("RightMtr" + wantedSpeedRight + " LeftMtr: " +
-		// wantedSpeedLeft);
 	}
 
 	@Override
@@ -351,12 +326,12 @@ public class Drives extends GenericSubsystem {
 		unsnappy.set(!unsnappy.get());
 	}
 
-	// checks if drives is done with its autonomous code
+	/** Checks if drives is not moving */
 	public boolean isDone() {
 		return !isMoving;
 	}
 
-	// move the robot at a given speed and distance
+	/** move the robot at a given speed and distance */
 	public void move(double speed, double dist) {
 		move(speed, dist, 1, speed);
 	}
@@ -382,24 +357,24 @@ public class Drives extends GenericSubsystem {
 		rightEnc.reset();
 	}
 
-	// stops all the motors in drives
+	/** Stops all the motors in drives */
 	public void stopMotors() {
 		isMoving = false;
 		leftMtrs.stopMotors();
 		rightMtrs.stopMotors();
 	}
 
-	// finds the value that left joystick is reading
+	/** Finds the value that left joystick is reading */
 	public void joystickLeft(double speed) {
 		speedLeft = speed;
 	}
 
-	// finds the value that the right joystick is reading
+	/** Finds the value that the right joystick is reading */
 	public void joystickRight(double speed) {
 		speedRight = speed;
 	}
 
-	// releases the arms from the robot
+	/** Releases the arms from the robot */
 	public void toArms() {
 		isMoving = true;
 		arms.reset();
@@ -408,7 +383,7 @@ public class Drives extends GenericSubsystem {
 		changeState(DriveState.ARMS);
 	}
 
-	// shifts the robot into low gear
+	/** Shifts the robot into low gear */
 	public void lowShift() {
 		speedLeft = 0;
 		speedRight = 0;
@@ -418,7 +393,7 @@ public class Drives extends GenericSubsystem {
 		changeState(DriveState.SHIFT_LOW);
 	}
 
-	// shifts the robot into high gear
+	/** shifts the robot into high gear */
 	public void highShift() {
 		speedRight = 0;
 		speedLeft = 0;
@@ -428,7 +403,7 @@ public class Drives extends GenericSubsystem {
 		changeState(DriveState.SHIFT_HIGH);
 	}
 
-	// straightens the robot
+	/** straightens the robot */
 	private void straightenForward() {
 		if (getAngle() > ANGLE_OFF_BY) {
 			wantedSpeedLeft *= SPEED_PERCENTAGE;
@@ -439,28 +414,28 @@ public class Drives extends GenericSubsystem {
 		}
 	}
 
-	// gets the distance the robot has travelled since the last time the encoders
+	/** gets the distance the robot has travelled since the last time the encoders */
 	private double getDistance() {
 		return (rightEnc.getDistance() + leftEnc.getDistance()) / 2;
 	}
 
-	// gets the average rate of the robot
+	/** gets the average rate of the robot */
 	private double getAverageRate() {
 		return (rightEnc.getRate() + leftEnc.getRate()) / 2;
 	}
 
-	// gets the angle the robot has turned since the last time the gyro was reset
+	/** gets the angle the robot has turned since the last time the gyro was reset */
 	private double getAngle() {
-		return gyro.getAngle() - lastAngle;
+		return lastAngle - gyro.getAngle();
 	}
 
-	// resets the gyro's angle so the robot turns to the angle from where the robot
+	/** resets the gyro's angle so the robot turns to the angle from where the robot */
 	private void resetGyroAngle() {
 		lastAngle = gyro.getAngle();
 		System.out.println("Reset: " + lastAngle);
 	}
 
-	// turns the robot a specified angle
+	/** turns the robot a specified angle */
 	public void turn(double speed, double angle) {
 		turn(speed, angle, 1, speed);
 	}
@@ -485,7 +460,7 @@ public class Drives extends GenericSubsystem {
 		changeState(DriveState.AMAZING_STRAIGHTNESS);
 	}
 
-	// changes the state of the robot to what is given as a parameter
+	/** changes the state of the robot to what is given as a parameter */
 	public void changeState(DriveState st) {
 		if (state == DriveState.ARMS && st != DriveState.ARMS) {
 			drivesPTOArms.set(false);
@@ -493,14 +468,14 @@ public class Drives extends GenericSubsystem {
 		state = st;
 	}
 
-	// used by RobotSystem to put the robot in the teleop state
+	/** used by RobotSystem to put the robot in the teleop state */
 	public void toTeleop() {
 		changeState(DriveState.TELEOP);
 		// turn(0.5, 90);
 		// move(0.5, 240);
 	}
 
-	// moves the robot forward, used to call move once for drives
+	/** moves the robot forward, used to call move once for drives */
 	public void moveForward() {
 		move(1, 120);
 	}
@@ -511,14 +486,16 @@ public class Drives extends GenericSubsystem {
 		changeState(DriveState.FINDING_LINE);
 	}
 
-	// retruns the Arms object
+	/** retruns the Arms object */
 	public Arms getArms() {
 		return arms;
 	}
 
-	// resets vision
+	/** resets vision */
 	public void resetVision() {
-		vision.reset();
+		if(vision != null) {
+			vision.reset();
+		}
 	}
 
 	@Override
@@ -534,12 +511,12 @@ public class Drives extends GenericSubsystem {
 		// lightMtr1.setName("Drives", "Left motor 1");
 		// leftMtr2.setName("Drives", "Left motor 2");
 		// leftMtr3.setName("Drives", "Left motor 3");
-		LiveWindow.remove(rightMtr1);
-		LiveWindow.remove(rightMtr2);
-		LiveWindow.remove(rightMtr3);
-		LiveWindow.remove(leftMtr1);
-		LiveWindow.remove(leftMtr2);
-		LiveWindow.remove(leftMtr3);
+//		LiveWindow.remove(rightMtr1);
+//		LiveWindow.remove(rightMtr2);
+//		LiveWindow.remove(rightMtr3);
+//		LiveWindow.remove(leftMtr1);
+//		LiveWindow.remove(leftMtr2);
+//		LiveWindow.remove(leftMtr3);
 		addToTables(rightMtrs, "Right drives");
 		addToTables(leftMtrs, "Left drives");
 		addToTables(rightEnc, "Right drives encoder");

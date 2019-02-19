@@ -8,7 +8,7 @@
 package frc.subsystem;
 
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.IO;
 
 /**
@@ -55,7 +55,7 @@ public class Hatch extends GenericSubsystem {
 			break;
 		case SHOOT_AND_FLIPPER:
 			shooterValue = true;
-			if (System.currentTimeMillis() > time + 0) {
+			if (Timer.getFPGATimestamp() > time + 0) {
 				state = HatchState.FLIPPER;
 			}
 			break;
@@ -69,18 +69,15 @@ public class Hatch extends GenericSubsystem {
 	}
 
 	public void flipperButton() {
-		// System.out.println("FLIPPER");
 		state = HatchState.FLIPPER;
 	}
 
 	public void shooterButton() {
-		// System.out.println("Shooter");
-		time = System.currentTimeMillis();
+		time = Timer.getFPGATimestamp();
 		state = HatchState.SHOOT_AND_FLIPPER;
 	}
 
 	public void homeButton() {
-		// System.out.println("Home");
 		state = HatchState.HOME;
 	}
 

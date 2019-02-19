@@ -8,7 +8,9 @@
 package frc.controls;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Solenoid;
 import frc.controls.Automation.AutoMethod;
+import frc.robot.IO;
 import frc.subsystem.Drives;
 import frc.subsystem.Drives.DriveState;
 import frc.subsystem.HAB;
@@ -27,6 +29,8 @@ public class TeleOP implements Controls {
 	private Automation auto;
 
 	private TeleState state;
+	
+	private Solenoid bzzzzzz;
 
 	private boolean[][] buttonStates = { { false, false }, // LEFTJOY_LEFT
 			{ false, false }, // LEFTJOY_MIDDLE
@@ -70,6 +74,7 @@ public class TeleOP implements Controls {
 		joysticks = new Joystick[] { new Joystick(CtrlMap.RIGHTJOYSTICK), new Joystick(CtrlMap.LEFTJOYSTICK),
 				new Joystick(CtrlMap.XBOXCONTROLLER) };
 		state = TeleState.TELEOP;
+		bzzzzzz = new Solenoid(IO.NOISEEEE_SOLENOID);
 	}
 
 	public enum TeleState {
@@ -105,6 +110,9 @@ public class TeleOP implements Controls {
 		setJoystickStates();
 		switch(state) {
 		case TELEOP:
+			if(bzzzzzz.get()) {
+				bzzzzzz.set(false);
+			}
 			if (isOffZeroAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
 				hab.setHabSpeedRight(getAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS));
 			} else {
@@ -158,6 +166,7 @@ public class TeleOP implements Controls {
 			}
 			break;
 		case AUTOMATION:
+			bzzzzzz.set(true);
 			auto.execute();
 			if(auto.isDone()) {
 				state = TeleState.TELEOP; //needed?

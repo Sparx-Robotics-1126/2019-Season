@@ -1,9 +1,6 @@
 package frc.controls;
 
-import java.util.Vector;
-
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.controls.Automation.AutoMethod;
@@ -15,25 +12,22 @@ public class Autonomous implements Controls{
 	
 	private Autos selectedAuto;
 
+	
+	@SuppressWarnings("unused")
 	private Drives drives;
+	@SuppressWarnings("unused")
 	private HAB hab;
+	@SuppressWarnings("unused")
+	private Hatch hatch;
 	private Automation automation;
 	
 	private boolean firstRun;
-	private Hatch hatch;
+
 
 	public boolean runAuto;
 
 	private SendableChooser<Autos> autoSelector;
 	
-	private final double DISTANCE_MULITPLIER = 1;
-
-	/**
-	 * Autos
-	 * -Goal 1 - Left side of hab level 1 -> go straight out, select first, second, or third hatch -> turn in, score (vision assistance), back up
-	 *
-	 */
-
 	private enum Autos{
 		DO_NOTHING,
 		HAB_ONE_TO_LEFT_HATCH_FRONT,
@@ -149,7 +143,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.AUTO_DELAY, 1.25);
 				automation.addStep(AutoMethod.HATCH_HOME);
-				automation.addStep(AutoMethod.AUTO_STARTTIMER);
+				automation.addStep(AutoMethod.AUTO_RECORD);
 				automation.addStep(AutoMethod.AUTO_DELAY, 0.25);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 1, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
@@ -172,7 +166,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
 				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 90);
-				
+				break;
 			default: 
 				break;
 			}

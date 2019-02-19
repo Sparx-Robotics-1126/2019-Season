@@ -11,8 +11,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.util.MotorGroup;
+import frc.util.SendableUtils.SendableBoolean;
 
 /**
  * Add your docs here.
@@ -52,6 +54,10 @@ public class Arms {
 	private double wantedLeftMtrPwr;
 	
 	private boolean isDone;
+	
+	private SendableBoolean leftStatus;
+	
+	private SendableBoolean rightStatus;
 
 	private boolean stopLeft;
 
@@ -74,6 +80,10 @@ public class Arms {
 		rightInput = new DigitalInput(IO.ARMS_LIMITSWITCH_RIGHT);
 		GenericSubsystem.addToTables(leftInput, "Arms", "Left Limit Switch");
 		GenericSubsystem.addToTables(rightInput, "Arms", "Right Limit Switch");
+		leftStatus = new SendableBoolean("Left arm locked");
+		rightStatus = new SendableBoolean("Right arm locked");
+		SmartDashboard.putData(leftStatus);
+		SmartDashboard.putData(rightStatus);
 	}
 
 	public void reset() {
@@ -85,6 +95,8 @@ public class Arms {
 		actualDegreeRight = 0;
 		leftInput.setName("Arms", "Left Limit Switch");
 		rightInput.setName("Arms", "Right Limit Switch");
+		leftStatus.set(false);
+		rightStatus.set(false);
 	}
 
 	public void armsDown() {
@@ -95,7 +107,6 @@ public class Arms {
 				stopLeft = true;
 			}
 			leftMtrSpeed = -leftArmEnc.getRate();
-
 			if (leftMtrSpeed < wantedSpeed) {
 				wantedLeftMtrPwr -= 0.02; // gav
 			} else if (leftMtrSpeed > wantedSpeed) {
@@ -105,6 +116,7 @@ public class Arms {
 			actualDegreeLeft = -leftArmEnc.getDistance();
 			leftMtrs.set(wantedLeftMtrPwr);
 		} else {
+			leftStatus.set(true);
 			leftMtrs.set(0);
 		}
 		if (wantedDegree > actualDegreeRight && (!stopRight || (stopRight && !rightInput.get()))) {
@@ -122,17 +134,13 @@ public class Arms {
 			actualDegreeRight = rightArmEnc.getDistance();
 			rightMtrs.set(wantedRightMtrPwr);
 		} else {
+			rightStatus.set(false);
 			rightMtrs.set(0);
 		}
 		if (isDone) {
 			rightMtrs.set(0);
 			leftMtrs.set(0);
 		}
-		System.out.println("Left arm: " + leftInput.get());
-		System.out.println("Right arm: " + rightInput.get());
-		System.out.println("Right motors: " + wantedRightMtrPwr);
-		System.out.println("Left motors: " + wantedLeftMtrPwr);
-		// System.out.println("Running arms");
 	}
 
 	public boolean isDone() {

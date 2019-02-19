@@ -129,7 +129,7 @@ public class MotorGroup extends SpeedControllerGroup{
 	@Override
 	public void initSendable(SendableBuilder builder) {
 		builder.setSmartDashboardType("Motor Group");
-		builder.setSafeState(this::stopMotor);
+		builder.setSafeState(this::stopMotors);
 		builder.addDoubleProperty("Value", this::get, this::set);
 	}
 

@@ -2,9 +2,7 @@ package frc.controls;
 
 import java.util.Vector;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.subsystem.Drives;
 import frc.subsystem.HAB;
@@ -28,16 +26,16 @@ public class Automation {
 	private boolean firstRun;
 	private boolean isDone;
 	
-	private double time;
-
 	private final double DISTANCE_MULTIPLIER = 1;
 
-	/**
-	 * Autos
-	 * -Goal 1 - Left side of hab level 1 -> go straight out, select first, second, or third hatch -> turn in, score (vision assistance), back up
-	 *
-	 */
-
+	public boolean toTeleCompletion;
+	public boolean allowOverride;
+	
+	public enum AutoConfig {
+		TOTELE,
+		ALLOWOVERRIDE;
+	}
+	
 	public enum AutoMethod {
 		/**
 		 * Moves forward with a given distance at a given speed.
@@ -91,7 +89,13 @@ public class Automation {
 		 * Moves arms down to latch onto the HAB.
 		 */
 		DRIVES_ARMS_DOWN(0),
+		/**
+		 * Switches drives to high gear.
+		 */
 		DRIVES_HIGHGEAR(0),
+		/**
+		 * Switches drives to low gear.
+		 */
 		DRIVES_LOWGEAR(0),
 		/**
 		 * Moves hab wheels forward (or backwards with -) at a given speed.
@@ -123,25 +127,23 @@ public class Automation {
 		 * @param seconds - the number of seconds to pause the auto for.
 		 */
 		AUTO_DELAY(1),
-		AUTO_STARTTIMER(0),
-		AUTO_ENDTIMER(1),
 		/**
-		 * Records the auto time at the moment, storing it into SmartDashboard.
+		 * Records the auto time at the moment (relative to the starting time, storing it into SmartDashboard).
 		 * @param 
 		 */
 		AUTO_RECORD(1),
 		/**
 		 * Kills the auto.
 		 */
-		AUTO_STOP(0),
-		AUTO_KILL(0);
-
+		AUTO_STOP(0);
+		
 		private final int[] parameterCount;
 
 		private AutoMethod(int... parameterCount) {
 			this.parameterCount = parameterCount;
 		}
 
+		@SuppressWarnings("unused")
 		private String printer(double[] parameters) {
 			switch(this) {
 			case DRIVES_FORWARD:
@@ -168,6 +170,28 @@ public class Automation {
 				return "AUTO_DELAY: pause auto for " + parameters[0] + " seconds.";
 			case AUTO_STOP:
 				return "AUTO_STOP: stop auto.";
+			case AUTO_RECORD:
+				break;
+			case DRIVES_ARMS_DOWN:
+				break;
+			case DRIVES_HIGHGEAR:
+				break;
+			case DRIVES_LOWGEAR:
+				break;
+			case HAB_DOWN:
+				break;
+			case HAB_PREARMS:
+				break;
+			case HAB_UP:
+				break;
+			case HAB_WAIT:
+				break;
+			case HAB_WAIT_PLATFORM:
+				break;
+			case HAB_WHEELS_FORWARD:
+				break;
+			default:
+				break;
 			}
 			return null;
 		}
@@ -203,6 +227,17 @@ public class Automation {
 		delayTimeStart = -1;
 		isDone = false;
 	}
+	
+	public void config(AutoConfig config, boolean setting) {
+		switch(config) {
+		case TOTELE:
+			toTeleCompletion = setting;
+			break;
+		case ALLOWOVERRIDE:
+			allowOverride = setting;
+			break;
+		}
+	}
 
 	public boolean addStep(AutoMethod autoMethod, double... parameters) {
 		if(!firstRun) {
@@ -229,6 +264,7 @@ public class Automation {
 		return true;
 	}
 
+	@SuppressWarnings("unused")
 	private boolean removeStep(int index) {
 		if(!firstRun) {
 			System.out.println("Dirty run - call reset() on Automation before changing anything else!");
@@ -240,7 +276,6 @@ public class Automation {
 		}
 		currentAuto.remove(index);
 		currentAutoParams.remove(index);
-		//		System.out.println("Removed step " + );
 		return true;
 	}
 	
@@ -367,16 +402,14 @@ public class Automation {
 				delayTimeStart = Timer.getFPGATimestamp();
 				delayTime = currentStepData[0];
 				break;
-			case AUTO_STARTTIMER:
+			case AUTO_RECORD:
 				SmartDashboard.putNumber("Auto time" + currentStep, Timer.getFPGATimestamp() - startTime);
 				currentStep++;
 				return;
 			case AUTO_STOP:
-				SmartDashboard.putNumber("Auto time", Timer.getFPGATimestamp() - startTime);
+				SmartDashboard.putNumber("Total auto time", Timer.getFPGATimestamp() - startTime);
 				drives.stopMotors();
 				currentStep = currentAuto.size() + 1;
-				break;
-			case AUTO_KILL:
 				break;
 			default:
 				System.out.println("Invalid auto (" + currentAuto.get(currentStep) + ")");
