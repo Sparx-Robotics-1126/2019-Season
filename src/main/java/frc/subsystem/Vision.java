@@ -56,7 +56,6 @@ public class Vision {
     {
         vState = VisionState.SENSING;
         firstIt = true;
-        DriveState = MoveState.STANDBY;
     }
 
     public static enum VisionState
@@ -121,7 +120,10 @@ public class Vision {
             distance = edgeDist - midDist;
 
             if(edgeDist == Double.MAX_VALUE && midDist == Double.MAX_VALUE)
+            {
                 arduinoRight.reset();
+                System.out.println("RESETING ARDUINO DURING PARALING");
+            }
             if(Math.abs(distance) < DEADBAND && edgeDist != Double.MAX_VALUE)
             {
                  vState = VisionState.REALIGNING;
@@ -270,11 +272,11 @@ public class Vision {
         double distance;
 
         distance = arduinoRight.getEdgeDist();
-        if(distance != -1)
+        if(distance != -1.0)
             edgeDist = distance;
 
         distance = arduinoRight.getmidDist();
-        if(distance != -1)
+        if(distance != -1.0)
             midDist = distance;
       }
 
