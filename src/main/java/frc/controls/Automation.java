@@ -212,6 +212,11 @@ public class Automation {
 		delayTimeStart = -1;
 		isDone = false;
 	}
+	
+	public void stopAll() {
+		drives.stopAll();
+		hab.stopAll();
+	}
 
 	public void reset() {
 		firstRun = true;
@@ -277,6 +282,10 @@ public class Automation {
 		currentAuto.remove(index);
 		currentAutoParams.remove(index);
 		return true;
+	}
+	
+	public void setDone(boolean done) {
+		isDone = done;
 	}
 	
 	public boolean isDone() {

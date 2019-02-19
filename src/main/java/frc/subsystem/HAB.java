@@ -172,5 +172,10 @@ public class HAB extends GenericSubsystem {
 		addToTables(habLeft, "Arms", "Arms Left Wheels");
 		addToTables(habRight, "Arms", "Arms Right Wheels");
 	}
+	
+	public void stopAll() {
+		stopHab();
+		stopHabWheels();
+	}
 
 }

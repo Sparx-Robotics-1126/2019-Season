@@ -29,18 +29,22 @@ public class TeleOP implements Controls {
 	private Automation auto;
 
 	private TeleState state;
-	
+
 	private Solenoid bzzzzzz;
 
-	private boolean[][] buttonStates = { { false, false }, // LEFTJOY_LEFT
-			{ false, false }, // LEFTJOY_MIDDLE
-			{ false, false }, // LEFTJOY_RIGHT
-			{ false, false }, // LEFTJOY_TRIGGER
-			{ false, false }, // RIGHTJOY_LEFT
-			{ false, false }, // RIGHTJOY_MIDDLE
-			{ false, false }, // RIGHTJOY_RIGHT
-			{ false, false }, // RIGHTJOY_TRIGGER
-			{ false, false }, // XBOX_A
+	private boolean[][] buttonStates = { { false, false }, // XBOX_A
+			{ false, false }, // XBOX_B
+			{ false, false }, // XBOX_X
+			{ false, false }, // XBOX_Y
+			{ false, false }, // XBOX_L1
+			{ false, false }, // XBOX_R1
+			{ false, false }, // XBOX_BACK
+			{ false, false }, // XBOX_START
+			{ false, false }, // XBOX_L2
+			{ false, false }, // XBOX_R2
+			{ false, false }, // XBOX_L3
+			{ false, false }, // XBOX_R3
+			{ false, false }, // XBOX_A //start second xbox
 			{ false, false }, // XBOX_B
 			{ false, false }, // XBOX_X
 			{ false, false }, // XBOX_Y
@@ -53,15 +57,11 @@ public class TeleOP implements Controls {
 			{ false, false }, // XBOX_L3
 			{ false, false } }; // XBOX_R3
 
-	private boolean[][] povStates = { { false, false }, // LEFTJOY_UP
-			{ false, false }, // LEFTJOY_RIGHT
-			{ false, false }, // LEFTJOY_DOWN
-			{ false, false }, // LEFTJOY_LEFT
-			{ false, false }, // RIGHTJOY_UP
-			{ false, false }, // RIGHTJOY_RIGHT
-			{ false, false }, // RIGHTJOY_DOWN
-			{ false, false }, // RIGHTJOY_LEFT
-			{ false, false }, // XBOX_UP
+	private boolean[][] povStates = { { false, false }, // XBOX_UP
+			{ false, false }, // XBOX_RIGHT
+			{ false, false }, // XBOX_DOWN
+			{ false, false },  // XBOX_LEFT
+			{ false, false }, // XBOX_UP //start second xbox
 			{ false, false }, // XBOX_RIGHT
 			{ false, false }, // XBOX_DOWN
 			{ false, false } }; // XBOX_LEFT
@@ -71,8 +71,7 @@ public class TeleOP implements Controls {
 		this.hab = hab;
 		this.hatch = hatch;
 		this.auto = new Automation(drives, hatch, hab);
-		joysticks = new Joystick[] { new Joystick(CtrlMap.RIGHTJOYSTICK), new Joystick(CtrlMap.LEFTJOYSTICK),
-				new Joystick(CtrlMap.XBOXCONTROLLER) };
+		joysticks = new Joystick[] {new Joystick(CtrlMap.XBOXCONTROLLER_MAIN), new Joystick(CtrlMap.XBOXCONTROLLER_CLIMBING)};
 		state = TeleState.TELEOP;
 		bzzzzzz = new Solenoid(IO.NOISEEEE_SOLENOID);
 	}
@@ -90,9 +89,9 @@ public class TeleOP implements Controls {
 		auto.addStep(AutoMethod.DRIVES_WAIT);
 		auto.addStep(AutoMethod.HAB_DOWN);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0.4);
-//		auto.addStep(AutoMethod.DRIVES_FORWARD, 0.2, 60);
+		//		auto.addStep(AutoMethod.DRIVES_FORWARD, 0.2, 60);
 		auto.addStep(AutoMethod.HAB_WAIT);	
-//		auto.addStep(AutoMethod.DRIVES_STOP);
+		//		auto.addStep(AutoMethod.DRIVES_STOP);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 1);
 		auto.addStep(AutoMethod.AUTO_DELAY, 2.75); 
 		auto.addStep(AutoMethod.HAB_UP);
@@ -104,7 +103,7 @@ public class TeleOP implements Controls {
 		auto.addStep(AutoMethod.AUTO_STOP);
 		state = TeleState.AUTOMATION;
 	}
-	
+
 	@Override
 	public void execute() {
 		setJoystickStates();
@@ -113,63 +112,61 @@ public class TeleOP implements Controls {
 			if(bzzzzzz.get()) {
 				bzzzzzz.set(false);
 			}
-			if (isOffZeroAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
-				hab.setHabSpeedRight(getAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS));
-			} else {
-				hab.setHabSpeedRight(0);
-			}
-			if (isOffZeroAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
-				hab.setHabSpeedLeft(-getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
-			} else {
-				hab.setHabSpeedLeft(0);
-			}
-			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y)) {
-				drives.joystickLeft(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y));
+			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_LEFT_Y)) {
+				drives.joystickLeft(getAxis(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_LEFT_Y));
 			} else {
 				drives.joystickLeft(0);
 			}
-			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y)) {
-				drives.joystickRight(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_RIGHT_Y));
+			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_RIGHT_Y)) {
+				drives.joystickRight(getAxis(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_RIGHT_Y));
 			} else {
 				drives.joystickRight(0);
 			}
-			if (isRisingEdgeButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1)) {
+			if (isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R1)) {
 				hatch.flipperButton();
-			} else if (isRisingEdgeButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L1)) {
+			} else if (isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L1)) {
 				hatch.shooterButton();
-			} else if (isFallingEdgeButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1) || isFallingEdgeButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L1)) {
+			} else if (isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R1) || isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L1)) {
 				hatch.homeButton();
 			}
-			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)) {
+			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_B)) {
 				drives.toAmazingStraightness();
-			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)) {
+			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_B)) {
 				drives.changeState(DriveState.TELEOP);
 			}
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_A)) {
+			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
+				drives.findLine();
+			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
+				drives.toTeleop();
+			}
+			//CLIMBING
+			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_A) && isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_L1)) {
 				setAutomationClimbing();
 			}
-			if(isRisingEdgePOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_DOWN)) {
-				drives.flipUnsnappy();
-			}
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)) {
+			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_Y)) {
 				drives.toArms();
 			}
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_START)) {
+			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_START)) {
 				hab.ctrlDown();
 			}
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_BACK)) {
+			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_BACK)) {
 				hab.ctrlPreArms();
 			}
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X)) {
+			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_X)) {
 				System.out.println("Button pressed");
 				hab.ctrlUP();
 			}
+
 			break;
 		case AUTOMATION:
 			if(!bzzzzzz.get()) {
 				bzzzzzz.set(true);
 			}
 			auto.execute();
+			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_B)) {
+				auto.setDone(true);
+				auto.stopAll();
+			}
 			if(auto.isDone()) {
 				state = TeleState.TELEOP; //needed?
 			}
@@ -185,12 +182,10 @@ public class TeleOP implements Controls {
 	 * @return if the button was previously not pressed and is now pressed.
 	 */
 	public boolean isRisingEdgeButton(int joy, int pos) {
-		if(joy == CtrlMap.XBOXCONTROLLER) {
-			pos += CtrlMap.XBOXBUTTONOFFSET;
-		} else if(joy == CtrlMap.RIGHTJOYSTICK) {
-			pos += CtrlMap.RIGHTJOYBUTTONOFFSET;
-		} else if(joy == CtrlMap.LEFTJOYSTICK) {
-			pos += CtrlMap.LEFTJOYBUTTONOFFSET;
+		if(joy == CtrlMap.XBOXCONTROLLER_MAIN) {
+			pos += CtrlMap.XBOXMAINBUTTONOFFSET;
+		} else if(joy == CtrlMap.XBOXCONTROLLER_CLIMBING) {
+			pos += CtrlMap.XBOXCLIMBINGBUTTONOFFSET;
 		}
 		return buttonStates[pos][0] && !buttonStates[pos][1];
 	}
@@ -203,12 +198,10 @@ public class TeleOP implements Controls {
 	 * @return if the button was previously pressed and is no longer pressed.
 	 */
 	public boolean isFallingEdgeButton(int joy, int pos) {
-		if(joy == CtrlMap.XBOXCONTROLLER) {
-			pos += CtrlMap.XBOXBUTTONOFFSET;
-		} else if(joy == CtrlMap.RIGHTJOYSTICK) {
-			pos += CtrlMap.RIGHTJOYBUTTONOFFSET;
-		} else if(joy == CtrlMap.LEFTJOYSTICK) {
-			pos += CtrlMap.LEFTJOYBUTTONOFFSET;
+		if(joy == CtrlMap.XBOXCONTROLLER_MAIN) {
+			pos += CtrlMap.XBOXMAINBUTTONOFFSET;
+		} else if(joy == CtrlMap.XBOXCONTROLLER_CLIMBING) {
+			pos += CtrlMap.XBOXCLIMBINGBUTTONOFFSET;
 		}
 		return !buttonStates[pos][0] && buttonStates[pos][1];
 	}
@@ -220,12 +213,10 @@ public class TeleOP implements Controls {
 	 * @return if the POV was previously not pressed and is now pressed.
 	 */
 	public boolean isRisingEdgePOV(int joy, int pos) {
-		if(joy == CtrlMap.XBOXCONTROLLER) {
-			pos += CtrlMap.XBOXPOVOFFSET;
-		} else if(joy == CtrlMap.RIGHTJOYSTICK) {
-			pos += CtrlMap.RIGHTJOYPOVOFFSET;
-		} else if(joy == CtrlMap.LEFTJOYSTICK) {
-			pos += CtrlMap.LEFTJOYPOVOFFSET;
+		if(joy == CtrlMap.XBOXCONTROLLER_MAIN) {
+			pos += CtrlMap.XBOXMAINPOVOFFSET;
+		} else if(joy == CtrlMap.XBOXCONTROLLER_CLIMBING) {
+			pos += CtrlMap.XBOXCLIMBINGPOVOFFSET;
 		}
 		return povStates[pos][0] && !povStates[pos][1];
 	}
@@ -237,12 +228,10 @@ public class TeleOP implements Controls {
 	 * @return if the POV was previously pressed and is now not pressed.
 	 */
 	public boolean isFallingEdgePOV(int joy, int pos) {
-		if(joy == CtrlMap.XBOXCONTROLLER) {
-			pos += CtrlMap.XBOXPOVOFFSET;
-		} else if(joy == CtrlMap.RIGHTJOYSTICK) {
-			pos += CtrlMap.RIGHTJOYPOVOFFSET;
-		} else if(joy == CtrlMap.LEFTJOYSTICK) {
-			pos += CtrlMap.LEFTJOYPOVOFFSET;
+		if(joy == CtrlMap.XBOXCONTROLLER_MAIN) {
+			pos += CtrlMap.XBOXMAINPOVOFFSET;
+		} else if(joy == CtrlMap.XBOXCONTROLLER_CLIMBING) {
+			pos += CtrlMap.XBOXCLIMBINGPOVOFFSET;
 		}
 		return !povStates[pos][0] && povStates[pos][1];
 	}
@@ -316,40 +305,42 @@ public class TeleOP implements Controls {
 		for(boolean povs[]: povStates) {
 			povs[1] = povs[0];
 		}
-		// buttonStates[0][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK,
-		// CtrlMap.JOY_LEFT);
-		// buttonStates[1][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK,
-		// CtrlMap.JOY_MIDDLE);
-		// buttonStates[2][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK,
-		// CtrlMap.JOY_RIGHT);
-		// buttonStates[3][0] = isPressedButton(CtrlMap.RIGHTJOYSTICK,
-		// CtrlMap.JOY_TRIGGER);
-		// buttonStates[4][0] = isPressedButton(CtrlMap.LEFTJOYSTICK2,
-		// CtrlMap.JOY_LEFT);
-		// buttonStates[5][0] = isPressedButton(CtrlMap.LEFTJOYSTICK,
-		// CtrlMap.JOY_MIDDLE);
-		// buttonStates[6][0] = isPressedButton(CtrlMap.LEFTJOYSTICK,
-		// CtrlMap.JOY_RIGHT);
-		// buttonStates[7][0] = isPressedButton(CtrlMap.LEFTJOYSTICK,
-		// CtrlMap.JOY_TRIGGER);
 
-		buttonStates[8][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_A);
-		buttonStates[9][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B);
-		buttonStates[10][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_X);
-		buttonStates[11][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y);
+		buttonStates[0][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A);
+		buttonStates[1][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_B);
+		buttonStates[2][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_X);
+		buttonStates[3][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_Y);
 
-		buttonStates[12][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L1);
-		buttonStates[13][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1);
-		buttonStates[14][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_BACK);
-		buttonStates[15][0] = isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_START);
-		// buttonStates[16][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER,
-		// CtrlMap.XBOX_L2);
-		// buttonStates[17][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER,
-		// CtrlMap.XBOX_R2);
-		// buttonStates[18][0] = isPressedButton(CtrlMap.XBOXCONTROLLER,
-		// CtrlMap.XBOX_L3);
-		// buttonStates[19][0] = isPressedButton(CtrlMap.XBOXCONTROLLER,
-		// CtrlMap.XBOX_R3);
+		buttonStates[4][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L1);
+		buttonStates[5][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R1);
+		buttonStates[6][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_BACK);
+		buttonStates[7][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_START);
+		buttonStates[8][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_MAIN,
+				CtrlMap.XBOX_L2);
+		buttonStates[9][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_MAIN,
+				CtrlMap.XBOX_R2);
+		buttonStates[10][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN,
+				CtrlMap.XBOX_L3);
+		buttonStates[11][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN,
+				CtrlMap.XBOX_R3);
+
+		buttonStates[12][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_A);
+		buttonStates[13][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_B);
+		buttonStates[14][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_X);
+		buttonStates[15][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_Y);
+
+		buttonStates[16][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_L1);
+		buttonStates[17][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_R1);
+		buttonStates[18][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_BACK);
+		buttonStates[19][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_START);
+		buttonStates[20][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_CLIMBING,
+				CtrlMap.XBOX_L2);
+		buttonStates[21][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_CLIMBING,
+				CtrlMap.XBOX_R2);
+		buttonStates[22][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING,
+				CtrlMap.XBOX_L3);
+		buttonStates[23][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING,
+				CtrlMap.XBOX_R3);
 		//
 		// povStates[0][0] = isPressedPOV(CtrlMap.RIGHTJOYSTICK, CtrlMap.POV_UP);
 		// povStates[1][0] = isPressedPOV(CtrlMap.RIGHTJOYSTICK, CtrlMap.POV_RIGHT);
@@ -359,9 +350,13 @@ public class TeleOP implements Controls {
 		// povStates[5][0] = isPressedPOV(CtrlMap.LEFTJOYSTICK, CtrlMap.POV_RIGHT);
 		// povStates[6][0] = isPressedPOV(CtrlMap.LEFTJOYSTICK, CtrlMap.POV_DOWN);
 		// povStates[7][0] = isPressedPOV(CtrlMap.LEFTJOYSTICK, CtrlMap.POV_LEFT);
-		// povStates[8][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_UP);
-		// povStates[9][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_RIGHT);
-		povStates[10][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_DOWN);
-		// povStates[11][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_LEFT);
+		povStates[0][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.POV_UP);
+		povStates[1][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.POV_RIGHT);
+		povStates[2][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.POV_DOWN);
+		povStates[3][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.POV_LEFT);
+		povStates[4][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.POV_UP);
+		povStates[5][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.POV_RIGHT);
+		povStates[6][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.POV_DOWN);
+		povStates[7][0] = isPressedPOV(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.POV_LEFT);
 	}
 }

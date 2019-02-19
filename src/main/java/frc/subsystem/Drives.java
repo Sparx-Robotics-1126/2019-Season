@@ -363,6 +363,13 @@ public class Drives extends GenericSubsystem {
 		leftMtrs.stopMotors();
 		rightMtrs.stopMotors();
 	}
+	
+	public void stopAll() {
+		isMoving = false;
+		drivesPTOArms.set(false);
+		leftMtrs.stopMotors();
+		rightMtrs.stopMotors();
+	}
 
 	/** Finds the value that left joystick is reading */
 	public void joystickLeft(double speed) {
@@ -470,6 +477,7 @@ public class Drives extends GenericSubsystem {
 
 	/** used by RobotSystem to put the robot in the teleop state */
 	public void toTeleop() {
+		isMoving = false;
 		changeState(DriveState.TELEOP);
 		// turn(0.5, 90);
 		// move(0.5, 240);
