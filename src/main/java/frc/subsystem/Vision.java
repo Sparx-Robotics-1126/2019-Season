@@ -38,7 +38,9 @@ public class Vision {
   
     private DigitalInput irLC;
 
-    private VisionState vState;
+    private VisionStateParalining vState;
+    
+    private VisionStateMixed vStateMixed;
 
     public MoveState DriveState;
 
@@ -47,18 +49,22 @@ public class Vision {
     public Vision()
     {
         DEADBAND = .75;
-        irRM = new DigitalInput(7);
+        irRM = new DigitalInput(5);
+        irRC = new DigitalInput(1);
+        irLM = new DigitalInput(15);
         irLC = new DigitalInput(8);
         arduinoRight = new Arduino(115200, Port.kUSB, 8, Parity.kSpace, StopBits.kOne);
+        vState = VisionStateParalining.SENSING;
+        vStateMixed = VisionStateMixed.SENSING;
     }
 
     public void reset()
     {
-        vState = VisionState.SENSING;
+        vState = VisionStateParalining.SENSING;
         firstIt = true;
     }
 
-    public static enum VisionState
+    public static enum VisionStateParalining
     {
         SENSING,
         PARALING,
@@ -68,14 +74,25 @@ public class Vision {
         SCORE,
         NOTHING;
     }
+    
+    public static enum VisionStateMixed
+    {
+    	SENSING,
+    	TURNING,
+    	DRIVING,
+    	SCORING,
+    	FINISHED;
+    }
 
     public static enum MoveState
     {
         DRIVER,
         SLOWRIGHT,
         RIGHT,
+        SLIGHTRIGHT,
         SLOWLEFT,
         LEFT,
+        SLIGHTLEFT,
         FORWARD,
         BACKWARD,
         SCORE,
@@ -93,6 +110,53 @@ public class Vision {
           paraliningMethodOneSide();
       }
 
+      public void mixedMethod()
+      {
+    	  switch(vStateMixed)
+    	  {
+    	  case SENSING:
+    		  DriveState = MoveState.DRIVER;
+    		  if(!irLM.get())
+    		  {
+    			  DriveState = MoveState.LEFT;
+    			  vStateMixed = VisionStateMixed.TURNING;
+    			  onRight = false;
+    		  }
+    		  else if(!irRM.get())
+    		  {
+    			  DriveState = MoveState.RIGHT;
+    			  vStateMixed = VisionStateMixed.TURNING;
+    			  onRight = true;
+    		  }
+    		  break;
+    	  case TURNING:
+    		  if(onRight)
+    		  {
+    			  if(!irLC.get())
+    			  {
+    				  DriveState = MoveState.LEFT;
+    				  vStateMixed = VisionStateMixed.DRIVING;
+    			  }
+    		  }
+    		  else
+    		  {
+    			  if(!irRC.get())
+    			  {
+    				  DriveState = MoveState.RIGHT;
+    				  vStateMixed = VisionStateMixed.DRIVING;
+    			  }
+    		  }
+    		  break;
+    	  case DRIVING:
+    		  if(!irLC.get())
+    			  DriveState = MoveState.SLIGHTLEFT;
+    		  else
+    			  DriveState = MoveState.SLIGHTRIGHT;
+    	  case SCORING:
+    		  DriveState = MoveState.SCORE;
+    	  }
+      }
+      
       public void paraliningMethodOneSide()
       {
         arduinoRight.updateDistances();
@@ -107,7 +171,7 @@ public class Vision {
             if(!irRM.get())
             {
                 firstIt = true;
-                vState = VisionState.PARALING;
+                vState = VisionStateParalining.PARALING;
                 DriveState = MoveState.STANDBY;
             }
             firstIt = false;
@@ -126,7 +190,7 @@ public class Vision {
             }
             if(Math.abs(distance) < DEADBAND && edgeDist != Double.MAX_VALUE)
             {
-                 vState = VisionState.REALIGNING;
+                 vState = VisionStateParalining.REALIGNING;
             }
             else
             {
@@ -158,7 +222,7 @@ public class Vision {
             if(!irRM.get())
                 {
                     DriveState = MoveState.STANDBY;
-                    vState = VisionState.QUARTERTURN;
+                    vState = VisionStateParalining.QUARTERTURN;
                 }
             break;
         case QUARTERTURN:
@@ -166,7 +230,7 @@ public class Vision {
                 if(!irLC.get())
                     {
                         DriveState = MoveState.STANDBY;
-                        vState = VisionState.DRIVE;
+                        vState = VisionStateParalining.DRIVE;
                     }
                 break;
         case DRIVE:
