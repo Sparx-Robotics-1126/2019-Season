@@ -40,7 +40,8 @@ public class Autonomous implements Controls{
 		HAB_ONE_TO_LEFT_HATCH_MIDDLE,
 		HAB_ONE_TO_LEFT_HATCH_BACK,
 		HAB_ONE_TO_LEFT_HATCH_FRONT_TO_PICKUP,
-		HAB_ONE_TO_LEFT_HATCH_FRONT_AND_PICKUP;
+		HAB_ONE_TO_LEFT_HATCH_FRONT_AND_PICKUP,
+		AUTO_TEST;
 	}
 
 	public Autonomous(Drives drives, Hatch hatch, HAB hab) {
@@ -56,6 +57,7 @@ public class Autonomous implements Controls{
 		autoSelector.addOption("Left side Hab 1 to back hatch", Autos.HAB_ONE_TO_LEFT_HATCH_BACK);
 		autoSelector.addOption("Left side Hab 1 to front hatch and to pickup station", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT_TO_PICKUP);
 		autoSelector.addOption("Left side Hab 1 to front hatch and to pickup station (and actually picks up!)", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT_AND_PICKUP);
+		autoSelector.addOption("haHAA (no touchy)", Autos.AUTO_TEST);
 		SmartDashboard.putData(autoSelector);
 		
 		selectedAuto = Autos.DO_NOTHING;
@@ -153,6 +155,24 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
+			case AUTO_TEST:
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 180);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 180);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
+				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 90);
+				
 			default: 
 				break;
 			}
