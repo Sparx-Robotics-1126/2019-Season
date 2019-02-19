@@ -166,7 +166,9 @@ public class TeleOP implements Controls {
 			}
 			break;
 		case AUTOMATION:
-			bzzzzzz.set(true);
+			if(!bzzzzzz.get()) {
+				bzzzzzz.set(true);
+			}
 			auto.execute();
 			if(auto.isDone()) {
 				state = TeleState.TELEOP; //needed?

@@ -82,6 +82,9 @@ public class RobotSystem extends Thread{
 			case STANDBY:
 				break;
 			case AUTO:
+				if(autonomous.isDone()) {
+					teleop();
+				}
 			case TELE:
 				currentControl.execute();
 			}

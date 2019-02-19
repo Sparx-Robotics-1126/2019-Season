@@ -22,9 +22,7 @@ public class Autonomous implements Controls{
 	private Automation automation;
 	
 	private boolean firstRun;
-
-
-	public boolean runAuto;
+	private boolean isDone;
 
 	private SendableChooser<Autos> autoSelector;
 	
@@ -46,11 +44,11 @@ public class Autonomous implements Controls{
 		
 		autoSelector = new SendableChooser<Autos>();
 		autoSelector.setDefaultOption("Do Nothing", Autos.DO_NOTHING);
-		autoSelector.addOption("Left side Hab 1 to front hatch", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT);
-		autoSelector.addOption("Left side Hab 1 to middle hatch", Autos.HAB_ONE_TO_LEFT_HATCH_MIDDLE);
-		autoSelector.addOption("Left side Hab 1 to back hatch", Autos.HAB_ONE_TO_LEFT_HATCH_BACK);
-		autoSelector.addOption("Left side Hab 1 to front hatch and to pickup station", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT_TO_PICKUP);
-		autoSelector.addOption("Left side Hab 1 to front hatch and to pickup station (and actually picks up!)", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT_AND_PICKUP);
+		autoSelector.addOption("Hab 1 to front hatch", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT);
+		autoSelector.addOption("Hab 1 to middle hatch", Autos.HAB_ONE_TO_LEFT_HATCH_MIDDLE);
+		autoSelector.addOption("Hab 1 to back hatch", Autos.HAB_ONE_TO_LEFT_HATCH_BACK);
+		autoSelector.addOption("Hab 1 to front hatch and to pickup station", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT_TO_PICKUP);
+		autoSelector.addOption("Hab 1 to front hatch and to pickup station (and actually picks up!)", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT_AND_PICKUP);
 		autoSelector.addOption("haHAA (no touchy)", Autos.AUTO_TEST);
 		SmartDashboard.putData(autoSelector);
 		
@@ -60,10 +58,12 @@ public class Autonomous implements Controls{
 
 	public void reset() {
 		firstRun = true;
+		isDone = false;
 		automation.reset();
 	}
 
 	public void setAuto(Autos auto) {
+		reset();
 		firstRun = false;
 		if(auto != selectedAuto) {
 			switch(auto) {
@@ -180,10 +180,16 @@ public class Autonomous implements Controls{
 				setAuto(autoSelector.getSelected());
 			} else {
 				automation.execute();
+				if(automation.isDone()) {
+					isDone = true;
+				}
 			}
 		}
 	}
 
+	public boolean isDone() {
+		return isDone;
+	}
 	
 /*
 	public class AutoSendable extends SendableBase {
