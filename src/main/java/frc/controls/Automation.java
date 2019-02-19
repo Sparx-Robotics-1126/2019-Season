@@ -27,8 +27,10 @@ public class Automation {
 	
 	private boolean firstRun;
 	private boolean isDone;
+	
+	private double time;
 
-	private final double DISTANCE_MULITPLIER = 1;
+	private final double DISTANCE_MULTIPLIER = 1;
 
 	/**
 	 * Autos
@@ -42,31 +44,25 @@ public class Automation {
 		 * @param speed - speed to go (in inches/second)
 		 * @param distance - distance to go (in inches)
 		 */
-		DRIVES_FORWARD(2),	
+		DRIVES_FORWARD(2, 4),	
 		/**
 		 * Moves backward with a given distance at a given speed.
 		 * @param speed - speed to go (in inches/second)
 		 * @param distance - distance to go (in inches)
 		 */
-		DRIVES_BACKWARD(2),
-		/**
-		 * Moves forward for a period of time at a given speed.
-		 * @param time - time to move (seconds)
-		 * @param speed - speed to go (inches/second)
-		 */
-		DRIVES_TIMED(2),		
+		DRIVES_BACKWARD(2, 4),	
 		/**
 		 * Turns left x degrees at a given speed.
 		 * @param speed - speed to go (inches/second)
 		 * @param degree - degrees to go (degrees)
 		 */
-		DRIVES_TURNLEFT(2),
+		DRIVES_TURNLEFT(2, 4),
 		/**
 		 * Turns right x degrees at a given speed.
 		 * @param speed - speed to go (inches/second)
 		 * @param degree - degrees to go (degrees)
 		 */
-		DRIVES_TURNRIGHT(2),
+		DRIVES_TURNRIGHT(2, 4),
 		/**
 		 * Starts vision following using line sensors.
 		 */
@@ -127,6 +123,8 @@ public class Automation {
 		 * @param seconds - the number of seconds to pause the auto for.
 		 */
 		AUTO_DELAY(1),
+		AUTO_STARTTIMER(0),
+		AUTO_ENDTIMER(1),
 		/**
 		 * Records the auto time at the moment, storing it into SmartDashboard.
 		 * @param 
@@ -135,11 +133,12 @@ public class Automation {
 		/**
 		 * Kills the auto.
 		 */
-		AUTO_STOP(0);
+		AUTO_STOP(0),
+		AUTO_KILL(0);
 
-		private final int parameterCount;
+		private final int[] parameterCount;
 
-		private AutoMethod(int parameterCount) {
+		private AutoMethod(int... parameterCount) {
 			this.parameterCount = parameterCount;
 		}
 
@@ -149,8 +148,6 @@ public class Automation {
 				return "DRIVES_FORWARD: move forward " + parameters[1] + " inches at a speed of " + parameters[0] + ".";
 			case DRIVES_BACKWARD:
 				return "DRIVES_BACKWARD: move backward " + parameters[1] + " inches at a speed of " + parameters[0] + ".";
-			case DRIVES_TIMED:
-				return "DRIVES_TIMED: move for " + parameters[1] + " seconds at a speed of " + parameters[0] + ".";
 			case DRIVES_TURNLEFT:
 				return "DRIVES_TURNLEFT: turn " + parameters[0] + " degrees left at a speed of " + parameters[1] + ".";
 			case DRIVES_TURNRIGHT:
@@ -213,7 +210,14 @@ public class Automation {
 			return false;
 		}
 		if(parameters != null) {
-			if(parameters.length != autoMethod.parameterCount) {
+			boolean parameterEqual = false;
+			for(int parameter: autoMethod.parameterCount) {
+				if(parameters.length == parameter) {
+					parameterEqual = true;
+					break;
+				}
+			}
+			if(!parameterEqual) {
 				System.out.println("Invalid number of parameters passed in - expected " + autoMethod.parameterCount + " but got " + parameters.length);
 				return false;
 			}
@@ -264,22 +268,35 @@ public class Automation {
 			System.out.println(currentAuto.get(currentStep));
 			switch(currentAuto.get(currentStep)) {
 			case DRIVES_FORWARD:
-				drives.move(currentStepData[0], currentStepData[1]*DISTANCE_MULITPLIER);
+				if(currentStepData.length == 2) {
+					drives.move(currentStepData[0], currentStepData[1]*DISTANCE_MULTIPLIER);
+				} else {
+					drives.move(currentStepData[0], currentStepData[1]*DISTANCE_MULTIPLIER, currentStepData[2], currentStepData[3]);
+				}
 				currentStep++;
 				break;
 			case DRIVES_BACKWARD:
-				drives.move(currentStepData[0], -currentStepData[1]*DISTANCE_MULITPLIER);
-				currentStep++;
-				break;
-			case DRIVES_TIMED:
+				if(currentStepData.length == 2) {
+					drives.move(currentStepData[0], -currentStepData[1]*DISTANCE_MULTIPLIER);
+				} else {
+					drives.move(currentStepData[0], -currentStepData[1]*DISTANCE_MULTIPLIER, currentStepData[2], currentStepData[3]);
+				}
 				currentStep++;
 				break;
 			case DRIVES_TURNLEFT:
-				drives.turn(currentStepData[0], -currentStepData[1]);
+				if(currentStepData.length == 2) {
+					drives.turn(currentStepData[0], -currentStepData[1]);
+				} else {
+					drives.turn(currentStepData[0], -currentStepData[1], currentStepData[2], currentStepData[3]);
+				}
 				currentStep++;
 				break;
 			case DRIVES_TURNRIGHT:
-				drives.turn(currentStepData[0], currentStepData[1]);
+				if(currentStepData.length == 2) {
+					drives.turn(currentStepData[0], currentStepData[1]);
+				} else {
+					drives.turn(currentStepData[0], currentStepData[1], currentStepData[2], currentStepData[3]);
+				}
 				currentStep++;
 				break;
 			case DRIVES_FOLLOWLINE:
@@ -350,10 +367,16 @@ public class Automation {
 				delayTimeStart = Timer.getFPGATimestamp();
 				delayTime = currentStepData[0];
 				break;
+			case AUTO_STARTTIMER:
+				SmartDashboard.putNumber("Auto time" + currentStep, Timer.getFPGATimestamp() - startTime);
+				currentStep++;
+				return;
 			case AUTO_STOP:
 				SmartDashboard.putNumber("Auto time", Timer.getFPGATimestamp() - startTime);
 				drives.stopMotors();
 				currentStep = currentAuto.size() + 1;
+				break;
+			case AUTO_KILL:
 				break;
 			default:
 				System.out.println("Invalid auto (" + currentAuto.get(currentStep) + ")");

@@ -29,8 +29,8 @@ public abstract class GenericSubsystem extends Thread {
 	}
 	
 	public static void addToTables(Sendable sendable, String subsystem, String name) {
-		sendable.setName(subsystem, name);
 		LiveWindow.add(sendable);
+		sendable.setName(subsystem, name);
 	}
 	
 	public void addToTables(Sendable sendable, String name) {
