@@ -10,6 +10,7 @@ package frc.controls;
 import edu.wpi.first.wpilibj.Joystick;
 import frc.controls.Automation.AutoMethod;
 import frc.subsystem.Drives;
+import frc.subsystem.Drives.DriveState;
 import frc.subsystem.HAB;
 import frc.subsystem.Hatch;
 
@@ -98,22 +99,22 @@ public class TeleOP implements Controls {
 		auto.addStep(AutoMethod.AUTO_STOP);
 		state = TeleState.AUTOMATION;
 	}
-
+	
 	@Override
 	public void execute() {
 		setJoystickStates();
 		switch(state) {
 		case TELEOP:
-//			if (isOffZeroAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
-//				hab.setHabSpeedRight(getAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS));
-//			} else {
-//				hab.setHabSpeedRight(0);
-//			}
-//			if (isOffZeroAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
-//				hab.setHabSpeedLeft(-getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
-//			} else {
-//				hab.setHabSpeedLeft(0);
-//			}
+			if (isOffZeroAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
+				hab.setHabSpeedRight(getAxis(CtrlMap.RIGHTJOYSTICK, CtrlMap.JOY_Y_AXIS));
+			} else {
+				hab.setHabSpeedRight(0);
+			}
+			if (isOffZeroAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS)) {
+				hab.setHabSpeedLeft(-getAxis(CtrlMap.LEFTJOYSTICK, CtrlMap.JOY_Y_AXIS));
+			} else {
+				hab.setHabSpeedLeft(0);
+			}
 			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y)) {
 				drives.joystickLeft(getAxis(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_LEFT_Y));
 			} else {
@@ -131,15 +132,16 @@ public class TeleOP implements Controls {
 			} else if (isFallingEdgeButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_R1) || isFallingEdgeButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_L1)) {
 				hatch.homeButton();
 			}
+			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)) {
+				drives.toAmazingStraightness();
+			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)) {
+				drives.changeState(DriveState.TELEOP);
+			}
 			if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_A)) {
 				setAutomationClimbing();
-				//drives.findLine();
 			}
 			if(isRisingEdgePOV(CtrlMap.XBOXCONTROLLER, CtrlMap.POV_DOWN)) {
 				drives.flipUnsnappy();
-			}
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_B)) {
-				drives.toTeleop();
 			}
 			if (isPressedButton(CtrlMap.XBOXCONTROLLER, CtrlMap.XBOX_Y)) {
 				drives.toArms();

@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.subsystem.Vision.directions;
 import frc.util.MotorGroup;
@@ -92,6 +91,10 @@ public class Drives extends GenericSubsystem {
 	private double slowPercent;
 
 	private double slowSpeed;
+	
+	private double highestLeft;
+	
+	private double highestRight;
 
 	// ----------------------------------------Constants----------------------------------------
 
@@ -136,6 +139,8 @@ public class Drives extends GenericSubsystem {
 		turnSpeed = 0;
 		moveDist = 0;
 		moveSpeed = 0;
+		highestLeft = 0;
+		highestRight = 0;
 		state = DriveState.STANDBY;
 		timer = 0;
 		wantedSpeedRight = 0;
@@ -149,7 +154,7 @@ public class Drives extends GenericSubsystem {
 	// all the states drives can be in
 	public enum DriveState {
 		STANDBY, TELEOP, MOVE_FORWARD, MOVE_BACKWARD, TURN_RIGHT, TURN_LEFT, SHIFT_LOW, SHIFT_HIGH, ARMS, FINDING_LINE,
-		LINE_FOLLOWER;
+		LINE_FOLLOWER, AMAZING_STRAIGHTNESS;
 	}
 
 	// does all the code for drives
@@ -161,9 +166,7 @@ public class Drives extends GenericSubsystem {
 		case STANDBY:
 			break;
 		case TELEOP:
-			if (!shiftingPosition && (getAverageRate() > 275)) {
-				highShift();
-			} else if (shiftingPosition && (getAverageRate() < 150)) {
+			if(shifter.get()) {
 				lowShift();
 			}
 			rightMtrs.set(speedRight);
@@ -270,7 +273,7 @@ public class Drives extends GenericSubsystem {
 			rightMtrs.set(0.2);
 			shifter.set(false);
 			shiftingPosition = false;
-			if (timer + 400 < System.currentTimeMillis()) {
+			if (timer + 0.1 < Timer.getFPGATimestamp()) {
 				leftMtrs.set(speedLeft);
 				rightMtrs.set(speedRight);
 				isMoving = false;
@@ -282,7 +285,7 @@ public class Drives extends GenericSubsystem {
 			rightMtrs.set(0.2);
 			shifter.set(true);
 			shiftingPosition = true;
-			if (timer + 400 < System.currentTimeMillis()) {
+			if (timer + 0.1 < Timer.getFPGATimestamp()) {
 				leftMtrs.set(speedLeft);
 				rightMtrs.set(speedRight);
 				changeState(prevState);
@@ -293,10 +296,20 @@ public class Drives extends GenericSubsystem {
 				drivesPTOArms.set(true);
 				arms.armsDown();
 				if (arms.isDone()) {
-					toTeleop();
+					changeState(DriveState.STANDBY);
 					isMoving = false;
 				}
 			}
+			break;
+		case AMAZING_STRAIGHTNESS:
+			if (!shifter.get() && (getAverageRate() > 65)) {
+				highShift();
+			}
+			wantedSpeedLeft = 1;
+			wantedSpeedRight = 1;
+			straightenForward();
+			leftMtrs.set(wantedSpeedLeft);
+			rightMtrs.set(wantedSpeedRight);
 			break;
 		case FINDING_LINE:
 			vision.getDirection();
@@ -313,8 +326,17 @@ public class Drives extends GenericSubsystem {
 		// System.out.println("Right Encoder: " + rightEnc.getDistance());
 		// System.out.println("Left Encoder: " + leftEnc.getDistance());
 		// System.out.println("Gyro: " + getAngle());
-		// System.out.println("left rate: " + leftEnc.getRate());
-		// System.out.println("right rate: " + rightEnc.getRate());
+		
+		 System.out.println("left rate: " + leftEnc.getRate());
+		 System.out.println("right rate: " + rightEnc.getRate());
+		 if(Math.abs(leftEnc.getRate()) > highestLeft) {
+			 highestLeft = leftEnc.getRate();
+		 }
+		 if(Math.abs(rightEnc.getRate()) > highestRight) {
+			 highestRight = rightEnc.getRate();
+		 }
+		 System.out.println("highest left rate: " + highestLeft);
+		 System.out.println("highest right rate: " + highestRight);
 		// System.out.println("GetDistance: " + getDistance());
 		// System.out.println("RightMtr" + wantedSpeedRight + " LeftMtr: " +
 		// wantedSpeedLeft);
@@ -392,7 +414,7 @@ public class Drives extends GenericSubsystem {
 		speedRight = 0;
 		isMoving = true;
 		prevState = state;
-		timer = System.currentTimeMillis();
+		timer = Timer.getFPGATimestamp();
 		changeState(DriveState.SHIFT_LOW);
 	}
 
@@ -402,7 +424,7 @@ public class Drives extends GenericSubsystem {
 		speedLeft = 0;
 		isMoving = true;
 		prevState = state;
-		timer = System.currentTimeMillis();
+		timer = Timer.getFPGATimestamp();
 		changeState(DriveState.SHIFT_HIGH);
 	}
 
@@ -457,6 +479,11 @@ public class Drives extends GenericSubsystem {
 		}
 
 	}
+	
+	public void toAmazingStraightness() {
+		resetGyroAngle();
+		changeState(DriveState.AMAZING_STRAIGHTNESS);
+	}
 
 	// changes the state of the robot to what is given as a parameter
 	public void changeState(DriveState st) {
@@ -507,6 +534,12 @@ public class Drives extends GenericSubsystem {
 		// lightMtr1.setName("Drives", "Left motor 1");
 		// leftMtr2.setName("Drives", "Left motor 2");
 		// leftMtr3.setName("Drives", "Left motor 3");
+		LiveWindow.remove(rightMtr1);
+		LiveWindow.remove(rightMtr2);
+		LiveWindow.remove(rightMtr3);
+		LiveWindow.remove(leftMtr1);
+		LiveWindow.remove(leftMtr2);
+		LiveWindow.remove(leftMtr3);
 		addToTables(rightMtrs, "Right drives");
 		addToTables(leftMtrs, "Left drives");
 		addToTables(rightEnc, "Right drives encoder");
@@ -515,12 +548,6 @@ public class Drives extends GenericSubsystem {
 		addToTables(drivesPTOArms, "Arms", "Drives PTO (Arms)");
 		addToTables(unsnappy, "Arms", "Unsnappy");
 		addToTables(gyro, "Gyro");
-		LiveWindow.remove(rightMtr1);
-		LiveWindow.remove(rightMtr2);
-		LiveWindow.remove(rightMtr3);
-		LiveWindow.remove(leftMtr1);
-		LiveWindow.remove(leftMtr2);
-		LiveWindow.remove(leftMtr3);
 	}
 
 }
