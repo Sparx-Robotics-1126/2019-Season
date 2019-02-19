@@ -10,85 +10,396 @@ package frc.subsystem;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.IO;
+import edu.wpi.first.wpilibj.SerialPort.Parity;
+import edu.wpi.first.wpilibj.SerialPort.Port;
+import edu.wpi.first.wpilibj.SerialPort.StopBits;
+import frc.util.Arduino;
 
 /**
  * Add your docs here.
  */
 public class Vision {
 
-	private directions direction;
+    private Arduino arduinoLeft;
 
-	private DigitalInput leftIR;
+    private Arduino arduinoRight;
 
-	private DigitalInput centerLeftIR;
+    private double d1, d2, edgeDist, midDist;
 
-	private DigitalInput centerRightIR;
+    private boolean clockWise, firstIt, onRight;
 
-	private DigitalInput rightIR;
+    private final double DEADBAND;
 
-	private boolean hitLine, centerHit, rightHitFirst;
+    private DigitalInput irRM;
 
-	public Vision() {
-		leftIR = new DigitalInput(IO.VISION_LEFTFOLLOWINGSENSOR);
-		centerLeftIR = new DigitalInput(IO.VISION_CENTERLEFTFOLLOWINGSENSOR);
-		centerRightIR = new DigitalInput(IO.VISION_CENTERRIGHTFOLLOWINGSENSOR);
-		rightIR = new DigitalInput(IO.VISION_RIGHTFOLLOWINGSENSOR);
-		direction = directions.STANDBY;
-	}
+    private DigitalInput irRC;
+  
+    private DigitalInput irLM;
+  
+    private DigitalInput irLC;
 
-	public void reset() {
-		hitLine = false;
-		rightHitFirst = false;
-		centerHit = false;
-		System.out.println("Vision reset");
-	}
+    private VisionStateParalining vState;
+    
+    private VisionStateMixed vStateMixed;
 
-	public enum directions {
-		LEFT, SLIGHTLEFT, STANDBY, FORWARD, RIGHT, SLIGHTRIGHT
-	}
+    public MoveState DriveState;
 
-	public directions getDirection() {
-		boolean left = !leftIR.get();
-		boolean right = !rightIR.get();
-		boolean centerLeft = !centerLeftIR.get();
-		boolean centerRight = !centerRightIR.get();
+    public MoveState dState;
 
-		// If we've hit right turn right
-		if (right) {
-			direction = directions.RIGHT;
-			hitLine = true;
-			rightHitFirst = true;
+    public Vision()
+    {
+        DEADBAND = .75;
+        irRM = new DigitalInput(5);
+        irRC = new DigitalInput(1);
+        irLM = new DigitalInput(15);
+        irLC = new DigitalInput(8);
+        arduinoRight = new Arduino(115200, Port.kUSB, 8, Parity.kSpace, StopBits.kOne);
+        vState = VisionStateParalining.SENSING;
+        vStateMixed = VisionStateMixed.SENSING;
+    }
 
-			// If we've hit left turn left
-		} else if (left) {
-			direction = directions.LEFT;
-			hitLine = true;
-			rightHitFirst = false;
-		}
+    public void reset()
+    {
+        vState = VisionStateParalining.SENSING;
+        firstIt = true;
+    }
 
-		// We'ver hit line on side now we turn until center line hit.
-		if (hitLine && !centerHit) {
-			// Waiting for the middle to be found
-			if ((rightHitFirst && centerLeft) || (!rightHitFirst && centerRight)) {
-				centerHit = true;
-			}
-		} else {
-			// Still Searching for line
-			direction = directions.FORWARD;
-		}
+    public static enum VisionStateParalining
+    {
+        SENSING,
+        PARALING,
+        REALIGNING,
+        QUARTERTURN,
+        DRIVE,
+        SCORE,
+        NOTHING;
+    }
+    
+    public static enum VisionStateMixed
+    {
+    	SENSING,
+    	TURNING,
+    	DRIVING,
+    	SCORING,
+    	FINISHED;
+    }
 
-		// We've found line now we must stay on it
-		if (hitLine && centerHit) {
-			if (centerLeft) {
-				direction = directions.SLIGHTLEFT;
-			} else {
-				direction = directions.SLIGHTRIGHT;
-			}
-		}
-		return direction;
-	}
+    public static enum MoveState
+    {
+        DRIVER,
+        SLOWRIGHT,
+        RIGHT,
+        SLIGHTRIGHT,
+        SLOWLEFT,
+        LEFT,
+        SLIGHTLEFT,
+        FORWARD,
+        BACKWARD,
+        SCORE,
+        STANDBY;
+    }
 
-	public boolean triggered() {
-		return hitLine;
-	}
+     public MoveState getDirection()
+     {
+         return DriveState;
+     }
+      
+      public void test()
+      {
+        System.out.println("edge distance: " + edgeDist + "\nmid  distance: " + midDist);
+          paraliningMethodOneSide();
+      }
+
+      public void mixedMethod()
+      {
+    	  switch(vStateMixed)
+    	  {
+    	  case SENSING:
+    		  DriveState = MoveState.DRIVER;
+    		  if(!irLM.get())
+    		  {
+    			  DriveState = MoveState.LEFT;
+    			  vStateMixed = VisionStateMixed.TURNING;
+    			  onRight = false;
+    		  }
+    		  else if(!irRM.get())
+    		  {
+    			  DriveState = MoveState.RIGHT;
+    			  vStateMixed = VisionStateMixed.TURNING;
+    			  onRight = true;
+    		  }
+    		  break;
+    	  case TURNING:
+    		  if(onRight)
+    		  {
+    			  if(!irLC.get())
+    			  {
+    				  DriveState = MoveState.LEFT;
+    				  vStateMixed = VisionStateMixed.DRIVING;
+    			  }
+    		  }
+    		  else
+    		  {
+    			  if(!irRC.get())
+    			  {
+    				  DriveState = MoveState.RIGHT;
+    				  vStateMixed = VisionStateMixed.DRIVING;
+    			  }
+    		  }
+    		  break;
+    	  case DRIVING:
+    		  if(!irLC.get())
+    			  DriveState = MoveState.SLIGHTLEFT;
+    		  else
+    			  DriveState = MoveState.SLIGHTRIGHT;
+    	  case SCORING:
+    		  DriveState = MoveState.SCORE;
+    	  }
+      }
+      
+      public void paraliningMethodOneSide()
+      {
+        arduinoRight.updateDistances();
+        onRightSetDistances();
+        System.out.println("edge distance: " + edgeDist + "\nmid  distance: " + midDist);
+    switch(vState)
+      {
+        case SENSING:
+            if(firstIt)
+                arduinoRight.reset();
+            DriveState = MoveState.DRIVER;
+            if(!irRM.get())
+            {
+                firstIt = true;
+                vState = VisionStateParalining.PARALING;
+                DriveState = MoveState.STANDBY;
+            }
+            firstIt = false;
+            break;
+        case PARALING:
+            double distance;
+            arduinoRight.updateDistances();
+            onRightSetDistances();
+
+            distance = edgeDist - midDist;
+
+            if(edgeDist == Double.MAX_VALUE && midDist == Double.MAX_VALUE)
+            {
+                arduinoRight.reset();
+                System.out.println("RESETING ARDUINO DURING PARALING");
+            }
+            if(Math.abs(distance) < DEADBAND && edgeDist != Double.MAX_VALUE)
+            {
+                 vState = VisionStateParalining.REALIGNING;
+            }
+            else
+            {
+                if(edgeDist > midDist)
+                {
+                    if(firstIt)
+                    {
+                        clockWise = true;
+                        firstIt = false;
+                    }
+                    DriveState = MoveState.SLOWRIGHT;
+                }
+                else if(midDist > edgeDist)
+                {
+                    if(firstIt)
+                    {
+                        clockWise = false;
+                        firstIt = false;
+                    }
+                    DriveState = MoveState.SLOWLEFT;
+                }
+            }
+            break;
+        case REALIGNING:
+            if(clockWise)
+                DriveState = MoveState.FORWARD;
+            else
+                DriveState = MoveState.BACKWARD;
+            if(!irRM.get())
+                {
+                    DriveState = MoveState.STANDBY;
+                    vState = VisionStateParalining.QUARTERTURN;
+                }
+            break;
+        case QUARTERTURN:
+                DriveState = MoveState.RIGHT;
+                if(!irLC.get())
+                    {
+                        DriveState = MoveState.STANDBY;
+                        vState = VisionStateParalining.DRIVE;
+                    }
+                break;
+        case DRIVE:
+                DriveState = MoveState.FORWARD;
+                break;
+        default:
+                System.out.println("default");
+        }
+      }
+
+
+    //   private void paraliningMethod()
+    //   {
+
+    //     switch(vState)
+    //   {
+    //     case SENSING:
+    //         if(!irRM.get() || !irLM.get())
+    //             if(!irRM.get())
+    //                 onRight = true;
+    //             vState = VisionState1.PARALING;
+    //         break;
+    //     case PARALING:
+    //         double distance;
+
+    //         if(onRight)
+    //         {
+    //             arduinoRight.updateDistances();
+    //             onRightSetDistances();
+    //         }
+    //         else
+    //         {
+    //             arduinoLeft.updateDistances();
+    //             onLeftSetDistances();
+    //         }
+
+    //         distance = d1 - d2;
+
+    //         if(Math.abs(distance) < DEADBAND)
+    //         {
+    //             if(firstIt)
+    //                 vState = VisionState1.QUARTERTURN;
+    //             else
+    //                 vState = VisionState1.REALIGNING;
+    //             DriveState = MoveState.STANDBY;
+    //         }
+    //         else
+    //         {
+    //             if(d1 > d2)
+    //             {
+    //                 if(firstIt)
+    //                     clockWise = true;
+    //                 DriveState = MoveState.SLOWRIGHT;
+    //             }
+    //             else
+    //             {
+    //                 if(firstIt)
+    //                     clockWise = false;
+    //                 DriveState = MoveState.SLOWLEFT;
+    //             }
+    //         }
+    //         firstIt = false;
+    //         break;
+    //     case REALIGNING:
+    //         if((onRight && clockWise) || (!onRight && !clockWise))
+    //             DriveState = MoveState.FORWARD;
+    //         else
+    //             DriveState = MoveState.BACKWARD;
+    //         if(!irLM.get() || !irRM.get())
+    //             {
+    //                 DriveState = MoveState.STANDBY;
+    //                 vState = VisionState1.QUARTERTURN;
+    //             }
+    //         break;
+    //     case QUARTERTURN:
+    //         if(onRight)
+    //         {
+    //             DriveState = MoveState.RIGHT;
+    //             if(!irLC.get())
+    //                 {
+    //                     DriveState = MoveState.STANDBY;
+    //                     vState = VisionState1.DRIVE;
+    //                 }
+    //         }
+    //         else
+    //         {
+    //             DriveState = MoveState.LEFT;
+    //             if(!irRC.get())
+    //             {
+    //                 DriveState = MoveState.STANDBY;
+    //                 vState = VisionState1.DRIVE;
+    //             }
+    //         }
+    //             break;
+    //     case DRIVE:
+    //             DriveState = MoveState.FORWARD;
+    //             break;
+    //     }
+    //   }
+
+      private void onRightSetDistances()
+      {
+        double distance;
+
+        distance = arduinoRight.getEdgeDist();
+        if(distance != -1.0)
+            edgeDist = distance;
+
+        distance = arduinoRight.getmidDist();
+        if(distance != -1.0)
+            midDist = distance;
+      }
+
+    //   private void onLeftSetDistances()
+    //   {
+    //     double distance;
+
+    //     distance = arduinoLeft.getEdgeDist();
+    //     if(distance != -1)
+    //         d1 = distance;
+
+    //     distance = arduinoLeft.getmidDist();
+    //     if(distance != -1)
+    //         d2 = distance;
+    //   }
+        /*
+    if(arduino == null)
+    {
+        System.err.println("WARNING: arduino not initialized");
+        return;
+    }
+      switch(vState)
+      {
+        case SENSING:
+          if(!irRM.get() || !irLM.get())
+            vState = VisionState.FIRSTTURN;
+          break;
+        case FIRSTTURN:
+          //turn
+          if(!irLE.get() || !irRE.get())
+          {
+          //zero gyro
+          vState = VisionState.SECONDTURN;
+          }
+          break;
+        case SECONDTURN:
+          double dist = getDistance();
+          if(dist < minDist)
+          {
+            minDist = dist;
+            //angle = gyro angle;
+          }
+          else if(count > 2)
+            vState = VisionState.CORRECTING;
+          else
+            count++;
+          break;
+        case CORRECTING:
+          //if(gyroAngle > angle)
+          //turn back
+          break;
+        case LINEUP:
+          //do stuff
+          break;
+        case DRIVE:
+          //do stuff
+      }
+      
+    }*/
+
+
 }
