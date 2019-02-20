@@ -27,7 +27,7 @@ public class SendableUtils {
 
 		@Override
 		public void initSendable(SendableBuilder builder) {
-			builder.setSmartDashboardType("SendableBoolean");
+			builder.setSmartDashboardType("Digital Input");
 			builder.addBooleanProperty("Value", this::get, this::set);
 		}
 		

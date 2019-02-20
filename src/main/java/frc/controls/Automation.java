@@ -64,7 +64,7 @@ public class Automation {
 		/**
 		 * Starts vision following using line sensors.
 		 */
-		DRIVES_FOLLOWLINE(0),
+		DRIVES_FOLLOWLINE(0, 1),
 		/**
 		 * Waits until any autonomous drive functions have finished.
 		 */
@@ -344,7 +344,11 @@ public class Automation {
 				currentStep++;
 				break;
 			case DRIVES_FOLLOWLINE:
-				drives.findLine();
+				if(currentStepData.length == 0) {
+					drives.findLine();
+				} else {
+					drives.findLine(currentStepData[0]);
+				}
 				currentStep++;
 				break;
 			case DRIVES_LOWGEAR:

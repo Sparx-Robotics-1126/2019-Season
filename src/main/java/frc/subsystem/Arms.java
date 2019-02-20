@@ -82,8 +82,9 @@ public class Arms {
 		GenericSubsystem.addToTables(rightInput, "Arms", "Right Limit Switch");
 		leftStatus = new SendableBoolean("Left arm locked");
 		rightStatus = new SendableBoolean("Right arm locked");
-		SmartDashboard.putData(leftStatus);
-		SmartDashboard.putData(rightStatus);
+		SmartDashboard.putData("Left Limit Switch Status", leftStatus);
+		SmartDashboard.putData("Right Limit Switch Status", rightStatus);
+		SmartDashboard.putBoolean("haHAA", false);
 	}
 
 	public void reset() {
@@ -93,8 +94,6 @@ public class Arms {
 		leftArmEnc.reset();
 		actualDegreeLeft = 0;
 		actualDegreeRight = 0;
-		leftInput.setName("Arms", "Left Limit Switch");
-		rightInput.setName("Arms", "Right Limit Switch");
 		leftStatus.set(false);
 		rightStatus.set(false);
 	}
@@ -134,7 +133,7 @@ public class Arms {
 			actualDegreeRight = rightArmEnc.getDistance();
 			rightMtrs.set(wantedRightMtrPwr);
 		} else {
-			rightStatus.set(false);
+			rightStatus.set(true);
 			rightMtrs.set(0);
 		}
 		if (isDone) {

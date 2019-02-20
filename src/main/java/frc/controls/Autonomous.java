@@ -120,7 +120,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case HAB_ONE_TO_LEFT_HATCH_FRONT_AND_PICKUP:
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 180); //-
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 171); //-
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
@@ -129,12 +129,12 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_DELAY, 0.25);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 1, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.80, 75, 0.8, 0.4);
+				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.60, 75, 0.8, 0.3);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_BACKWARD, 1, 213);
+				automation.addStep(AutoMethod.DRIVES_BACKWARD, 1, 214);
 				automation.addStep(AutoMethod.HATCH_HOME);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 55);
+				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 75);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.75, 50);
 				automation.addStep(AutoMethod.HATCH_FLIP);	
@@ -153,19 +153,26 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 180);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 180);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 90);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			default: 
 				break;
@@ -178,6 +185,7 @@ public class Autonomous implements Controls{
 		if(DriverStation.getInstance().isEnabled() && DriverStation.getInstance().isAutonomous()) {
 			if(firstRun) {
 				setAuto(autoSelector.getSelected());
+				drives.resetGyroAngle();
 			} else {
 				automation.execute();
 				if(automation.isDone()) {

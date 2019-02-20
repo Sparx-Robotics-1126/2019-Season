@@ -96,9 +96,11 @@ public class Drives extends GenericSubsystem {
 
 	// ----------------------------------------Constants----------------------------------------
 
-	private final double ANGLE_OFF_BY = 1;
+	private final double ANGLE_OFF_BY = 2;
 
-	private final double SPEED_PERCENTAGE = .7;
+	private final double SPEED_PERCENTAGE = .6;
+	
+	private final double STRAIGHTEN_MIN_SPEED_MULTIPLIER = 0.8;
 
 	// ------------------------------------------Code-------------------------------------------
 
@@ -211,6 +213,7 @@ public class Drives extends GenericSubsystem {
 			if (getAngle() > turnAngle) {
 				rightMtrs.stopMotors();
 				leftMtrs.stopMotors();
+				resetGyroAngle(turnAngle);
 				isMoving = false;
 				changeState(DriveState.STANDBY);
 			} else {
@@ -227,6 +230,7 @@ public class Drives extends GenericSubsystem {
 			if (getAngle() < turnAngle) {
 				rightMtrs.stopMotors();
 				leftMtrs.stopMotors();
+				resetGyroAngle(turnAngle);
 				isMoving = false;
 				changeState(DriveState.STANDBY);
 			} else {
@@ -238,6 +242,7 @@ public class Drives extends GenericSubsystem {
 					leftMtrs.set(-turnSpeed);
 				}
 			}
+			System.out.println("Gyro angle (turn): " + getAngle());
 			break;
 		case LINE_FOLLOWER:
 			directions st = vision.getDirection();
@@ -289,8 +294,7 @@ public class Drives extends GenericSubsystem {
 				drivesPTOArms.set(true);
 				arms.armsDown();
 				if (arms.isDone()) {
-					changeState(DriveState.STANDBY);
-					isMoving = false;
+					toStandby();
 				}
 			}
 			break;
@@ -306,15 +310,23 @@ public class Drives extends GenericSubsystem {
 			break;
 		case FINDING_LINE:
 			vision.getDirection();
+			if(moveDist != -1 && moveDist < getDistance()) {
+				toStandby();
+			}
 			if (vision.triggered()) {
 				changeState(DriveState.LINE_FOLLOWER);
 			} else {
-				rightMtrs.set(0.35);
-				leftMtrs.set(0.35);
+				wantedSpeedLeft = 0.3;
+				wantedSpeedRight = 0.3;
+				straightenForward();
+				rightMtrs.set(wantedSpeedLeft);
+				leftMtrs.set(wantedSpeedRight);
 			}
 			break;
 
 		}
+		System.out.println("Gyro angle: " + getAngle());
+
 	}
 
 	@Override
@@ -342,7 +354,6 @@ public class Drives extends GenericSubsystem {
 		moveDist = dist;
 		this.slowPercent = slowPercent;
 		this.slowSpeed = slowSpeed;
-		resetGyroAngle();
 		isMoving = true;
 		if (moveDist > 0) {
 			changeState(DriveState.MOVE_FORWARD);
@@ -357,6 +368,11 @@ public class Drives extends GenericSubsystem {
 		rightEnc.reset();
 	}
 
+	public void toStandby() {
+		stopMotors();
+		changeState(DriveState.STANDBY);
+	}
+	
 	/** Stops all the motors in drives */
 	public void stopMotors() {
 		isMoving = false;
@@ -412,12 +428,13 @@ public class Drives extends GenericSubsystem {
 
 	/** straightens the robot */
 	private void straightenForward() {
+		double reducedPower = ((Math.abs(getAngle()/ANGLE_OFF_BY)) > 1 ? 0 : Math.abs(getAngle()/ANGLE_OFF_BY))*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
 		if (getAngle() > ANGLE_OFF_BY) {
-			wantedSpeedLeft *= SPEED_PERCENTAGE;
+			wantedSpeedLeft = reducedPower;
 			System.out.println("correcting rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
 		} else if (getAngle() < -ANGLE_OFF_BY) {
 			System.out.println("correcting oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
-			wantedSpeedRight *= SPEED_PERCENTAGE;
+			wantedSpeedRight = reducedPower;
 		}
 	}
 
@@ -437,8 +454,14 @@ public class Drives extends GenericSubsystem {
 	}
 
 	/** resets the gyro's angle so the robot turns to the angle from where the robot */
-	private void resetGyroAngle() {
+	public void resetGyroAngle() {
 		lastAngle = gyro.getAngle();
+		System.out.println("Reset: " + lastAngle);
+	}
+	
+	/** resets the gyro's angle so the robot turns to the angle from where the robot */
+	private void resetGyroAngle(double lastAngle) {
+		this.lastAngle -= lastAngle;
 		System.out.println("Reset: " + lastAngle);
 	}
 
@@ -488,7 +511,16 @@ public class Drives extends GenericSubsystem {
 		move(1, 120);
 	}
 
+	// hi
 	public void findLine() {
+		findLine(-1);
+	}
+	
+	
+	public void findLine(double maxDistance) {
+		moveDist = maxDistance;
+		resetEncoders();
+		resetGyroAngle();
 		isMoving = true;
 		vision.reset();
 		changeState(DriveState.FINDING_LINE);
