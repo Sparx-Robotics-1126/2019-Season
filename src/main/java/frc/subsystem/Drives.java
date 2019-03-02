@@ -97,6 +97,12 @@ public class Drives extends GenericSubsystem {
 	// ----------------------------------------Constants----------------------------------------
 
 	private final double ANGLE_OFF_BY = 2;
+	
+	private final double TURN_SLOW_PERCENT = 1;
+	
+	private final double TURN_SLOW_SPEED = 0.4;
+	
+	private final double TURN_MIN_SPEED = 0.3;
 
 	private final double SPEED_PERCENTAGE = .6;
 	
@@ -221,8 +227,10 @@ public class Drives extends GenericSubsystem {
 					rightMtrs.set(-slowSpeed);
 					leftMtrs.set(slowSpeed);
 				} else {
-					rightMtrs.set(-turnSpeed);
-					leftMtrs.set(turnSpeed);
+					double speed = Math.abs(((((turnAngle * slowPercent) - getAngle()) / (turnAngle * slowPercent)) * (turnSpeed - slowSpeed))) + slowSpeed;
+					speed = speed > slowSpeed ? speed : slowSpeed;
+					rightMtrs.set(-speed);
+					leftMtrs.set(speed);
 				}
 			}
 			break;
@@ -238,8 +246,10 @@ public class Drives extends GenericSubsystem {
 					rightMtrs.set(slowSpeed);
 					leftMtrs.set(-slowSpeed);
 				} else {
-					rightMtrs.set(turnSpeed);
-					leftMtrs.set(-turnSpeed);
+					double speed = Math.abs(((((turnAngle * slowPercent) - getAngle()) / (turnAngle * slowPercent)) * (turnSpeed - slowSpeed))) + slowSpeed;
+					speed = speed > slowSpeed ? speed : slowSpeed;
+					rightMtrs.set(speed);
+					leftMtrs.set(-speed);
 				}
 			}
 			System.out.println("Gyro angle (turn): " + getAngle());

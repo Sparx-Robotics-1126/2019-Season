@@ -19,6 +19,8 @@ public class Hatch extends GenericSubsystem {
 	private Solenoid flipper;
 
 	private Solenoid shooter;
+	
+	private Solenoid bzzzzzz;
 
 	private boolean flipperValue;
 
@@ -43,6 +45,7 @@ public class Hatch extends GenericSubsystem {
 		shooterValue = false;
 		state = HatchState.STANDBY;
 		time = 0;
+//		bzzzzzz = new Solenoid(IO.NOISEEEE_SOLENOID);
 	}
 
 	public void execute() {
@@ -64,6 +67,7 @@ public class Hatch extends GenericSubsystem {
 			shooterValue = false;
 			state = HatchState.STANDBY;
 		}
+//		bzzzzzz.set(flipperValue);
 		flipper.set(flipperValue);
 		shooter.set(shooterValue);
 	}

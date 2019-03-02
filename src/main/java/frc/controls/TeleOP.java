@@ -30,8 +30,6 @@ public class TeleOP implements Controls {
 
 	private TeleState state;
 
-	private Solenoid bzzzzzz;
-
 	private boolean[][] buttonStates = { { false, false }, // XBOX_A
 			{ false, false }, // XBOX_B
 			{ false, false }, // XBOX_X
@@ -73,7 +71,6 @@ public class TeleOP implements Controls {
 		this.auto = new Automation(drives, hatch, hab);
 		joysticks = new Joystick[] {new Joystick(CtrlMap.XBOXCONTROLLER_MAIN), new Joystick(CtrlMap.XBOXCONTROLLER_CLIMBING)};
 		state = TeleState.TELEOP;
-		bzzzzzz = new Solenoid(IO.NOISEEEE_SOLENOID);
 	}
 
 	public enum TeleState {
@@ -110,9 +107,6 @@ public class TeleOP implements Controls {
 		setJoystickStates();
 		switch(state) {
 		case TELEOP:
-			if(bzzzzzz.get()) {
-				bzzzzzz.set(false);
-			}
 			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_LEFT_Y)) {
 				drives.joystickLeft(getAxis(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_LEFT_Y));
 			} else {
@@ -160,9 +154,6 @@ public class TeleOP implements Controls {
 
 			break;
 		case AUTOMATION:
-			if(!bzzzzzz.get()) {
-				bzzzzzz.set(true);
-			}
 			auto.execute();
 			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_B)) {
 				auto.setDone(true);
