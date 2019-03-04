@@ -90,21 +90,17 @@ public class Drives extends GenericSubsystem {
 
 	private double slowSpeed;
 	
-	private double highestLeft;
+	private double currentRate;
 	
-	private double highestRight;
-
 	// ----------------------------------------Constants----------------------------------------
 
 	private final double ANGLE_OFF_BY = 2;
 	
-	private final double TURN_SLOW_PERCENT = 1;
-	
-	private final double TURN_SLOW_SPEED = 0.4;
-	
-	private final double TURN_MIN_SPEED = 0.3;
+	private final double SLOW_TURNING_RATE = 10;
 
-	private final double SPEED_PERCENTAGE = .6;
+	private final double SLOW_TURNING_DEADBAND = 1;
+	
+	private final double TURN_SLOW_DEFAULT_PERCENT = 0.8;
 	
 	private final double STRAIGHTEN_MIN_SPEED_MULTIPLIER = 0.8;
 
@@ -145,8 +141,6 @@ public class Drives extends GenericSubsystem {
 		turnSpeed = 0;
 		moveDist = 0;
 		moveSpeed = 0;
-		highestLeft = 0;
-		highestRight = 0;
 		state = DriveState.STANDBY;
 		timer = 0;
 		wantedSpeedRight = 0;
@@ -224,13 +218,17 @@ public class Drives extends GenericSubsystem {
 				changeState(DriveState.STANDBY);
 			} else {
 				if (slowPercent * getAngle() > turnAngle) {
-					rightMtrs.set(-slowSpeed);
-					leftMtrs.set(slowSpeed);
+					currentRate = gyro.getRate();
+					if(currentRate > SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
+						rightMtrs.set(rightMtrs.get() + 0.02);
+						leftMtrs.set(leftMtrs.get() - 0.02);
+					} else if(currentRate < SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
+						rightMtrs.set(rightMtrs.get() - 0.02);
+						leftMtrs.set(leftMtrs.get() + 0.02);
+					}
 				} else {
-					double speed = Math.abs(((((turnAngle * slowPercent) - getAngle()) / (turnAngle * slowPercent)) * (turnSpeed - slowSpeed))) + slowSpeed;
-					speed = speed > slowSpeed ? speed : slowSpeed;
-					rightMtrs.set(-speed);
-					leftMtrs.set(speed);
+					rightMtrs.set(-moveSpeed);
+					leftMtrs.set(moveSpeed);
 				}
 			}
 			break;
@@ -243,13 +241,17 @@ public class Drives extends GenericSubsystem {
 				changeState(DriveState.STANDBY);
 			} else {
 				if (slowPercent * getAngle() < turnAngle) {
-					rightMtrs.set(slowSpeed);
-					leftMtrs.set(-slowSpeed);
+					currentRate = gyro.getRate();
+					if(currentRate > SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
+						rightMtrs.set(rightMtrs.get() - 0.02);
+						leftMtrs.set(leftMtrs.get() + 0.02);
+					} else if(currentRate < SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
+						rightMtrs.set(rightMtrs.get() + 0.02);
+						leftMtrs.set(leftMtrs.get() - 0.02);
+					}
 				} else {
-					double speed = Math.abs(((((turnAngle * slowPercent) - getAngle()) / (turnAngle * slowPercent)) * (turnSpeed - slowSpeed))) + slowSpeed;
-					speed = speed > slowSpeed ? speed : slowSpeed;
-					rightMtrs.set(speed);
-					leftMtrs.set(-speed);
+					rightMtrs.set(moveSpeed);
+					leftMtrs.set(-moveSpeed);
 				}
 			}
 			System.out.println("Gyro angle (turn): " + getAngle());
@@ -477,14 +479,13 @@ public class Drives extends GenericSubsystem {
 
 	/** turns the robot a specified angle */
 	public void turn(double speed, double angle) {
-		turn(speed, angle, 1, speed);
+		turn(speed, angle, TURN_SLOW_DEFAULT_PERCENT);
 	}
 
-	public void turn(double speed, double angle, double slowPercent, double slowSpeed) {
+	public void turn(double speed, double angle, double slowPercent) {
 		turnAngle = angle;
 		turnSpeed = speed;
 		this.slowPercent = slowPercent;
-		this.slowSpeed = slowSpeed;
 		resetGyroAngle();
 		isMoving = true;
 		if (angle > 0) {

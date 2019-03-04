@@ -24,7 +24,7 @@ public class SendableUtils {
 		public void set(boolean bool) {
 			this.bool = bool;
 		}
-
+ 
 		@Override
 		public void initSendable(SendableBuilder builder) {
 			builder.setSmartDashboardType("Digital Input");
@@ -32,5 +32,37 @@ public class SendableUtils {
 		}
 		
 	}
+	
+	public static class SendableDouble extends SendableBase {
+
+		private double num;
+		
+		public SendableDouble(String name) {
+			this(name, 0);
+		}
+		
+		public SendableDouble(String name, double num) {
+			this.num = num;
+		}
+		
+		public double get() {
+			return num;
+		}
+		
+		public void set(double num) {
+			this.num = num;
+		}
+		
+		@Override
+		public void initSendable(SendableBuilder builder) {
+//			build
+			
+			
+		}
+		
+		
+		
+	}
+	
 	
 }

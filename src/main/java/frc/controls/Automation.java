@@ -331,7 +331,7 @@ public class Automation {
 				if(currentStepData.length == 2) {
 					drives.turn(currentStepData[0], -currentStepData[1]);
 				} else {
-					drives.turn(currentStepData[0], -currentStepData[1], currentStepData[2], currentStepData[3]);
+					drives.turn(currentStepData[0], -currentStepData[1], currentStepData[2]);
 				}
 				currentStep++;
 				break;
@@ -339,7 +339,7 @@ public class Automation {
 				if(currentStepData.length == 2) {
 					drives.turn(currentStepData[0], currentStepData[1]);
 				} else {
-					drives.turn(currentStepData[0], currentStepData[1], currentStepData[2], currentStepData[3]);
+					drives.turn(currentStepData[0], currentStepData[1], currentStepData[2]);
 				}
 				currentStep++;
 				break;
