@@ -8,6 +8,7 @@
 package frc.robot;
 
 import frc.controls.Autonomous;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import frc.controls.Controls;
 import frc.controls.TeleOP;
@@ -40,6 +41,7 @@ public class RobotSystem extends Thread{
 		currentControl = teleop;
 		compress = new Compressor(IO.ROBOT_COMPRESSOR);
 		compress.setClosedLoopControl(true);
+//		CameraServer.getInstance().startAutomaticCapture();
 	}
 
 

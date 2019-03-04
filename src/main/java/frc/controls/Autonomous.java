@@ -33,6 +33,7 @@ public class Autonomous implements Controls{
 		HAB_ONE_TO_LEFT_HATCH_BACK,
 		HAB_ONE_TO_LEFT_HATCH_FRONT_TO_PICKUP,
 		HAB_ONE_TO_LEFT_HATCH_FRONT_AND_PICKUP,
+		HAB_ONE_TO_LEFT_ROCKET,
 		AUTO_TEST;
 	}
 
@@ -147,6 +148,21 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_DELAY, 0.25);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 1, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.AUTO_STOP);
+				break;
+			case HAB_ONE_TO_LEFT_ROCKET:
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.75, 202);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 90);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 60);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.AUTO_DELAY, 1);
+				automation.addStep(AutoMethod.HATCH_SHOOTFLIP);
+				automation.addStep(AutoMethod.AUTO_DELAY, 1);
+				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
+				automation.addStep(AutoMethod.HATCH_HOME);
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case AUTO_TEST:
