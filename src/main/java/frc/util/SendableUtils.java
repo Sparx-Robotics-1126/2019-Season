@@ -55,9 +55,8 @@ public class SendableUtils {
 		
 		@Override
 		public void initSendable(SendableBuilder builder) {
-//			build
-			
-			
+			builder.setSmartDashboardType("Servo");
+			builder.addDoubleProperty("Value", this::get, this::set);
 		}
 		
 		
