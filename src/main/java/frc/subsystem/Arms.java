@@ -141,7 +141,12 @@ public class Arms {
 			leftMtrs.set(0);
 		}
 	}
-
+	
+	public void print() {
+		System.out.println("Left switch: " + leftInput.get());
+		System.out.println("Right switch: " + rightInput.get());
+	}
+	
 	public boolean isDone() {
 		return isDone;
 	}

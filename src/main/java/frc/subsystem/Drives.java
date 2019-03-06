@@ -242,7 +242,7 @@ public class Drives extends GenericSubsystem {
 					leftMtrs.set(-turnSpeed);
 				}
 			}
-			System.out.println("Gyro angle (turn): " + getAngle());
+//			System.out.println("Gyro angle (turn): " + getAngle());
 			break;
 		case LINE_FOLLOWER:
 			directions st = vision.getDirection();
@@ -325,13 +325,13 @@ public class Drives extends GenericSubsystem {
 			break;
 
 		}
-		System.out.println("Gyro angle: " + getAngle());
+//		System.out.println("Gyro angle: " + getAngle());
 
 	}
 
 	@Override
 	public void delayedPrints() {
-
+		arms.print();
 	}
 
 	public void flipUnsnappy() {
@@ -488,6 +488,10 @@ public class Drives extends GenericSubsystem {
 	public void toAmazingStraightness() {
 		resetGyroAngle();
 		changeState(DriveState.AMAZING_STRAIGHTNESS);
+	}
+	
+	public void togglePTO() {
+		drivesPTOArms.set(!drivesPTOArms.get());
 	}
 
 	/** changes the state of the robot to what is given as a parameter */

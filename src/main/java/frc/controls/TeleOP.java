@@ -131,6 +131,7 @@ public class TeleOP implements Controls {
 				hatch.homeButton();
 			}
 			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_B)) {
+//				drives.togglePTO();
 				drives.toAmazingStraightness();
 			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_B)) {
 				drives.changeState(DriveState.TELEOP);
@@ -156,6 +157,9 @@ public class TeleOP implements Controls {
 			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_X)) {
 				System.out.println("Button pressed");
 				hab.ctrlUP();
+			}
+			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_B)) {
+				drives.togglePTO();
 			}
 
 			break;

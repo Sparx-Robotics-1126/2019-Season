@@ -24,12 +24,12 @@ public class IO {
     public static final int DRIVES_LEFTENCODER_CH1 =						12;
     public static final int DRIVES_LEFTENCODER_CH2 =						13;
     
-    public static final int DRIVES_PTOSOLENOID =							1;
-    public static final int DRIVES_SHIFTINGSOLENOID =						0;
+    public static final int DRIVES_PTOSOLENOID =							0; //1
+    public static final int DRIVES_SHIFTINGSOLENOID =						1; //0
     public static final int DRIVES_UNSNAPPY = 								2;
     
-    public static final int ARMS_LIMITSWITCH_LEFT =							6;
-    public static final int ARMS_LIMITSWITCH_RIGHT = 						5;
+    public static final int ARMS_LIMITSWITCH_LEFT =							6; //6
+    public static final int ARMS_LIMITSWITCH_RIGHT = 						5; //5
     
     public static final int ROBOT_COMPRESSOR =								0;
     
