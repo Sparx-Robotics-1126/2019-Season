@@ -139,7 +139,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.75, 65);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.75, 50);
-				automation.addStep(AutoMethod.HATCH_FLIP);	
+				automation.addStep(AutoMethod.HATCH_FLIP);
 				automation.addStep(AutoMethod.AUTO_DELAY, 0.5);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
