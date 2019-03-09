@@ -97,6 +97,7 @@ public class Automation {
 		 * Switches drives to low gear.
 		 */
 		DRIVES_LOWGEAR(0),
+		DRIVES_RESETANGLE(0),
 		/**
 		 * Moves hab wheels forward (or backwards with -) at a given speed.
 		 * @param speed - the speed at which to move the HAB wheels forward.
@@ -294,6 +295,7 @@ public class Automation {
 
 	public void execute() {
 		if(firstRun) {
+//			drives.resetGyro();
 			startTime = Timer.getFPGATimestamp();
 			clearData();
 			firstRun = false;
@@ -331,7 +333,7 @@ public class Automation {
 				if(currentStepData.length == 2) {
 					drives.turn(currentStepData[0], -currentStepData[1]);
 				} else {
-					drives.turn(currentStepData[0], -currentStepData[1], currentStepData[2], currentStepData[3]);
+					drives.turn(currentStepData[0], -currentStepData[1], currentStepData[2]);
 				}
 				currentStep++;
 				break;
@@ -339,7 +341,7 @@ public class Automation {
 				if(currentStepData.length == 2) {
 					drives.turn(currentStepData[0], currentStepData[1]);
 				} else {
-					drives.turn(currentStepData[0], currentStepData[1], currentStepData[2], currentStepData[3]);
+					drives.turn(currentStepData[0], currentStepData[1], currentStepData[2]);
 				}
 				currentStep++;
 				break;
@@ -349,6 +351,10 @@ public class Automation {
 				} else {
 					drives.findLine(currentStepData[0]);
 				}
+				currentStep++;
+				break;
+			case DRIVES_RESETANGLE:
+				drives.resetGyroAngle();
 				currentStep++;
 				break;
 			case DRIVES_LOWGEAR:

@@ -74,14 +74,14 @@ public class HAB extends GenericSubsystem {
 		case STANDBY:
 			break;
 		case UP:
-			if (leadScrewEncRaw.getDistance() < 0) {
-				leadScrewMtr.set(0.9);
+			if (leadScrewEncRaw.getDistance() < -0.5) {
+				leadScrewMtr.set(1);
 			} else {
 				stopHab();
 			}
 			break;
 		case DOWN:
-			if (leadScrewEncRaw.getDistance() > -18.5) {
+			if (leadScrewEncRaw.getDistance() > -19.4) {
 				leadScrewMtr.set(-1);
 			} else {
 				stopHab();

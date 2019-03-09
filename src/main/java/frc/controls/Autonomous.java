@@ -51,6 +51,7 @@ public class Autonomous implements Controls{
 		autoSelector.addOption("Hab 1 to front hatch and to pickup station", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT_TO_PICKUP);
 		autoSelector.addOption("Hab 1 to front hatch and to pickup station (and actually picks up!)", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT_AND_PICKUP);
 		autoSelector.addOption("haHAA (no touchy)", Autos.AUTO_TEST);
+		autoSelector.addOption("Hab 1 to left rocket", Autos.HAB_ONE_TO_LEFT_ROCKET);
 		SmartDashboard.putData(autoSelector);
 		
 		selectedAuto = Autos.DO_NOTHING;
@@ -70,7 +71,7 @@ public class Autonomous implements Controls{
 			switch(auto) {
 			case HAB_ONE_TO_LEFT_HATCH_FRONT:
 //				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_FRONT");
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 180); //-
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 192); //-
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
@@ -104,7 +105,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case HAB_ONE_TO_LEFT_HATCH_FRONT_TO_PICKUP:
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 168); //-
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 180); //-
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
@@ -113,7 +114,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_DELAY, 0.45);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.30, 93);
+				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.65, 115);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.HATCH_HOME);
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 204);
@@ -121,40 +122,41 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case HAB_ONE_TO_LEFT_HATCH_FRONT_AND_PICKUP:
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 171); //-
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 204); //-
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.AUTO_DELAY, 1);
 				automation.addStep(AutoMethod.HATCH_SHOOTFLIP);	
-				automation.addStep(AutoMethod.AUTO_DELAY, 0.25);
-				automation.addStep(AutoMethod.DRIVES_BACKWARD, 1, 30);
+				automation.addStep(AutoMethod.DRIVES_RESETANGLE);
+				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.75, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.60, 75, 0.8, 0.3);
+				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.80, 75);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_BACKWARD, 1, 214);
+				automation.addStep(AutoMethod.DRIVES_BACKWARD, 1, 215);
 				automation.addStep(AutoMethod.HATCH_HOME);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 75);
+				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.75, 65);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.75, 50);
 				automation.addStep(AutoMethod.HATCH_FLIP);	
-				automation.addStep(AutoMethod.AUTO_DELAY, 0.75);
+				automation.addStep(AutoMethod.AUTO_DELAY, 0.5);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.AUTO_DELAY, 1.25);
+				automation.addStep(AutoMethod.AUTO_DELAY, 0.75);
 				automation.addStep(AutoMethod.HATCH_HOME);
 				automation.addStep(AutoMethod.AUTO_RECORD);
 				automation.addStep(AutoMethod.AUTO_DELAY, 0.25);
+				automation.addStep(AutoMethod.DRIVES_RESETANGLE);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 1, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case HAB_ONE_TO_LEFT_ROCKET:
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.75, 202);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.75, 101);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 90);
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 60);
+				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 60);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 42);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
@@ -166,28 +168,34 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case AUTO_TEST:
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
+				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 216);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 180);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 180);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 90);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.6, 65);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.6, 65);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.6, 65);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.6, 65);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 180);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 180);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 90);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			default: 

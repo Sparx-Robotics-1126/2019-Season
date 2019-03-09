@@ -67,6 +67,7 @@ public class RobotSystem extends Thread{
 	public void autonomous() {
 		System.out.println("Starting autonomous");
 		autonomous.reset();
+		drives.toAuto();
 		currentControl = autonomous;
 		currentState = RobotState.AUTO;
 	}

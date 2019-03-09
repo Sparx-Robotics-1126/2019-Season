@@ -35,6 +35,7 @@ public class IO {
     
     public static final int HATCH_SOLENOID_FLIPPER =						4;
     public static final int HATCH_SOLENOID_SHOOTER =						5;
+    public static final int HATCH_SOLENOID_HOLDER = 						3;
   
   //HAB
     public static final int HAB_LEADSCREWENCODER_CH1 =						24;
@@ -48,5 +49,5 @@ public class IO {
     public static final int VISION_CENTERRIGHTFOLLOWINGSENSOR =				16;
     public static final int VISION_RIGHTFOLLOWINGSENSOR =					17;
     
-    public static final int NOISEEEE_SOLENOID = 							3;
+//    public static final int NOISEEEE_SOLENOID = 							3;
 }

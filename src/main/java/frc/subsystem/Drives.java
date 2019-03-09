@@ -7,6 +7,7 @@
 
 package frc.subsystem;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
@@ -89,17 +90,19 @@ public class Drives extends GenericSubsystem {
 	private double slowPercent;
 
 	private double slowSpeed;
-	
-	private double highestLeft;
-	
-	private double highestRight;
+
+	private double currentRate;
 
 	// ----------------------------------------Constants----------------------------------------
 
 	private final double ANGLE_OFF_BY = 2;
 
-	private final double SPEED_PERCENTAGE = .6;
-	
+	private final double SLOW_TURNING_DEADBAND = 0.15;
+
+	private final double SLOW_TURNING_RATE = 0.8;
+
+	private final double TURN_SLOW_DEFAULT_PERCENT = 0.5;
+
 	private final double STRAIGHTEN_MIN_SPEED_MULTIPLIER = 0.8;
 
 	// ------------------------------------------Code-------------------------------------------
@@ -139,8 +142,6 @@ public class Drives extends GenericSubsystem {
 		turnSpeed = 0;
 		moveDist = 0;
 		moveSpeed = 0;
-		highestLeft = 0;
-		highestRight = 0;
 		state = DriveState.STANDBY;
 		timer = 0;
 		wantedSpeedRight = 0;
@@ -198,8 +199,8 @@ public class Drives extends GenericSubsystem {
 				changeState(DriveState.STANDBY);
 			} else {
 				if (getDistance() * slowPercent < moveDist) {
-					wantedSpeedRight = moveSpeed;
-					wantedSpeedLeft = moveSpeed;
+					wantedSpeedRight = slowSpeed;
+					wantedSpeedLeft = slowSpeed;
 				} else {
 					wantedSpeedRight = moveSpeed;
 					wantedSpeedLeft = moveSpeed;
@@ -210,20 +211,35 @@ public class Drives extends GenericSubsystem {
 			}
 			break;
 		case TURN_RIGHT:
+			System.out.println("0: " + rightMtrs.get() + ", " + leftMtrs.get());
 			if (getAngle() > turnAngle) {
 				rightMtrs.stopMotors();
 				leftMtrs.stopMotors();
 				resetGyroAngle(turnAngle);
 				isMoving = false;
 				changeState(DriveState.STANDBY);
+				System.out.println("1: " + rightMtrs.get() + ", " + leftMtrs.get());
 			} else {
-				if (slowPercent * getAngle() > turnAngle) {
-					rightMtrs.set(-slowSpeed);
-					leftMtrs.set(slowSpeed);
-				} else {
-					rightMtrs.set(-turnSpeed);
-					leftMtrs.set(turnSpeed);
-				}
+				if (turnAngle < getAngle() + 45) {
+					System.out.println("2: " + rightMtrs.get() + ", " + leftMtrs.get());
+					currentRate = gyro.getRate();
+					System.out.println("currentRate: " + currentRate);
+					if(currentRate < -SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
+						if(currentRate < -2) {
+							turnSpeed = 0;
+						} else {
+							turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
+						}
+						//						turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
+						System.out.println("greater than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
+					} else if(currentRate > -SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
+						turnSpeed = turnSpeed + 0.05 <= 1 ? turnSpeed + 0.05 : 1;
+						System.out.println("less than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
+					}
+				} 
+				rightMtrs.set(-turnSpeed);
+				leftMtrs.set(turnSpeed);
+				System.out.println("3: " + rightMtrs.get() + ", " + leftMtrs.get());
 			}
 			break;
 		case TURN_LEFT:
@@ -234,27 +250,37 @@ public class Drives extends GenericSubsystem {
 				isMoving = false;
 				changeState(DriveState.STANDBY);
 			} else {
-				if (slowPercent * getAngle() < turnAngle) {
-					rightMtrs.set(slowSpeed);
-					leftMtrs.set(-slowSpeed);
-				} else {
-					rightMtrs.set(turnSpeed);
-					leftMtrs.set(-turnSpeed);
+				if (turnAngle > getAngle() - 45) {
+					currentRate = gyro.getRate();
+					System.out.println("currentRate: " + currentRate);
+					if(currentRate > SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
+						if(currentRate > 2) {
+							turnSpeed = 0;
+						} else {
+							turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
+						}
+						System.out.println("greater than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
+					} else if(currentRate < SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
+						turnSpeed = turnSpeed + 0.05 <= 1 ? turnSpeed + 0.05 : 1;
+						System.out.println("less than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
+					}
 				}
+				rightMtrs.set(turnSpeed);
+				leftMtrs.set(-turnSpeed);
 			}
-//			System.out.println("Gyro angle (turn): " + getAngle());
+			System.out.println("Gyro angle (turn): " + getAngle());
 			break;
 		case LINE_FOLLOWER:
 			directions st = vision.getDirection();
 			if (st == directions.LEFT) {
-				leftMtrs.set(-0.5);
+				leftMtrs.set(-0.4);
 				rightMtrs.set(0.5);
 			} else if (st == directions.RIGHT) {
-				leftMtrs.set(0.5);
+				leftMtrs.set(0.4);
 				rightMtrs.set(-0.5);
 			} else if (st == directions.FORWARD) {
-				leftMtrs.set(0.3);
-				rightMtrs.set(0.3);
+				leftMtrs.set(0.2);
+				rightMtrs.set(0.2);
 			} else if (st == directions.SLIGHTLEFT) {
 				isMoving = false;
 				leftMtrs.set(0.00);
@@ -290,7 +316,7 @@ public class Drives extends GenericSubsystem {
 			}
 			break;
 		case ARMS:
-			if (timer + 1.5 < Timer.getFPGATimestamp()) {
+			if (timer + 0.8 < Timer.getFPGATimestamp()) {
 				drivesPTOArms.set(true);
 				arms.armsDown();
 				if (arms.isDone()) {
@@ -309,6 +335,7 @@ public class Drives extends GenericSubsystem {
 			rightMtrs.set(wantedSpeedRight);
 			break;
 		case FINDING_LINE:
+			System.out.println("finding line");
 			vision.getDirection();
 			if(moveDist != -1 && moveDist < getDistance()) {
 				toStandby();
@@ -319,16 +346,23 @@ public class Drives extends GenericSubsystem {
 				wantedSpeedLeft = 0.3;
 				wantedSpeedRight = 0.3;
 				straightenForward();
-				rightMtrs.set(wantedSpeedLeft);
-				leftMtrs.set(wantedSpeedRight);
+				rightMtrs.set(wantedSpeedRight);
+				leftMtrs.set(wantedSpeedLeft);
 			}
 			break;
 
 		}
-//		System.out.println("Gyro angle: " + getAngle());
-
+		if(gyro != null) {
+			System.out.println(gyro.getAngle());
+		}
+		//		System.out.println("Gyro angle: " + getAngle());
 	}
 
+	public void resetGyro() {
+		gyro.zeroYaw();
+		resetGyroAngle();
+	}
+	
 	@Override
 	public void delayedPrints() {
 		arms.print();
@@ -372,14 +406,14 @@ public class Drives extends GenericSubsystem {
 		stopMotors();
 		changeState(DriveState.STANDBY);
 	}
-	
+
 	/** Stops all the motors in drives */
 	public void stopMotors() {
 		isMoving = false;
 		leftMtrs.stopMotors();
 		rightMtrs.stopMotors();
 	}
-	
+
 	public void stopAll() {
 		isMoving = false;
 		drivesPTOArms.set(false);
@@ -431,16 +465,16 @@ public class Drives extends GenericSubsystem {
 		double reducedPower = ((Math.abs(getAngle()/ANGLE_OFF_BY)) > 1 ? 0 : Math.abs(getAngle()/ANGLE_OFF_BY))*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
 		if (getAngle() > ANGLE_OFF_BY) {
 			wantedSpeedLeft = reducedPower;
-			System.out.println("correcting rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+			//			System.out.println("correcting rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
 		} else if (getAngle() < -ANGLE_OFF_BY) {
-			System.out.println("correcting oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+			//			System.out.println("correcting oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
 			wantedSpeedRight = reducedPower;
 		}
 	}
 
 	/** gets the distance the robot has travelled since the last time the encoders */
 	private double getDistance() {
-		return (rightEnc.getDistance() + leftEnc.getDistance()) / 2;
+		return Math.abs(rightEnc.getDistance()) > Math.abs(leftEnc.getDistance()) ? rightEnc.getDistance() : leftEnc.getDistance();
 	}
 
 	/** gets the average rate of the robot */
@@ -458,7 +492,7 @@ public class Drives extends GenericSubsystem {
 		lastAngle = gyro.getAngle();
 		System.out.println("Reset: " + lastAngle);
 	}
-	
+
 	/** resets the gyro's angle so the robot turns to the angle from where the robot */
 	private void resetGyroAngle(double lastAngle) {
 		this.lastAngle -= lastAngle;
@@ -467,14 +501,13 @@ public class Drives extends GenericSubsystem {
 
 	/** turns the robot a specified angle */
 	public void turn(double speed, double angle) {
-		turn(speed, angle, 1, speed);
+		turn(speed, angle, TURN_SLOW_DEFAULT_PERCENT);
 	}
 
-	public void turn(double speed, double angle, double slowPercent, double slowSpeed) {
+	public void turn(double speed, double angle, double slowPercent) {
 		turnAngle = angle;
 		turnSpeed = speed;
 		this.slowPercent = slowPercent;
-		this.slowSpeed = slowSpeed;
 		resetGyroAngle();
 		isMoving = true;
 		if (angle > 0) {
@@ -484,12 +517,12 @@ public class Drives extends GenericSubsystem {
 		}
 
 	}
-	
+
 	public void toAmazingStraightness() {
 		resetGyroAngle();
 		changeState(DriveState.AMAZING_STRAIGHTNESS);
 	}
-	
+
 	public void togglePTO() {
 		drivesPTOArms.set(!drivesPTOArms.get());
 	}
@@ -505,9 +538,18 @@ public class Drives extends GenericSubsystem {
 	/** used by RobotSystem to put the robot in the teleop state */
 	public void toTeleop() {
 		isMoving = false;
+		rightMtrs.setNeutralMode(NeutralMode.Brake);
+		leftMtrs.setNeutralMode(NeutralMode.Brake);
 		changeState(DriveState.TELEOP);
 		// turn(0.5, 90);
 		// move(0.5, 240);
+	}
+
+	public void toAuto() {
+		isMoving = false;
+		resetGyroAngle();
+		rightMtrs.setNeutralMode(NeutralMode.Brake);
+		leftMtrs.setNeutralMode(NeutralMode.Brake);
 	}
 
 	/** moves the robot forward, used to call move once for drives */
@@ -519,8 +561,8 @@ public class Drives extends GenericSubsystem {
 	public void findLine() {
 		findLine(-1);
 	}
-	
-	
+
+
 	public void findLine(double maxDistance) {
 		moveDist = maxDistance;
 		resetEncoders();
@@ -544,7 +586,7 @@ public class Drives extends GenericSubsystem {
 
 	@Override
 	public long sleepTime() {
-		return 20;
+		return 5;
 	}
 
 	@Override
@@ -555,12 +597,12 @@ public class Drives extends GenericSubsystem {
 		// lightMtr1.setName("Drives", "Left motor 1");
 		// leftMtr2.setName("Drives", "Left motor 2");
 		// leftMtr3.setName("Drives", "Left motor 3");
-//		LiveWindow.remove(rightMtr1);
-//		LiveWindow.remove(rightMtr2);
-//		LiveWindow.remove(rightMtr3);
-//		LiveWindow.remove(leftMtr1);
-//		LiveWindow.remove(leftMtr2);
-//		LiveWindow.remove(leftMtr3);
+		//		LiveWindow.remove(rightMtr1);
+		//		LiveWindow.remove(rightMtr2);
+		//		LiveWindow.remove(rightMtr3);
+		//		LiveWindow.remove(leftMtr1);
+		//		LiveWindow.remove(leftMtr2);
+		//		LiveWindow.remove(leftMtr3);
 		addToTables(rightMtrs, "Right drives");
 		addToTables(leftMtrs, "Left drives");
 		addToTables(rightEnc, "Right drives encoder");
@@ -568,7 +610,7 @@ public class Drives extends GenericSubsystem {
 		addToTables(shifter, "Shifter");
 		addToTables(drivesPTOArms, "Arms", "Drives PTO (Arms)");
 		addToTables(unsnappy, "Arms", "Unsnappy");
-		addToTables(gyro, "Gyro");
+		//		addToTables(gyro, "Gyro");
 	}
 
 }

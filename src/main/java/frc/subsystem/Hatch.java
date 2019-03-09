@@ -19,11 +19,13 @@ public class Hatch extends GenericSubsystem {
 	private Solenoid flipper;
 
 	private Solenoid shooter;
+	
+	private Solenoid holder;
 
 	private boolean flipperValue;
 
 	private boolean shooterValue;
-
+	
 	private HatchState state;
 
 	private double time;
@@ -39,6 +41,7 @@ public class Hatch extends GenericSubsystem {
 	public void init() {
 		flipper = new Solenoid(IO.HATCH_SOLENOID_FLIPPER);
 		shooter = new Solenoid(IO.HATCH_SOLENOID_SHOOTER);
+		holder = new Solenoid(IO.HATCH_SOLENOID_HOLDER);
 		flipperValue = false;
 		shooterValue = false;
 		state = HatchState.STANDBY;
@@ -66,6 +69,7 @@ public class Hatch extends GenericSubsystem {
 		}
 		flipper.set(flipperValue);
 		shooter.set(shooterValue);
+		holder.set(flipperValue);
 	}
 
 	public void flipperButton() {
