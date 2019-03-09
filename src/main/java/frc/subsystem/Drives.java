@@ -352,9 +352,9 @@ public class Drives extends GenericSubsystem {
 			break;
 
 		}
-		if(gyro != null) {
-			System.out.println(gyro.getAngle());
-		}
+//		if(gyro != null) {
+//			System.out.println(gyro.getAngle());
+//		}
 		//		System.out.println("Gyro angle: " + getAngle());
 	}
 
@@ -603,8 +603,8 @@ public class Drives extends GenericSubsystem {
 		//		LiveWindow.remove(leftMtr1);
 		//		LiveWindow.remove(leftMtr2);
 		//		LiveWindow.remove(leftMtr3);
-		addToTables(rightMtrs, "Right drives");
-		addToTables(leftMtrs, "Left drives");
+//		addToTables(rightMtrs, "Right drives");
+//		addToTables(leftMtrs, "Left drives");
 		addToTables(rightEnc, "Right drives encoder");
 		addToTables(leftEnc, "Left drives encoder");
 		addToTables(shifter, "Shifter");

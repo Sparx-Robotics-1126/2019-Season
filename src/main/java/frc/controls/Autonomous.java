@@ -153,10 +153,11 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case HAB_ONE_TO_LEFT_ROCKET:
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.75, 101);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.75, 180);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 60);
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 42);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 66);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
@@ -164,6 +165,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.HATCH_SHOOTFLIP);
 				automation.addStep(AutoMethod.AUTO_DELAY, 1);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.HATCH_HOME);
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
