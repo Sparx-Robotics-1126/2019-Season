@@ -119,6 +119,7 @@ public class Automation {
 		 * Moves the hab screw just enough so that the arms can go safely onto the HAB.
 		 */
 		HAB_PREARMS(0),
+		HAB_LEVELTWO(0),
 		/**
 		 * Waits until the hab screw has finished moving.
 		 */
@@ -404,6 +405,10 @@ public class Automation {
 				break;
 			case HAB_UP:
 				hab.ctrlUP();
+				currentStep++;
+				break;
+			case HAB_LEVELTWO:
+				hab.ctrlLevelTwo();
 				currentStep++;
 				break;
 			case HAB_WAIT:

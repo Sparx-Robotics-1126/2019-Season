@@ -62,7 +62,7 @@ public class RobotSystem extends Thread{
 		currentControl = teleop;
 		currentState = RobotState.TELE;
 		drives.toTeleop();
-		hatch.toTele();
+//		hatch.toTele();
 	}
 
 	public void autonomous() {
