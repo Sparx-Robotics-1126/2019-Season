@@ -93,10 +93,11 @@ public class TeleOP implements Controls {
 		auto.addStep(AutoMethod.HAB_WAIT);	
 		//		auto.addStep(AutoMethod.DRIVES_STOP);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 1);
-		auto.addStep(AutoMethod.AUTO_DELAY, 2.25); 
+		auto.addStep(AutoMethod.AUTO_DELAY, 2.35); 
 		auto.addStep(AutoMethod.HAB_UP);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0);
 		auto.addStep(AutoMethod.HAB_WAIT);
+		auto.addStep(AutoMethod.DRIVES_RESETANGLE);
 		auto.addStep(AutoMethod.DRIVES_FORWARD, 0.4, 7);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0.5);
 		auto.addStep(AutoMethod.DRIVES_WAIT);
