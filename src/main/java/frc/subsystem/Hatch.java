@@ -26,6 +26,8 @@ public class Hatch extends GenericSubsystem {
 
 	private boolean shooterValue;
 	
+	private boolean holderValue;
+	
 	private HatchState state;
 
 	private double time;
@@ -46,6 +48,7 @@ public class Hatch extends GenericSubsystem {
 		shooterValue = false;
 		state = HatchState.STANDBY;
 		time = 0;
+		holderValue = false;
 	}
 
 	public void execute() {
@@ -53,23 +56,38 @@ public class Hatch extends GenericSubsystem {
 		case STANDBY:
 			break;
 		case FLIPPER:
+			holderValue = true;
 			flipperValue = true;
 			state = HatchState.STANDBY;
 			break;
 		case SHOOT_AND_FLIPPER:
+			holderValue = true;
 			shooterValue = true;
 			if (Timer.getFPGATimestamp() > time + 0) {
 				state = HatchState.FLIPPER;
 			}
 			break;
 		case HOME:
+			holderValue = true;
 			flipperValue = false;
 			shooterValue = false;
 			state = HatchState.STANDBY;
 		}
 		flipper.set(flipperValue);
 		shooter.set(shooterValue);
-		holder.set(flipperValue);
+		holder.set(holderValue);
+	}
+	
+	public void toAuto() {
+		setHolder(false);
+	}
+	
+	public void toTele() {
+		setHolder(true);
+	}
+	
+	public void setHolder(boolean holderValue) {
+		this.holderValue = holderValue;
 	}
 
 	public void flipperButton() {
