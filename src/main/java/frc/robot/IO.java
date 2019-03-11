@@ -12,32 +12,42 @@ package frc.robot;
  */
 public class IO {
 
-    public static final int rightDriveCIM1 =                                  10;
-    public static final int rightDriveCIM2 =                                  11;
-    public static final int rightDriveCIM3 =                                  12;
-    public static final int leftDriveCIM1 =                                   1;
-    public static final int leftDriveCIM2 =                                   2;
-    public static final int leftDriveCIM3 =                                   3;
-    public static final int rightDrivesEncoderChannel1 =                      10; //0
-    public static final int rightDrivesEncoderChannel2 =                      11; //1
-    public static final int leftDrivesEncoderChannel1 =                       12; //2
-    public static final int leftDrivesEncoderChannel2 =                       13; //3
-    public static final int compressor =                                       0;
-    public static final int rightHabEncoderChannel1 =                         20;
-    public static final int rightHabEncoderChannel2 =                         21;
-    public static final int leftHabEncoderChannel1 =                          22;
-    public static final int leftHabEncoderChannel2 =                          23;
-    public static final int screwHabEncoderChannel =                          24;
-    public static final int screwHabEncoderChanne2 =                          25;
-    public static final int hatchSolenoid1 =                                   4;
-    public static final int hatchSolenoid2 =                                   5;
-    public static final int ptoSolenoid =                                      1;
-    public static final int shiftingSolenoid =                                 0;
-    public static final int leadScrewCIM =                                     4;
-    public static final int rightHabMotor =                                    5;
-    public static final int leftHabMotor =                                     6;
-    public static final int leftFollowingSensor =                             14;
-    public static final int centerLeftFollowingSensor =                       15;
-    public static final int centerRightFollowingSensor =                      16;
-    public static final int rightFollowingSensor =                            17;
+    public static final int DRIVES_RIGHTMOTOR_1 =							10;
+    public static final int DRIVES_RIGHTMOTOR_2 =							11;
+    public static final int DRIVES_RIGHTMOTOR_3 =							12;
+    public static final int DRIVES_LEFTMOTOR_1 =							1;
+    public static final int DRIVES_LEFTMOTOR_2 =							2;
+    public static final int DRIVES_LEFTMOTOR_3 =							3;
+    
+    public static final int DRIVES_RIGHTENCODER_CH1 =						11; //10
+    public static final int DRIVES_RIGHTENCODER_CH2 =						10; //11
+    public static final int DRIVES_LEFTENCODER_CH1 =						12;
+    public static final int DRIVES_LEFTENCODER_CH2 =						13;
+    
+    public static final int DRIVES_PTOSOLENOID =							0; //1
+    public static final int DRIVES_SHIFTINGSOLENOID =						1; //0
+    public static final int DRIVES_UNSNAPPY = 								2;
+    
+    public static final int ARMS_LIMITSWITCH_LEFT =							6; //6
+    public static final int ARMS_LIMITSWITCH_RIGHT = 						5; //5
+    
+    public static final int ROBOT_COMPRESSOR =								0;
+    
+    public static final int HATCH_SOLENOID_FLIPPER =						4;
+    public static final int HATCH_SOLENOID_SHOOTER =						5;
+    public static final int HATCH_SOLENOID_HOLDER = 						3;
+  
+  //HAB
+    public static final int HAB_LEADSCREWENCODER_CH1 =						24;
+    public static final int HAB_LEADSCREWENCODER_CH2 =						25;
+    public static final int HAB_LEADSCREWMOTOR =							4;
+    public static final int HAB_RIGHTMOTOR =								6;
+    public static final int HAB_LEFTMOTOR =									7;
+   
+    public static final int VISION_LEFTFOLLOWINGSENSOR =					14;
+    public static final int VISION_CENTERLEFTFOLLOWINGSENSOR =				15;
+    public static final int VISION_CENTERRIGHTFOLLOWINGSENSOR =				16;
+    public static final int VISION_RIGHTFOLLOWINGSENSOR =					17;
+    
+//    public static final int NOISEEEE_SOLENOID = 							3;
 }

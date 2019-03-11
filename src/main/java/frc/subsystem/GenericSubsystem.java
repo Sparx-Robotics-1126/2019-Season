@@ -7,49 +7,73 @@
 
 package frc.subsystem;
 
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+
 /**
  * Add your docs here.
  */
-public abstract class GenericSubsystem extends Thread{
+public abstract class GenericSubsystem extends Thread {
 
-    private String name;
-	public GenericSubsystem(String name){
-		this(name, Thread.NORM_PRIORITY);
+	private String name;
+	
+	private double timeToPrint;
+	private double lastPrinted;
+	
+	public GenericSubsystem(String name) {
+		this.name = name;
+		timeToPrint = 1;
+		lastPrinted = Timer.getFPGATimestamp();
+		setPriority(Thread.NORM_PRIORITY);
 	}
 	
-	public GenericSubsystem(String name, int priority){
-		this.name = name;
-		setPriority(priority);
+	public static void addToTables(Sendable sendable, String subsystem, String name) {
+		LiveWindow.add(sendable);
+		sendable.setName(subsystem, name);
 	}
+	
+	public void addToTables(Sendable sendable, String name) {
+		addToTables(sendable, this.name, name);
+	}
+	
+	public abstract void init();
 
+	public abstract void execute();
 
-    public abstract void init();
+	public abstract boolean isDone();
 
-    public abstract void execute();
+	public abstract long sleepTime();
+	
+	public abstract void delayedPrints();
+	
+	public abstract void smartDashboardInit();
 
-    public abstract void debug();
-
-    public abstract boolean isDone();
-
-    public abstract long sleepTime();
-
-    protected void log(String message){
+	protected void log(String message) {
 		print(message);
 	}
-	
-	protected void print(String message){
+
+	protected void print(String message) {
 		System.out.println(name + ": " + message);
 	}
 
-    @Override
-	public void run(){
+	@Override
+	public void run() {
 		log("Initializing " + name + "...");
-		//init();
+		init();
+		smartDashboardInit();
 		long timeWait = sleepTime();
 		log("Starting " + name + "...");
-		while(true){
+		while (true) {
 			execute();
-			try { Thread.sleep(timeWait); } catch (InterruptedException e) {}
+			if(timeToPrint + lastPrinted < Timer.getFPGATimestamp()) {
+				delayedPrints();
+				lastPrinted = Timer.getFPGATimestamp();
+			}
+			try {
+				Thread.sleep(timeWait);
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 

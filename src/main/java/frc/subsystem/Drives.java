@@ -1,4 +1,4 @@
-    /*----------------------------------------------------------------------------*/
+/*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
@@ -7,454 +7,610 @@
 
 package frc.subsystem;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import frc.robot.IO;
-import frc.sensors.EncoderData;
 import frc.subsystem.Vision.directions;
 import frc.util.MotorGroup;
-
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SerialPort;
-import edu.wpi.first.wpilibj.Servo;
 
 /**
  * Add your docs here.
  */
-public class Drives extends GenericSubsystem{
+public class Drives extends GenericSubsystem {
 
-    //----------------------------------------Motors/Sensors----------------------------------------
+	// --------------------------------------Motors/Sensors-------------------------------------
 
-    private WPI_TalonSRX rightMtr1;
+	private WPI_TalonSRX rightMtr1;
 
-    private WPI_TalonSRX rightMtr2;
+	private WPI_TalonSRX rightMtr2;
 
-    private WPI_TalonSRX rightMtr3;
+	private WPI_TalonSRX rightMtr3;
 
-    private WPI_TalonSRX leftMtr1;
+	private WPI_TalonSRX leftMtr1;
 
-    private WPI_TalonSRX leftMtr2;
+	private WPI_TalonSRX leftMtr2;
 
-    private WPI_TalonSRX leftMtr3;
+	private WPI_TalonSRX leftMtr3;
 
-    private Encoder rightEnc;
+	private Encoder rightEnc;
 
-    private Encoder leftEnc;
+	private Encoder leftEnc;
 
-    private AHRS gyro;
+	private AHRS gyro;
 
-    private MotorGroup rightMtrs;
+	private MotorGroup rightMtrs;
 
-    private MotorGroup leftMtrs;
+	private MotorGroup leftMtrs;
 
-    private Servo rightServo;
+	private Solenoid shifter;
 
-    private Servo leftServo;
+	private Solenoid drivesPTOArms;
 
-    private Solenoid shifter;
+	private Arms arms;
 
-    //----------------------------------------Variable----------------------------------------
+	private Solenoid unsnappy;
 
-    private double lastAngle;
+	private Vision vision;
 
-    private double speedRight;
+	// ----------------------------------------Variable-----------------------------------------
 
-    private double speedLeft;
+	private double lastAngle;
 
-    private double turnAngle;
+	private double speedRight;
 
-    private double turnSpeed;
+	private double speedLeft;
 
-    private double moveSpeed;
+	private double turnAngle;
 
-    private double moveDist;
+	private double turnSpeed;
 
-    private DriveState state;
+	private double moveDist;
 
-    private Vision vision;
+	private double moveSpeed;
 
-    private double shiftingTime;
+	private DriveState state;
 
-    private boolean shifted;
+	private DriveState prevState;
 
-    private boolean servoEnabled;
+	private double timer;
 
-    private double wantedSpeedRight;
+	private double wantedSpeedRight;
 
-    private double wantedSpeedLeft;
+	private double wantedSpeedLeft;
 
-    private boolean shiftingPosition;
+	private boolean isMoving;
 
-    private boolean isMoving;
+	private double slowPercent;
 
-    //----------------------------------------Constants----------------------------------------
+	private double slowSpeed;
 
-    private final double ANGLE_OFF_BY = 2;
+	private double currentRate;
 
-    private final double SPEED_PERCENTAGE = .5;
+	// ----------------------------------------Constants----------------------------------------
 
-    //create a drives object
-    public Drives(){
-        super("Drives");
-    }
-    public void resetVision()
-    {
-        vision.reset();
-    }
+	private final double ANGLE_OFF_BY = 2;
 
-    //initialized all the variable in drives
-    public void init(){
-        rightMtr1 = new WPI_TalonSRX(IO.rightDriveCIM1);
-        rightMtr2 = new WPI_TalonSRX(IO.rightDriveCIM2);
-        rightMtr3 = new WPI_TalonSRX(IO.rightDriveCIM3);
-        leftMtr1 = new WPI_TalonSRX(IO.leftDriveCIM1);
-        leftMtr2 = new WPI_TalonSRX(IO.leftDriveCIM2);
-        leftMtr3 = new WPI_TalonSRX(IO.leftDriveCIM3);
-        rightMtrs = new MotorGroup(rightMtr1, rightMtr2, rightMtr3);
-        leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
-        rightEnc = new Encoder(IO.rightDrivesEncoderChannel1, IO.rightDrivesEncoderChannel2);
-        leftEnc = new Encoder(IO.leftDrivesEncoderChannel1, IO.leftDrivesEncoderChannel2);
-        rightEnc.setDistancePerPulse(-0.07897476);
-        leftEnc.setDistancePerPulse(0.07897476);
-        rightMtrs.setInverted(true);
-        gyro = new AHRS(SerialPort.Port.kUSB);
-        gyro.reset();
-        rightServo = new Servo(0);
-        leftServo = new Servo(1);
-        lastAngle = 0;
-        speedLeft = 0;
-        speedRight = 0;
-        resetGyroAngle();
-        moveDist = 0;
-        moveSpeed = 0; 
-        turnAngle = 0;
-        turnSpeed = 0;
-      //  hatchPTO = new Solenoid(0)
-        vision = new Vision();
-        state = state.STANDBY;
-        shiftingTime = 0;
-        shifted = false;
-        servoEnabled = false;
-        wantedSpeedRight = 0;
-        wantedSpeedLeft = 0;
-        shifter = new Solenoid(IO.shiftingSolenoid);
-        shiftingPosition = false;
-        isMoving = false;
-    }
+	private final double SLOW_TURNING_DEADBAND = 0.15;
 
-    public enum DriveState{
-        STANDBY,
-        TELEOP,
-        MOVE_FORWARD,
-        MOVE_BACKWARD,
-        TURN_RIGHT,
-        TURN_LEFT,
-        SHIFT_LOW,
-        SHIFT_HIGH,
-        SHIFT_NEUTRAL,
-        ARMS,
-        FINDING_LINE,
-        LINE_FOLLOWER;
-    }
+	private final double SLOW_TURNING_RATE = 0.8;
 
-    //does all the code for drives
-    public void execute(){
-        //move(0.8, 150);
-        
-        //changeState(DriveState.LINE_FOLLOWER);
-        switch(state){
-            case STANDBY:
-                //System.out.println("You are a bold one");
-                break;
-            case TELEOP:
-                //System.out.println("Drives SpeedRight: " + speedRight + " speedLeft: " + speedLeft);
-                if(!shiftingPosition && (getAverageRate() > 275)){
-                    highShift();
-                }else if(shiftingPosition && (getAverageRate() < 150)){
-                    lowShift();
-                }
-                rightMtrs.set(speedRight);
-                leftMtrs.set(speedLeft);
-                break;
-            case MOVE_FORWARD:
-               // System.out.println("Hello");
-                if(getDistance() > moveDist){
-                  //  System.out.println("There");
-                    rightMtrs.stopMotors();
-                    leftMtrs.stopMotors();
-                    isMoving = false;
-                    changeState(DriveState.STANDBY);
-                }else{
-                    wantedSpeedRight = moveSpeed;
-                    wantedSpeedLeft = moveSpeed;
-                    straightenForward();
-                    rightMtrs.set(wantedSpeedRight);
-                    leftMtrs.set(wantedSpeedLeft);
-                }
-                break;
-            case MOVE_BACKWARD:
-               // System.out.println("General");
-                if(getDistance() > moveDist){
-                  //  System.out.println("Kenobi");
-                    rightMtrs.stopMotors();
-                    leftMtrs.stopMotors();
-                    isMoving = false;
-                    changeState(DriveState.STANDBY);
-                }else{
-                    wantedSpeedRight = moveSpeed;
-                    wantedSpeedLeft = moveSpeed;
-                    straightenForward();
-                    rightMtrs.set(-speedRight);
-                    leftMtrs.set(-speedLeft);
-                }
-                break;
-            case TURN_RIGHT:
-                if(getAngle() > turnAngle){
-                    rightMtrs.stopMotors();
-                    leftMtrs.stopMotors();
-                    isMoving = false;
-                    changeState(DriveState.STANDBY);
-                }else{
-                    rightMtrs.set(-turnSpeed);
-                    leftMtrs.set(turnSpeed);
-                }
-                // System.out.println("turn right");
-                break;
-            case TURN_LEFT:
-                if(getAngle() < turnAngle){
-                    rightMtrs.stopMotors();
-                    leftMtrs.stopMotors();
-                    isMoving = false;
-                    changeState(DriveState.STANDBY);
-                }else{
-                    rightMtrs.set(turnSpeed);
-                    leftMtrs.set(-turnSpeed);
-                }
-               // System.out.println("turn left");
-                break;
-            case LINE_FOLLOWER: 
-                directions st = vision.getDirection();
-                // System.out.println("Left motor power = " + leftMtr1.getBusVoltage());
-                //System.out.println("right motor power = " + rightMtr1.getBusVoltage());
-                if(st == directions.LEFT){
-                    leftMtrs.set(-0.5);
-                    rightMtrs.set(0.5);
-                }else if(st == directions.RIGHT){
-                    leftMtrs.set(0.5);
-                    rightMtrs.set(-0.5);
-                }else if(st == directions.FORWARD){
-                    leftMtrs.set(0.3);
-                    rightMtrs.set(0.3);
-                }else if(st == directions.SLIGHTLEFT){
-                    leftMtrs.set(0.00);
-                    rightMtrs.set(0.30);
-                }else if(st == directions.SLIGHTRIGHT){
-                    leftMtrs.set(0.30);
-                    rightMtrs.set(0.10);
-                }
-                else if(st == directions.STANDBY)
-                {
-                    leftMtrs.set(0);
-                    rightMtrs.set(0);
-                }
-                break;
-            case SHIFT_LOW:
-                leftMtrs.set(0.2);
-                rightMtrs.set(0.2);
-                shifter.set(false);
-                shiftingPosition = false;
-                if(shiftingTime + 400 < System.currentTimeMillis()){
-                    leftMtrs.set(speedLeft);
-                    rightMtrs.set(speedLeft);
-                    changeState(DriveState.TELEOP);
-                }
-                break;
-            case SHIFT_NEUTRAL:
-                leftMtrs.set(0.2);
-                rightMtrs.set(0.2);
-                if(shiftingTime + 200 < System.currentTimeMillis()){
-                    if(!servoEnabled){
-                        enableServo();
-                    }
-                    if(!shifted){
-                        changeState(DriveState.SHIFT_LOW);
-                    }
-                    if(shifted){
-                        changeState(DriveState.SHIFT_HIGH);
-                    }
-                }
-                break;
-            case SHIFT_HIGH:
-                leftMtrs.set(0.2);
-                rightMtrs.set(0.2);
-                shifter.set(true);
-                shiftingPosition = true;
-                if(shiftingTime + 400 < System.currentTimeMillis()){
-                    leftMtrs.set(speedLeft);
-                    rightMtrs.set(speedRight);
-                    changeState(DriveState.TELEOP);
-                }
-                break;
-            case ARMS:
-                break;
-            case FINDING_LINE: 
-                vision.getDirection();
-                if(vision.triggered()){
-                    changeState(DriveState.LINE_FOLLOWER);
-                }else{
-                    rightMtrs.set(0.35);
-                    leftMtrs.set(0.35);
-                }
-                break;
-                
-                
-                
-        }
-      //  System.out.println("State: " + )
-        // System.out.println("Right Encoder: " + rightEnc.getdista;
-        // System.out.println("Left Encoder: " + leftEnc.getRaw());
-        // System.out.println("Gyro: " + getAngle());
-        //  System.out.println("left rate: " + leftEnc.getRate());
-        //  System.out.println("right rate: " + rightEnc.getRate());
-//         System.out.println("rate: " + getAverageRate());
-        // System.out.println("GetDistance: " + getDistance());
-        // System.out.println("RightMtr" + wantedSpeedRight + " LeftMtr: " + wantedSpeedLeft);
-    }
+	private final double TURN_SLOW_DEFAULT_PERCENT = 0.5;
 
-    //debugs all the possible problems in drives
-    public void debug(){
+	private final double STRAIGHTEN_MIN_SPEED_MULTIPLIER = 0.8;
 
-    }
+	// ------------------------------------------Code-------------------------------------------
 
-    //checks if drives is done with its autonomous code
-    public boolean isDone(){
-        return !isMoving;
-    }
+	/** Creates a drives object */
+	public Drives() {
+		super("Drives");
+	}
 
-    //the time in milliseconds between each call to execute
-    public long sleepTime(){
-        return 20;
-    }
+	/** Initializes all the variable in drives */
+	public void init() {
+		rightMtr1 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_1);
+		rightMtr2 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_2);
+		rightMtr3 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_3);
+		leftMtr1 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_1);
+		leftMtr2 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_2);
+		leftMtr3 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_3);
+		rightEnc = new Encoder(IO.DRIVES_RIGHTENCODER_CH1, IO.DRIVES_RIGHTENCODER_CH2);
+		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
+		rightEnc.setDistancePerPulse(-0.02110013);// 0.07897476
+		leftEnc.setDistancePerPulse(0.02110013);
+		gyro = new AHRS(SerialPort.Port.kUSB);
+		gyro.reset();
+		resetGyroAngle();
+		rightMtrs = new MotorGroup(rightMtr1, rightMtr2, rightMtr3);
+		rightMtrs.setInverted(true);
+		leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
+		shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID);
+		drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID);
+		arms = new Arms(rightMtrs, leftMtrs, rightEnc, leftEnc);
+		unsnappy = new Solenoid(IO.DRIVES_UNSNAPPY);
+		vision = new Vision();
+		lastAngle = 0;
+		speedRight = 0;
+		speedLeft = 0;
+		turnAngle = 0;
+		turnSpeed = 0;
+		moveDist = 0;
+		moveSpeed = 0;
+		state = DriveState.STANDBY;
+		timer = 0;
+		wantedSpeedRight = 0;
+		wantedSpeedLeft = 0;
+		isMoving = false;
+		slowPercent = 1;
+		slowSpeed = 0;
+	}
 
-    //move the robot at a given speed and distance
-    public void move(double speed, double dist){
-        moveSpeed = speed;
-        moveDist = dist;
-        resetGyroAngle();
-        isMoving = true;
-        if(moveDist > 0){
-            changeState(DriveState.MOVE_FORWARD);
-        }else{
-            changeState(DriveState.MOVE_BACKWARD);
-            
-        }
-    }
+	/** All the states drives can be in */
+	public enum DriveState {
+		STANDBY, TELEOP, MOVE_FORWARD, MOVE_BACKWARD, TURN_RIGHT, TURN_LEFT, SHIFT_LOW, SHIFT_HIGH, ARMS, FINDING_LINE,
+		LINE_FOLLOWER, AMAZING_STRAIGHTNESS;
+	}
 
-    public void stopMotors(){
-        isMoving = false;
-        leftMtrs.stopMotors();
-        rightMtrs.stopMotors();
-    }
+	/* Runs all the code for drives */
+	public void execute() {
+		if (state != DriveState.ARMS && drivesPTOArms.get()) {
+			drivesPTOArms.set(false);
+		}
+		switch (state) {
+		case STANDBY:
+			break;
+		case TELEOP:
+			if(shifter.get()) {
+				lowShift();
+			}
+			rightMtrs.set(speedRight);
+			leftMtrs.set(speedLeft);
+			break;
+		case MOVE_FORWARD:
+			if (getDistance() > moveDist) {
+				rightMtrs.stopMotors();
+				leftMtrs.stopMotors();
+				isMoving = false;
+				changeState(DriveState.STANDBY);
+			} else {
+				if (getDistance() * slowPercent > moveDist) {
+					wantedSpeedRight = slowSpeed;
+					wantedSpeedLeft = slowSpeed;
+				} else {
+					wantedSpeedRight = moveSpeed;
+					wantedSpeedLeft = moveSpeed;
+				}
+				straightenForward();
+				rightMtrs.set(wantedSpeedRight);
+				leftMtrs.set(wantedSpeedLeft);
+			}
+			break;
+		case MOVE_BACKWARD:
+			if (getDistance() < moveDist) {
+				rightMtrs.stopMotors();
+				leftMtrs.stopMotors();
+				isMoving = false;
+				changeState(DriveState.STANDBY);
+			} else {
+				if (getDistance() * slowPercent < moveDist) {
+					wantedSpeedRight = slowSpeed;
+					wantedSpeedLeft = slowSpeed;
+				} else {
+					wantedSpeedRight = moveSpeed;
+					wantedSpeedLeft = moveSpeed;
+				}
+				straightenForward();
+				rightMtrs.set(-wantedSpeedLeft);
+				leftMtrs.set(-wantedSpeedRight);
+			}
+			break;
+		case TURN_RIGHT:
+			System.out.println("0: " + rightMtrs.get() + ", " + leftMtrs.get());
+			if (getAngle() > turnAngle) {
+				rightMtrs.stopMotors();
+				leftMtrs.stopMotors();
+				resetGyroAngle(turnAngle);
+				isMoving = false;
+				changeState(DriveState.STANDBY);
+				System.out.println("1: " + rightMtrs.get() + ", " + leftMtrs.get());
+			} else {
+				if (turnAngle < getAngle() + 45) {
+					System.out.println("2: " + rightMtrs.get() + ", " + leftMtrs.get());
+					currentRate = gyro.getRate();
+					System.out.println("currentRate: " + currentRate);
+					if(currentRate < -SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
+						if(currentRate < -2) {
+							turnSpeed = 0;
+						} else {
+							turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
+						}
+						//						turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
+						System.out.println("greater than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
+					} else if(currentRate > -SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
+						turnSpeed = turnSpeed + 0.05 <= 1 ? turnSpeed + 0.05 : 1;
+						System.out.println("less than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
+					}
+				} 
+				rightMtrs.set(-turnSpeed);
+				leftMtrs.set(turnSpeed);
+				System.out.println("3: " + rightMtrs.get() + ", " + leftMtrs.get());
+			}
+			break;
+		case TURN_LEFT:
+			if (getAngle() < turnAngle) {
+				rightMtrs.stopMotors();
+				leftMtrs.stopMotors();
+				resetGyroAngle(turnAngle);
+				isMoving = false;
+				changeState(DriveState.STANDBY);
+			} else {
+				if (turnAngle > getAngle() - 45) {
+					currentRate = gyro.getRate();
+					System.out.println("currentRate: " + currentRate);
+					if(currentRate > SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
+						if(currentRate > 2) {
+							turnSpeed = 0;
+						} else {
+							turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
+						}
+						System.out.println("greater than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
+					} else if(currentRate < SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
+						turnSpeed = turnSpeed + 0.05 <= 1 ? turnSpeed + 0.05 : 1;
+						System.out.println("less than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
+					}
+				}
+				rightMtrs.set(turnSpeed);
+				leftMtrs.set(-turnSpeed);
+			}
+			System.out.println("Gyro angle (turn): " + getAngle());
+			break;
+		case LINE_FOLLOWER:
+			directions st = vision.getDirection();
+			if (st == directions.LEFT) {
+				leftMtrs.set(-0.4);
+				rightMtrs.set(0.5);
+			} else if (st == directions.RIGHT) {
+				leftMtrs.set(0.4);
+				rightMtrs.set(-0.5);
+			} else if (st == directions.FORWARD) {
+				leftMtrs.set(0.2);
+				rightMtrs.set(0.2);
+			} else if (st == directions.SLIGHTLEFT) {
+				isMoving = false;
+				leftMtrs.set(0.00);
+				rightMtrs.set(0.40);
+			} else if (st == directions.SLIGHTRIGHT) {
+				isMoving = false;
+				leftMtrs.set(0.40);
+				rightMtrs.set(0.00);
+			} else if (st == directions.STANDBY) {
+				leftMtrs.set(0);
+				rightMtrs.set(0);
+			}
+			break;
+		case SHIFT_LOW:
+			leftMtrs.set(0.2);
+			rightMtrs.set(0.2);
+			shifter.set(false);
+			if (timer + 0.1 < Timer.getFPGATimestamp()) {
+				leftMtrs.set(speedLeft);
+				rightMtrs.set(speedRight);
+				isMoving = false;
+				changeState(prevState);
+			}
+			break;
+		case SHIFT_HIGH:
+			leftMtrs.set(0.2);
+			rightMtrs.set(0.2);
+			shifter.set(true);
+			if (timer + 0.1 < Timer.getFPGATimestamp()) {
+				leftMtrs.set(speedLeft);
+				rightMtrs.set(speedRight);
+				changeState(prevState);
+			}
+			break;
+		case ARMS:
+			if (timer + 0.8 < Timer.getFPGATimestamp()) {
+				drivesPTOArms.set(true);
+				arms.armsDown();
+				if (arms.isDone()) {
+					toStandby();
+				}
+			}
+			break;
+		case AMAZING_STRAIGHTNESS:
+			if (!shifter.get() && (getAverageRate() > 65)) {
+				highShift();
+			}
+			wantedSpeedLeft = 1;
+			wantedSpeedRight = 1;
+			straightenForward();
+			leftMtrs.set(wantedSpeedLeft);
+			rightMtrs.set(wantedSpeedRight);
+			break;
+		case FINDING_LINE:
+			System.out.println("finding line");
+			vision.getDirection();
+			if(moveDist != -1 && moveDist < getDistance()) {
+				toStandby();
+			}
+			if (vision.triggered()) {
+				changeState(DriveState.LINE_FOLLOWER);
+			} else {
+				wantedSpeedLeft = 0.3;
+				wantedSpeedRight = 0.3;
+				straightenForward();
+				rightMtrs.set(wantedSpeedRight);
+				leftMtrs.set(wantedSpeedLeft);
+			}
+			break;
 
-    public void joystickLeft(double speed) {
-        speedLeft = speed;
-     // leftMtrs.set(speed);
-    }
+		}
+//		if(gyro != null) {
+//			System.out.println(gyro.getAngle());
+//		}
+		//		System.out.println("Gyro angle: " + getAngle());
+	}
 
-    public void joystickRight(double speed) {
-        speedRight = speed;
-     //   rightMtrs.set(speed);
-    }
+	public void resetGyro() {
+		gyro.zeroYaw();
+		resetGyroAngle();
+	}
+	
+	@Override
+	public void delayedPrints() {
+		arms.print();
+	}
 
-    public void lowShift(){
-        shifted = true;
-        shiftingTime = System.currentTimeMillis();
-        changeState(DriveState.SHIFT_LOW);
-    }
+	public void flipUnsnappy() {
+		unsnappy.set(!unsnappy.get());
+	}
 
-    public void highShift(){
-        shifted = false;
-        shiftingTime = System.currentTimeMillis();
-        changeState(DriveState.SHIFT_HIGH);
-    }
+	/** Checks if drives is not moving */
+	public boolean isDone() {
+		return !isMoving;
+	}
 
-    private void enableServo(){
-        rightServo.set(1);
-        leftServo.set(1);
-        servoEnabled = true;
-    }
+	/** move the robot at a given speed and distance */
+	public void move(double speed, double dist) {
+		move(speed, dist, 1, speed);
+	}
 
-    //straightens the robot
-    private void straightenForward(){
-        if(getAngle() > ANGLE_OFF_BY){
-            wantedSpeedLeft *= SPEED_PERCENTAGE; 
-            System.out.println("correcting rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
-        }else if(getAngle() < -ANGLE_OFF_BY){
-            System.out.println("correcting oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
-            wantedSpeedRight *= SPEED_PERCENTAGE;
-        }
-    }
+	public void move(double speed, double dist, double slowPercent, double slowSpeed) {
+		resetEncoders();
+		moveSpeed = speed;
+		moveDist = dist;
+		this.slowPercent = slowPercent;
+		this.slowSpeed = slowSpeed;
+		isMoving = true;
+		if (moveDist > 0) {
+			changeState(DriveState.MOVE_FORWARD);
+		} else {
+			changeState(DriveState.MOVE_BACKWARD);
 
-    //gets the distance the robot has travelled since the last time the encoders were reset
-    private double getDistance() {
-		return (rightEnc.getDistance() + leftEnc.getDistance())/2;
-    }
+		}
+	}
 
-    private double getAverageRate(){
-        return (rightEnc.getRate() + leftEnc.getRate())/2;
-    }
+	public void resetEncoders() {
+		leftEnc.reset();
+		rightEnc.reset();
+	}
 
-    //gets the angle the robot has turned since the last time the gyro was reset 
-    private double getAngle(){
-        return gyro.getAngle() - lastAngle;
-    }
+	public void toStandby() {
+		stopMotors();
+		changeState(DriveState.STANDBY);
+	}
 
-    //resets the gyro's angle so the robot turns to the angle from where the robot is currently facing
-    private void resetGyroAngle(){
-        lastAngle = gyro.getAngle();
-        System.out.println("Reset: " + lastAngle);
-    }
+	/** Stops all the motors in drives */
+	public void stopMotors() {
+		isMoving = false;
+		leftMtrs.stopMotors();
+		rightMtrs.stopMotors();
+	}
 
-    //turns the robot a specified angle 
-    public void turn(double speed, double angle){
-        turnAngle = angle;
-        turnSpeed = speed;
-        resetGyroAngle();
-        isMoving = true;
-        if(angle > 0){
-            changeState(DriveState.TURN_RIGHT);
-        }else{
-            changeState(DriveState.TURN_LEFT);
-        }
+	public void stopAll() {
+		isMoving = false;
+		drivesPTOArms.set(false);
+		leftMtrs.stopMotors();
+		rightMtrs.stopMotors();
+	}
 
-    }
+	/** Finds the value that left joystick is reading */
+	public void joystickLeft(double speed) {
+		speedLeft = speed;
+	}
 
-    //changes the state of the robot to what is given as a parameter
-    private void changeState(DriveState st){
-        state = st;
-    }
+	/** Finds the value that the right joystick is reading */
+	public void joystickRight(double speed) {
+		speedRight = speed;
+	}
 
-    //used by RobotSystem to put the robot in the teleop state
-    public void toTeleop(){
-       changeState(DriveState.TELEOP);
-       //turn(0.5, 90);
-      // move(0.5, 240);
-    }
+	/** Releases the arms from the robot */
+	public void toArms() {
+		isMoving = true;
+		arms.reset();
+		unsnappy.set(true);
+		timer = Timer.getFPGATimestamp();
+		changeState(DriveState.ARMS);
+	}
 
-    public void moveForward(){
-        move(0.5, 240);
-    }
+	/** Shifts the robot into low gear */
+	public void lowShift() {
+		speedLeft = 0;
+		speedRight = 0;
+		isMoving = true;
+		prevState = state;
+		timer = Timer.getFPGATimestamp();
+		changeState(DriveState.SHIFT_LOW);
+	}
 
-    public void findLine(){
-        vision.reset();
-        changeState(DriveState.FINDING_LINE);
-    }
+	/** shifts the robot into high gear */
+	public void highShift() {
+		speedRight = 0;
+		speedLeft = 0;
+		isMoving = true;
+		prevState = state;
+		timer = Timer.getFPGATimestamp();
+		changeState(DriveState.SHIFT_HIGH);
+	}
+
+	/** straightens the robot */
+	private void straightenForward() {
+		double reducedPower = ((Math.abs(getAngle()/ANGLE_OFF_BY)) > 1 ? 0 : Math.abs(getAngle()/ANGLE_OFF_BY))*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
+		if (getAngle() > ANGLE_OFF_BY) {
+			wantedSpeedLeft = reducedPower;
+			//			System.out.println("correcting rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
+		} else if (getAngle() < -ANGLE_OFF_BY) {
+			//			System.out.println("correcting oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+			wantedSpeedRight = reducedPower;
+		}
+	}
+
+	/** gets the distance the robot has travelled since the last time the encoders */
+	private double getDistance() {
+		return Math.abs(rightEnc.getDistance()) > Math.abs(leftEnc.getDistance()) ? rightEnc.getDistance() : leftEnc.getDistance();
+	}
+
+	/** gets the average rate of the robot */
+	private double getAverageRate() {
+		return (rightEnc.getRate() + leftEnc.getRate()) / 2;
+	}
+
+	/** gets the angle the robot has turned since the last time the gyro was reset */
+	private double getAngle() {
+		return lastAngle - gyro.getAngle();
+	}
+
+	/** resets the gyro's angle so the robot turns to the angle from where the robot */
+	public void resetGyroAngle() {
+		lastAngle = gyro.getAngle();
+		System.out.println("Reset: " + lastAngle);
+	}
+
+	/** resets the gyro's angle so the robot turns to the angle from where the robot */
+	private void resetGyroAngle(double lastAngle) {
+		this.lastAngle -= lastAngle;
+		System.out.println("Reset: " + lastAngle);
+	}
+
+	/** turns the robot a specified angle */
+	public void turn(double speed, double angle) {
+		turn(speed, angle, TURN_SLOW_DEFAULT_PERCENT);
+	}
+
+	public void turn(double speed, double angle, double slowPercent) {
+		turnAngle = angle;
+		turnSpeed = speed;
+		this.slowPercent = slowPercent;
+		resetGyroAngle();
+		isMoving = true;
+		if (angle > 0) {
+			changeState(DriveState.TURN_RIGHT);
+		} else {
+			changeState(DriveState.TURN_LEFT);
+		}
+
+	}
+
+	public void toAmazingStraightness() {
+		resetGyroAngle();
+		changeState(DriveState.AMAZING_STRAIGHTNESS);
+	}
+
+	public void togglePTO() {
+		drivesPTOArms.set(!drivesPTOArms.get());
+	}
+
+	/** changes the state of the robot to what is given as a parameter */
+	public void changeState(DriveState st) {
+		if (state == DriveState.ARMS && st != DriveState.ARMS) {
+			drivesPTOArms.set(false);
+		}
+		state = st;
+	}
+
+	/** used by RobotSystem to put the robot in the teleop state */
+	public void toTeleop() {
+		isMoving = false;
+		rightMtrs.setNeutralMode(NeutralMode.Brake);
+		leftMtrs.setNeutralMode(NeutralMode.Brake);
+		changeState(DriveState.TELEOP);
+		// turn(0.5, 90);
+		// move(0.5, 240);
+	}
+
+	public void toAuto() {
+		isMoving = false;
+		resetGyroAngle();
+		rightMtrs.setNeutralMode(NeutralMode.Brake);
+		leftMtrs.setNeutralMode(NeutralMode.Brake);
+	}
+
+	/** moves the robot forward, used to call move once for drives */
+	public void moveForward() {
+		move(1, 120);
+	}
+
+	// hi
+	public void findLine() {
+		findLine(-1);
+	}
+
+
+	public void findLine(double maxDistance) {
+		moveDist = maxDistance;
+		resetEncoders();
+		resetGyroAngle();
+		isMoving = true;
+		vision.reset();
+		changeState(DriveState.FINDING_LINE);
+	}
+
+	/** retruns the Arms object */
+	public Arms getArms() {
+		return arms;
+	}
+
+	/** resets vision */
+	public void resetVision() {
+		if(vision != null) {
+			vision.reset();
+		}
+	}
+
+	@Override
+	public long sleepTime() {
+		return 5;
+	}
+
+	@Override
+	public void smartDashboardInit() {
+		// rightMtr1.setName("Drives", "Right motor 1");
+		// rightMtr2.setName("Drives", "Right motor 2");
+		// rightMtr3.setName("Drives", "Right motor 3");
+		// lightMtr1.setName("Drives", "Left motor 1");
+		// leftMtr2.setName("Drives", "Left motor 2");
+		// leftMtr3.setName("Drives", "Left motor 3");
+		//		LiveWindow.remove(rightMtr1);
+		//		LiveWindow.remove(rightMtr2);
+		//		LiveWindow.remove(rightMtr3);
+		//		LiveWindow.remove(leftMtr1);
+		//		LiveWindow.remove(leftMtr2);
+		//		LiveWindow.remove(leftMtr3);
+//		addToTables(rightMtrs, "Right drives");
+//		addToTables(leftMtrs, "Left drives");
+		addToTables(rightEnc, "Right drives encoder");
+		addToTables(leftEnc, "Left drives encoder");
+		addToTables(shifter, "Shifter");
+		addToTables(drivesPTOArms, "Arms", "Drives PTO (Arms)");
+		addToTables(unsnappy, "Arms", "Unsnappy");
+		//		addToTables(gyro, "Gyro");
+	}
 
 }

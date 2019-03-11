@@ -7,13 +7,12 @@
 
 package frc.util;
 
-import javax.lang.model.util.ElementScanner6;
-
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.SpeedController;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * Add your docs here.
@@ -61,6 +60,22 @@ public class MotorGroup extends SpeedControllerGroup{
 	public int getMtrCount() {
 		return speedControllers.length;
     }
+	
+	public double getCurrent() {
+		double avg = 0;
+		for(SpeedController spd: speedControllers) {
+			avg += ((WPI_TalonSRX)spd).getOutputCurrent();
+		}
+		return avg / speedControllers.length;
+	}
+	
+	public double getVoltage() {
+		double avg = 0;
+		for(SpeedController spd: speedControllers) {
+			avg += ((WPI_TalonSRX)spd).getMotorOutputVoltage();
+		}
+		return avg / speedControllers.length;
+	}
     
     /**
 	 * Sets the mode of operation during neutral throttle output for each speedController that is a WPI_TalonSRX 
@@ -111,6 +126,12 @@ public class MotorGroup extends SpeedControllerGroup{
         }
 	}
 
+	@Override
+	public void initSendable(SendableBuilder builder) {
+		builder.setSmartDashboardType("Motor Group");
+		builder.setSafeState(this::stopMotors);
+		builder.addDoubleProperty("Value", this::get, this::set);
+	}
 
 
 }

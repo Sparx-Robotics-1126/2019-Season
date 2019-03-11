@@ -5,100 +5,182 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-
 package frc.subsystem;
 
-import frc.robot.IO;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import edu.wpi.first.wpilibj.Encoder;
+
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.IO;
 
 /**
  * Add your docs here.
  */
-public class HAB extends GenericSubsystem{
+public class HAB extends GenericSubsystem {
 
-    //----------------------------------------Motors/Sensors----------------------------------------
+	// ----------------------------------------Motors/Sensors----------------------------------------
 
-    private WPI_TalonSRX leadScrewMtr;
-    private Encoder leadScrewEncRaw;
-    private LeadScrewState state;
-    private DigitalInput bottomSensor;
+	private WPI_TalonSRX leadScrewMtr;
 
-    public HAB(){
-        super("Hab");
-    }
+	private Encoder leadScrewEncRaw;
 
-    @Override
-    public void init(){
-        leadScrewMtr = new WPI_TalonSRX(9);
-        leadScrewEncRaw = new Encoder(23, 22);
-        leadScrewEncRaw.setDistancePerPulse(0.03103);
-        leadScrewEncRaw.reset();
-        bottomSensor = new DigitalInput(14);
-        state = LeadScrewState.HOME;
-    }
-   
-    public enum LeadScrewState{
-        STANDBY,
-        UP,
-        DOWN,
-        HOME;
-    }
+	private DigitalInput bottomSensor;
 
-    @Override
-    public void execute(){
-        switch(state){
-            case STANDBY:
-                break;
-            case UP:
-                if(leadScrewEncRaw.getDistance() > 0){
-                    leadScrewMtr.set(0.3);
-                }else{
-                    leadScrewMtr.set(0.0);
-                }
-                break;
-            case DOWN:
-                if(leadScrewEncRaw.getDistance()< 24){ //gav
-                    leadScrewMtr.set(-0.3); //gav
-                }else{
-                    leadScrewMtr.set(0.0);
-                }
-                break;
-            case HOME:
-                if(bottomSensor.get()){
-                    leadScrewMtr.set(0.3); 
-                }else{
-                    leadScrewMtr.set(0.0);
-                    leadScrewEncRaw.reset();
-                    state = LeadScrewState.STANDBY;
-                }
-                break;
-        }
-       // System.out.println("HAB Encoder Value:" + leadScrewEncRaw.getDistance());
-    }
+	private WPI_TalonSRX habLeft;
 
-    public void ctrlDown(){
-        state = LeadScrewState.DOWN;
-    }
+	private WPI_TalonSRX habRight;
 
-    public void ctrlUP(){
-        state = LeadScrewState.UP;
-    }
+	// ----------------------------------------Variables---------------------------------------------
 
-    @Override
-    public void debug(){
+	private double wantedSpeedLeft;
 
-    }
- 
-    @Override
-    public boolean isDone(){
-        return false;
-    }
-  
-    @Override
-    public long sleepTime(){
-        return 20;
-    }
+	private double wantedSpeedRight;
+
+	private LeadScrewState state;
+
+	// ----------------------------------------Constants---------------------------------------------
+
+	private boolean isDone = false;
+
+	// ------------------------------------------Code-------------------------------------------
+	
+	public HAB() {
+		super("HAB");
+	}
+
+	@Override
+	public void init() {
+		leadScrewMtr = new WPI_TalonSRX(IO.HAB_LEADSCREWMOTOR);
+		leadScrewEncRaw = new Encoder(IO.HAB_LEADSCREWENCODER_CH1, IO.HAB_LEADSCREWENCODER_CH2);
+		leadScrewEncRaw.setDistancePerPulse(0.0002698035829915821);
+//		leadScrewEncRaw.setDistancePerPulse(0.0002278293558123873); //0.0002823311758 //0.0003366589558616
+		leadScrewEncRaw.reset();
+		habLeft = new WPI_TalonSRX(IO.HAB_LEFTMOTOR);
+		habRight = new WPI_TalonSRX(IO.HAB_RIGHTMOTOR);
+		wantedSpeedLeft = 0;
+		wantedSpeedRight = 0;
+		// bottomSensor = new DigitalInput(14);
+		state = LeadScrewState.STANDBY;
+	}
+
+	public enum LeadScrewState {
+		STANDBY, UP, DOWN, HOME, PRE_ARMS, LEVELTWO;
+	} 
+
+	@Override
+	public void execute() {
+		switch (state) {
+		case STANDBY:
+			break;
+		case UP:
+			if (leadScrewEncRaw.getDistance() < -1) {
+				leadScrewMtr.set(1);
+			} else {
+				stopHab();
+			}
+			break;
+		case DOWN:
+			if (leadScrewEncRaw.getDistance() > -19.4) {
+				leadScrewMtr.set(-1);
+			} else {
+				stopHab();
+			}
+			break;
+		case PRE_ARMS:
+			if(leadScrewEncRaw.getDistance() > -2.5) {
+				leadScrewMtr.set(-1);
+			} else {
+				stopHab();
+			}
+			break;
+		case LEVELTWO:
+			if(leadScrewEncRaw.getDistance() > -7.25) {
+				leadScrewMtr.set(-1);
+			} else {
+				stopHab();
+			}
+			break;
+		}
+		habLeft.set(wantedSpeedLeft);
+		habRight.set(wantedSpeedRight);
+	}
+	
+	@Override
+	public void delayedPrints() {
+		System.out.println("Lead screw: " + leadScrewEncRaw.getDistance());
+	}
+	
+	public void stopHab() {
+		leadScrewMtr.set(0);
+		isDone = true;
+		state = LeadScrewState.STANDBY;
+	}
+
+	public void ctrlDown() {
+		state = LeadScrewState.DOWN;
+		isDone = false;
+	}
+
+	public void ctrlUP() {
+		state = LeadScrewState.UP;
+		isDone = false;
+	}
+	
+	public void ctrlLevelTwo() {
+		state = LeadScrewState.LEVELTWO;
+		isDone = false;
+	}
+	
+	public void ctrlPreArms() {
+		state = LeadScrewState.PRE_ARMS;
+		isDone = false;
+	}
+	
+	public void setHabWheelsSpeed(double speed) {
+		setHabSpeedLeft(-speed);
+		setHabSpeedRight(speed);
+	}
+	
+	public void stopHabWheels() {
+		setHabSpeedLeft(0);
+		setHabSpeedRight(0);
+	}
+	
+	public boolean onPlatform() {
+		return true;
+	}
+
+	public void setHabSpeedLeft(double speed) {
+		wantedSpeedLeft = speed;
+	}
+
+	public void setHabSpeedRight(double speed) {
+		wantedSpeedRight = speed;
+	}
+
+	@Override
+	public boolean isDone() {
+		return isDone;
+	}
+
+	@Override
+	public long sleepTime() {
+		return 20;
+	}
+
+	@Override
+	public void smartDashboardInit() {
+		addToTables(leadScrewMtr, "Lead Screw Motor");
+		addToTables(leadScrewEncRaw, "Lead Screw Encoder");
+		SmartDashboard.putData("Lead Screw Encoder", leadScrewEncRaw);
+		addToTables(habLeft, "Arms", "Arms Left Wheels");
+		addToTables(habRight, "Arms", "Arms Right Wheels");
+	}
+	
+	public void stopAll() {
+		stopHab();
+		stopHabWheels();
+	}
 
 }
