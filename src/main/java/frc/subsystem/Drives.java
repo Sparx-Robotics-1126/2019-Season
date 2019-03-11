@@ -462,7 +462,7 @@ public class Drives extends GenericSubsystem {
 
 	/** straightens the robot */
 	private void straightenForward() {
-		double reducedPower = ((Math.abs(getAngle()/ANGLE_OFF_BY)) > 1 ? 0 : Math.abs(getAngle()/ANGLE_OFF_BY))*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
+		double reducedPower = Math.abs(getAngle()/ANGLE_OFF_BY) > 1 ? 0 : (ANGLE_OFF_BY - Math.abs(getAngle())/ANGLE_OFF_BY)*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
 		if (getAngle() > ANGLE_OFF_BY) {
 			wantedSpeedLeft = reducedPower;
 			//			System.out.println("correcting rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");

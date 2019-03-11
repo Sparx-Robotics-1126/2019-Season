@@ -69,7 +69,7 @@ public class Hatch extends GenericSubsystem {
 		}
 		flipper.set(flipperValue);
 		shooter.set(shooterValue);
-		holder.set(flipperValue);
+//		holder.set(flipperValue);
 	}
 
 	public void flipperButton() {
