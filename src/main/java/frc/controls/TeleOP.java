@@ -210,6 +210,7 @@ public class TeleOP implements Controls {
 				auto.stopAll();
 			}
 			if(auto.isDone()) {
+				drives.toTeleop();
 				state = TeleState.TELEOP; //needed?
 			}
 			break;
