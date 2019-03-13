@@ -20,8 +20,8 @@ public class Logger extends GenericSubsystem {
 	private String logName;
 	private final String COMPRESSION_MODE = "TAR.GZ";
 	private final String COUNTER_FILE = "counter.txt";
-	private final String LOGS_DIRECTORY_LOCATION = "/home/lvuser/logs/"; //starting from the home directory
-	//	private final String LOGS_DIRECTORY_LOCATION = "C:\\Users\\Spenser\\Documents\\Miscellaneous\\Sparx\\"; //starting from the home directory
+//	private final String LOGS_DIRECTORY_LOCATION = "/home/lvuser/logs/"; //starting from the home directory
+		private final String LOGS_DIRECTORY_LOCATION = "C:\\Sparx\\"; //starting from the home directory
 	private boolean logReady;
 	private final boolean LOG_TO_CONSOLE = true;
 	private final int maxSavedFiles = 10;
@@ -113,15 +113,17 @@ public class Logger extends GenericSubsystem {
 
 					@Override
 					public void println(Object x) {
-						println(String.valueOf(x));
+						println(String.valueOf(x), 4);
 					}
 
 					@Override
 					public void println(String x) {
+						systemOut.println(x);
 						logOut(x + "\n", Tag.INFO);
 					}
 
 					public void println(String x, int stack) {
+						systemOut.println(x);
 						logOut(x + "\n", Tag.INFO, stack);
 					}
 
@@ -168,12 +170,12 @@ public class Logger extends GenericSubsystem {
 					@Override
 					public void print(String x) {
 						systemOut.print(x);
-						println(x, 4);
+						logOut(x + "\n", Tag.INFO, 4);
 					}
 
 					public void print(String x, int stack) {
 						systemOut.print(x);
-						println(x, 5);
+						logOut(x + "\n", Tag.INFO, stack);
 					}
 
 				};/*
@@ -330,7 +332,7 @@ public class Logger extends GenericSubsystem {
 		if(stw != null) {
 			getStackInfo(true, stack);
 		}
-		String log = "[" + stackInfo[0] + "][" + stackInfo[1] + "][" + stackInfo[2] + "][" + timerToHMS() + "][" + type.toString() + "] " + message;
+		String log = "[" + timerToHMS() + "][" + stackInfo[0] + "][" + stackInfo[1] + "][" + stackInfo[2] + "][" + type.toString() + "] " + message;
 		printToLog.add(log);
 		//		synchronized(printThread) {
 		//			printThread.notify();
@@ -400,6 +402,7 @@ public class Logger extends GenericSubsystem {
 			name = file.getName();
 			if(name.indexOf('-') != -1) {
 				counter = Integer.parseInt(name.substring(0, name.indexOf('-')));
+				System.out.println(counter);
 				if(name.endsWith(".tar.gz") || name.endsWith(".log")) {
 					if(counter > 9) {
 						file.delete();

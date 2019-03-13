@@ -5,7 +5,8 @@ public class MillisTimer {
 	private double startingTime;
 	private double passedTime;
 	private boolean isRunning;
-	private double tempVariable;
+	private double tempDouble;
+	private String tempString;
 	private StringBuilder strBuilder;
 	
 	public MillisTimer() {
@@ -18,13 +19,21 @@ public class MillisTimer {
 	}
 	
 	public String getHMS() {
-		tempVariable = get();
+		tempDouble = get();
 		strBuilder.setLength(0);
-		strBuilder.append((int) (tempVariable / 3600) + ":");
-		tempVariable %= 3600;
-		strBuilder.append((int) (tempVariable / 60) + ":");
-		tempVariable = tempVariable % 60;
-		strBuilder.append(((int)(tempVariable*1000))/1000.0);
+		tempString = (int) (tempDouble / 3600) + ":";
+		if(tempString.length() < 3) {
+			tempString = "0" + tempString;
+		}
+		strBuilder.append(tempString);
+		tempDouble %= 3600;
+		tempString = (int) (tempDouble / 60) + ":";
+		if(tempString.length() == 2) {
+			tempString = "0" + tempString;
+		}
+		strBuilder.append(tempString);
+		tempDouble = tempDouble % 60;
+		strBuilder.append(((int)(tempDouble*1000))/1000.0);
 		return strBuilder.toString();
 	}
 	

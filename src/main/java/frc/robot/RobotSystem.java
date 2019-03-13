@@ -7,14 +7,14 @@
 
 package frc.robot;
 
-import frc.controls.Autonomous;
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
+import frc.controls.Autonomous;
 import frc.controls.Controls;
 import frc.controls.TeleOP;
 import frc.subsystem.Drives;
 import frc.subsystem.HAB;
 import frc.subsystem.Hatch;
+import frc.util.Logger;
 
 /**
  * Add your docs here.
@@ -28,6 +28,7 @@ public class RobotSystem extends Thread{
 	private Drives drives;
 	private HAB hab;
 	private Hatch hatch;
+	private Logger logger;
 
 	private Compressor compress;
 
@@ -35,12 +36,14 @@ public class RobotSystem extends Thread{
 		drives = new Drives();
 		hab = new HAB();
 		hatch = new Hatch();
+		logger = new Logger();
 		teleop = new TeleOP(drives, hab, hatch);
 		autonomous = new Autonomous(drives, hatch, hab);
 		currentState = RobotState.STANDBY;
 		currentControl = teleop;
 		compress = new Compressor(IO.ROBOT_COMPRESSOR);
 		compress.setClosedLoopControl(true);
+		logger.start();
 //		CameraServer.getInstance().startAutomaticCapture();
 	}
 
