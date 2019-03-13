@@ -1,26 +1,21 @@
 package frc.util;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.StackWalker.Option;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-import edu.wpi.first.wpilibj.Timer;
 import frc.subsystem.GenericSubsystem;
 
 public class Logger extends GenericSubsystem {
 
-	private Timer timer;
+	private MillisTimer timer;
 
 	private String logName;
 	private final String COMPRESSION_MODE = "TAR.GZ";
@@ -33,11 +28,7 @@ public class Logger extends GenericSubsystem {
 	private String[] stackInfo;
 
 	private PrintStream systemOut;
-	private Thread printThread;
-	private DecimalFormat df;
-	private DecimalFormat df2;
 
-	private ConcurrentLinkedDeque<String> dataToPrint;
 	private ConcurrentLinkedDeque<String> printToLog;
 	private File logFile;
 
@@ -49,21 +40,13 @@ public class Logger extends GenericSubsystem {
 		if(!makeLogsDir()) { 
 			return;			  
 		}					
-		dataToPrint = new ConcurrentLinkedDeque<String>();
-		df = new DecimalFormat();
-		df.setGroupingUsed(false);
-		df.setMinimumFractionDigits(3);
-		df.setMaximumFractionDigits(3);
-		df.setMinimumIntegerDigits(2);
-		df2 = new DecimalFormat();
-		df2.setGroupingUsed(false);
-		df2.setMinimumIntegerDigits(2);
-		stackInfo = new String[2];
+
+		stackInfo = new String[3];
 		stw = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
 		updateFiles();
 		logName = LocalDateTime.now().getDayOfMonth() + "_" + LocalDateTime.now().getMonth() + "_" + LocalDateTime.now().getYear() + 
 				"-" + LocalDateTime.now().getHour() + "_" + LocalDateTime.now().getMinute() + "_" + LocalDateTime.now().getSecond() + ".log";
-		timer = new Timer();
+		timer = new MillisTimer();
 		timer.start();
 		try {
 			logFile = new File(LOGS_DIRECTORY_LOCATION + "0-" + logName);
@@ -78,244 +61,234 @@ public class Logger extends GenericSubsystem {
 	}
 
 	public void printOverride() {
-		if(printThread == null) {
-			printThread = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					String str = null;
-					while(!isInterrupted()) {
-						if(!dataToPrint.isEmpty()) {
-							str = "[" + timerToHMS() + "]" + dataToPrint.remove();
-							systemOut.print(str);
-						}
-						if(str != null) {
-							printToLog.push(str);
-							loggerNotify();
-							str = null;
-						}
-						try {
-							synchronized(printThread) {
-								printThread.wait(10);
-							}
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+		if(logReady) {
+			if(systemOut == null) {
+				OutputStream os = new OutputStream() {
+					@Override
+					public void write(int b) throws IOException {
+						return;
 					}
-				}
-			});
-			printThread.setPriority(Thread.MIN_PRIORITY);
+				};
+				PrintStream printStream = new PrintStream(os) {
+
+					@Override
+					public void println() {
+						println("", 4);
+					}
+
+					@Override
+					public void println(boolean x) {
+						println(x + "", 4);
+					}
+
+					@Override
+					public void println(char x) {
+						println(x + "", 4);
+					}
+
+					@Override
+					public void println(char[] x) {
+						println(String.valueOf(x), 4);
+					}
+
+					@Override
+					public void println(double x) {
+						println(x + "", 4);
+					}
+
+					@Override
+					public void println(float x) {
+						println(x + "", 4);
+					}
+
+					@Override
+					public void println(int x) {
+						println(x + "", 4);
+					}
+
+					@Override
+					public void println(long x) {
+						println(x + "", 4);
+					}
+
+					@Override
+					public void println(Object x) {
+						println(String.valueOf(x));
+					}
+
+					@Override
+					public void println(String x) {
+						logOut(x + "\n", Tag.INFO);
+					}
+
+					public void println(String x, int stack) {
+						logOut(x + "\n", Tag.INFO, stack);
+					}
+
+					@Override
+					public void print(boolean x) {
+						print(x + "", 5);
+					}
+
+					@Override
+					public void print(char x) {
+						print(x + "", 5);				
+					}
+
+					@Override
+					public void print(char[] x) {
+						print(String.valueOf(x), 5);
+					}
+
+					@Override
+					public void print(double x) {
+						print(x + "", 5);				
+					}
+
+					@Override
+					public void print(float x) {
+						print(x + "", 5);
+					}
+
+					@Override
+					public void print(int x) {
+						print(x + "", 5);
+					}
+
+					@Override
+					public void print(long x) {
+						print(x + "", 5);
+					}
+
+					@Override
+					public void print(Object x) {
+						print(String.valueOf(x), 5);
+					}
+
+					@Override
+					public void print(String x) {
+						systemOut.print(x);
+						println(x, 4);
+					}
+
+					public void print(String x, int stack) {
+						systemOut.print(x);
+						println(x, 5);
+					}
+
+				};/*
+				PrintStream printStreamErr = new PrintStream(os) {
+
+					@Override
+					public void println() {
+						println("", 4);
+					}
+
+					@Override
+					public void println(boolean x) {
+						println(x + "", 4);
+					}
+
+					@Override
+					public void println(char x) {
+						println(x + "", 4);
+					}
+
+					@Override
+					public void println(char[] x) {
+						println(String.valueOf(x), 4);
+					}
+
+					@Override
+					public void println(double x) {
+						println(x + "", 4);
+					}
+
+					@Override
+					public void println(float x) {
+						println(x + "", 4);
+					}
+
+					@Override
+					public void println(int x) {
+						println(x + "", 4);
+					}
+
+					@Override
+					public void println(long x) {
+						println(x + "", 4);
+					}
+
+					@Override
+					public void println(Object x) {
+						println(String.valueOf(x));
+					}
+
+					@Override
+					public void println(String x) {
+						logOut(x + "\n", Tag.ERROR);
+					}
+
+					public void println(String x, int stack) {
+						logOut(x + "\n", Tag.ERROR, stack);
+					}
+
+					@Override
+					public void print(boolean x) {
+						print(x + "", 5);
+					}
+
+					@Override
+					public void print(char x) {
+						print(x + "", 5);				
+					}
+
+					@Override
+					public void print(char[] x) {
+						print(String.valueOf(x), 5);
+					}
+
+					@Override
+					public void print(double x) {
+						print(x + "", 5);				
+					}
+
+					@Override
+					public void print(float x) {
+						print(x + "", 5);
+					}
+
+					@Override
+					public void print(int x) {
+						print(x + "", 5);
+					}
+
+					@Override
+					public void print(long x) {
+						print(x + "", 5);
+					}
+
+					@Override
+					public void print(Object x) {
+						print(String.valueOf(x), 5);
+					}
+
+					@Override
+					public void print(String x) {
+						println(x, 4);
+					}
+
+					public void print(String x, int stack) {
+						println(x, 5);
+					}
+
+				};*/
+				systemOut = System.out;
+				System.setOut(printStream);
+				//				System.setErr(printStreamErr);
+			}
 		}
-		if(!printThread.isAlive()) {
-			printThread.start();
-		}
-		if(systemOut == null) {
-			OutputStream os = new OutputStream() {
-				@Override
-				public void write(int b) throws IOException {
-					return;
-				}
-			};
-			PrintStream printStream = new PrintStream(os) {
 
-				@Override
-				public void println() {
-					println("");
-				}
-
-				@Override
-				public void println(boolean x) {
-					println(x + "");
-				}
-
-				@Override
-				public void println(char x) {
-					println(x + "");
-				}
-
-				@Override
-				public void println(char[] x) {
-					println(String.valueOf(x));
-				}
-
-				@Override
-				public void println(double x) {
-					println(x + "");
-				}
-
-				@Override
-				public void println(float x) {
-					println(x + "");
-				}
-
-				@Override
-				public void println(int x) {
-					println(x + "");
-				}
-
-				@Override
-				public void println(long x) {
-					println(x + "");
-				}
-
-				@Override
-				public void println(Object x) {
-					println(String.valueOf(x));
-				}
-
-				@Override
-				public void println(String x) {
-					logOut(x + "\n", Tag.INFO);
-				}
-
-				@Override
-				public void print(boolean x) {
-					print(x + "");
-				}
-
-				@Override
-				public void print(char x) {
-					print(x + "");				
-				}
-
-				@Override
-				public void print(char[] x) {
-					print(String.valueOf(x));
-				}
-
-				@Override
-				public void print(double x) {
-					print(x + "");				
-				}
-
-				@Override
-				public void print(float x) {
-					print(x + "");
-				}
-
-				@Override
-				public void print(int x) {
-					print(x + "");
-				}
-
-				@Override
-				public void print(long x) {
-					print(x + "");
-				}
-
-				@Override
-				public void print(Object x) {
-					print(String.valueOf(x));
-				}
-
-				@Override
-				public void print(String x) {
-					println(x);
-				}
-
-			};
-			PrintStream printStreamErr = new PrintStream(os) {
-
-				@Override
-				public void println() {
-					println("");
-				}
-
-				@Override
-				public void println(boolean x) {
-					println(x + "");
-				}
-
-				@Override
-				public void println(char x) {
-					println(x + "");
-				}
-
-				@Override
-				public void println(char[] x) {
-					println(String.valueOf(x));
-				}
-
-				@Override
-				public void println(double x) {
-					println(x + "");
-				}
-
-				@Override
-				public void println(float x) {
-					println(x + "");
-				}
-
-				@Override
-				public void println(int x) {
-					println(x + "");
-				}
-
-				@Override
-				public void println(long x) {
-					println(x + "");
-				}
-
-				@Override
-				public void println(Object x) {
-					println(String.valueOf(x));
-				}
-
-				@Override
-				public void println(String x) {
-					logOut(x + "\n", Tag.ERROR);
-				}
-
-				@Override
-				public void print(boolean x) {
-					print(x + "");
-				}
-
-				@Override
-				public void print(char x) {
-					print(x + "");				
-				}
-
-				@Override
-				public void print(char[] x) {
-					print(String.valueOf(x));
-				}
-
-				@Override
-				public void print(double x) {
-					print(x + "");				
-				}
-
-				@Override
-				public void print(float x) {
-					print(x + "");
-				}
-
-				@Override
-				public void print(int x) {
-					print(x + "");
-				}
-
-				@Override
-				public void print(long x) {
-					print(x + "");
-				}
-
-				@Override
-				public void print(Object x) {
-					print(String.valueOf(x));
-				}
-
-				@Override
-				public void print(String x) {
-					println(x);
-				}
-
-			};
-			systemOut = System.out;
-			System.setOut(printStream);
-			System.setErr(printStreamErr);
-		}
 
 	}
 
@@ -326,8 +299,8 @@ public class Logger extends GenericSubsystem {
 	public void getStackInfo(boolean getClass, int stack){
 		StackWalker.StackFrame frame = stw.walk(stream1 -> stream1.skip(stack).findFirst().orElse(null));
 		if(getClass) {
-			stackInfo[0] = frame.getClassName() + ":" + frame.getLineNumber();
-			//			stackInfo[0] = frame.getClassName();
+			stackInfo[0] = frame.getClassName();
+			stackInfo[2] = "" + frame.getLineNumber();
 			if(stackInfo[0].indexOf('.') != -1) {
 				stackInfo[0] = stackInfo[0].substring(stackInfo[0].lastIndexOf('.') + 1);
 			}
@@ -353,27 +326,28 @@ public class Logger extends GenericSubsystem {
 		INTERRUPTED;	//Used when commands have been interrupted
 	}
 
-	public void logOut(String message, Tag type) {
+	public void logOut(String message, Tag type, int stack) {
 		if(stw != null) {
-			getStackInfo(true, 3);
+			getStackInfo(true, stack);
 		}
-		String log = "[" + stackInfo[0] + "][" + stackInfo[1] + "][" + type.toString() + "] " + message;
-		dataToPrint.add(log);
-		synchronized(printThread) {
-			printThread.notify();
-		}
+		String log = "[" + stackInfo[0] + "][" + stackInfo[1] + "][" + stackInfo[2] + "][" + timerToHMS() + "][" + type.toString() + "] " + message;
+		printToLog.add(log);
+		//		synchronized(printThread) {
+		//			printThread.notify();
+		//		}
 
+	}
+
+	public void logOut(String message, Tag type) {
+		logOut(message, type, 4);
 	}
 
 	public void log(String subsystem, String method, Tag type, String message) {
 		String log = "[" + timerToHMS() + "][" + subsystem.toUpperCase() + "][" + method.toUpperCase() + "][" + type.toString().toUpperCase() + "] " + message;
 		if(logReady && LOG_TO_CONSOLE) {
 			//			synchronized(dataToPrint) {
-			dataToPrint.add(log);
+			printToLog.add(log);
 			//			}
-			synchronized(printThread) {
-				printThread.notify();
-			}
 		} else {
 			if(!logReady) {
 				System.out.println(log);
@@ -398,15 +372,13 @@ public class Logger extends GenericSubsystem {
 
 	public void log(String message) {
 		if(stw != null) {
-			
 			getStackInfo(true);
 		}
 		log(stackInfo[0], stackInfo[1], Tag.INFO, message);
 	}
 
 	private String timerToHMS() {
-		double timeDouble = timer.get();
-		return (df2.format((int) (timeDouble / 3600))) + ":" + df2.format(((int) ((timeDouble / 60) % 60))) + ":" + df.format(timeDouble % 60);
+		return timer.getHMS();
 	}
 
 	private boolean makeLogsDir() {
@@ -416,25 +388,6 @@ public class Logger extends GenericSubsystem {
 			return false;
 		}
 		return true;
-	}
-
-	private long readCounter() {//we probably don't need a long but w/e "just in case"
-		try {
-			File counter = new File(LOGS_DIRECTORY_LOCATION + COUNTER_FILE);
-			if(counter.exists()) {
-				Scanner sc = new Scanner(new FileReader(counter));
-				long ln = sc.nextLong();
-				sc.close();
-				Files.write(counter.toPath(), ((ln + 1) + "").getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.DSYNC, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-				return ln;
-			} else {
-				counter.createNewFile();
-				Files.write(counter.toPath(), "2".getBytes());
-				return 1;
-			}
-		} catch(Exception e) {
-		}
-		return -1;
 	}
 
 	private void updateFiles() {
@@ -515,9 +468,6 @@ public class Logger extends GenericSubsystem {
 					Files.write(logFile.toPath(), builder.toString().getBytes(), StandardOpenOption.APPEND, StandardOpenOption.DSYNC, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
 					builder.setLength(0);
 				}
-				synchronized(this) {
-					wait(60000);
-				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -531,10 +481,6 @@ public class Logger extends GenericSubsystem {
 	}
 
 	@Override
-	public void debug() {
-	}
-
-	@Override
 	public boolean isDone() {
 		return false;
 	}
@@ -543,5 +489,17 @@ public class Logger extends GenericSubsystem {
 	public long sleepTime() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public void delayedPrints() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void smartDashboardInit() {
+		// TODO Auto-generated method stub
+
 	}
 }
