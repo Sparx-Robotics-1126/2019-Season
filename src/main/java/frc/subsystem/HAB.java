@@ -53,7 +53,8 @@ public class HAB extends GenericSubsystem {
 	public void init() {
 		leadScrewMtr = new WPI_TalonSRX(IO.HAB_LEADSCREWMOTOR);
 		leadScrewEncRaw = new Encoder(IO.HAB_LEADSCREWENCODER_CH1, IO.HAB_LEADSCREWENCODER_CH2);
-		leadScrewEncRaw.setDistancePerPulse(0.0002278293558123873); //0.0002823311758 //0.0003366589558616
+		leadScrewEncRaw.setDistancePerPulse(0.0002698035829915821);
+//		leadScrewEncRaw.setDistancePerPulse(0.0002278293558123873); //0.0002823311758 //0.0003366589558616
 		leadScrewEncRaw.reset();
 		habLeft = new WPI_TalonSRX(IO.HAB_LEFTMOTOR);
 		habRight = new WPI_TalonSRX(IO.HAB_RIGHTMOTOR);
@@ -64,8 +65,8 @@ public class HAB extends GenericSubsystem {
 	}
 
 	public enum LeadScrewState {
-		STANDBY, UP, DOWN, HOME, PRE_ARMS;
-	}
+		STANDBY, UP, DOWN, HOME, PRE_ARMS, LEVELTWO;
+	} 
 
 	@Override
 	public void execute() {
@@ -73,14 +74,14 @@ public class HAB extends GenericSubsystem {
 		case STANDBY:
 			break;
 		case UP:
-			if (leadScrewEncRaw.getDistance() < 0) {
-				leadScrewMtr.set(0.9);
+			if (leadScrewEncRaw.getDistance() < -1) {
+				leadScrewMtr.set(1);
 			} else {
 				stopHab();
 			}
 			break;
 		case DOWN:
-			if (leadScrewEncRaw.getDistance() > -22) {
+			if (leadScrewEncRaw.getDistance() > -19.4) {
 				leadScrewMtr.set(-1);
 			} else {
 				stopHab();
@@ -93,12 +94,11 @@ public class HAB extends GenericSubsystem {
 				stopHab();
 			}
 			break;
-		case HOME:
-			if (bottomSensor.get()) {
-				leadScrewMtr.set(0.3);
+		case LEVELTWO:
+			if(leadScrewEncRaw.getDistance() > -7.25) {
+				leadScrewMtr.set(-1);
 			} else {
 				stopHab();
-				leadScrewEncRaw.reset();
 			}
 			break;
 		}
@@ -124,6 +124,11 @@ public class HAB extends GenericSubsystem {
 
 	public void ctrlUP() {
 		state = LeadScrewState.UP;
+		isDone = false;
+	}
+	
+	public void ctrlLevelTwo() {
+		state = LeadScrewState.LEVELTWO;
 		isDone = false;
 	}
 	

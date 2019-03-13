@@ -46,13 +46,12 @@ public class Vision {
 	public enum directions {
 		LEFT, SLIGHTLEFT, STANDBY, FORWARD, RIGHT, SLIGHTRIGHT
 	}
-
+	
 	public directions getDirection() {
-		boolean left = !leftIR.get();
+//		boolean left = !leftIR.get();
 		boolean right = !rightIR.get();
 		boolean centerLeft = !centerLeftIR.get();
 		boolean centerRight = !centerRightIR.get();
-
 		// If we've hit right turn right
 		if (right) {
 			direction = directions.RIGHT;
@@ -60,11 +59,12 @@ public class Vision {
 			rightHitFirst = true;
 
 			// If we've hit left turn left
-		} else if (left) {
-			direction = directions.LEFT;
-			hitLine = true;
-			rightHitFirst = false;
-		}
+		} 
+//		else if (left) {
+//			direction = directions.LEFT;
+//			hitLine = true;
+//			rightHitFirst = false;
+//		}
 
 		// We'ver hit line on side now we turn until center line hit.
 		if (hitLine && !centerHit) {

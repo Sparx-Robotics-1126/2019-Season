@@ -19,22 +19,23 @@ public class IO {
     public static final int DRIVES_LEFTMOTOR_2 =							2;
     public static final int DRIVES_LEFTMOTOR_3 =							3;
     
-    public static final int DRIVES_RIGHTENCODER_CH1 =						10; //0
-    public static final int DRIVES_RIGHTENCODER_CH2 =						11; //1
-    public static final int DRIVES_LEFTENCODER_CH1 =						12; //2
-    public static final int DRIVES_LEFTENCODER_CH2 =						13; //3
+    public static final int DRIVES_RIGHTENCODER_CH1 =						11; //10
+    public static final int DRIVES_RIGHTENCODER_CH2 =						10; //11
+    public static final int DRIVES_LEFTENCODER_CH1 =						12;
+    public static final int DRIVES_LEFTENCODER_CH2 =						13;
     
-    public static final int DRIVES_PTOSOLENOID =							1;
-    public static final int DRIVES_SHIFTINGSOLENOID =						0;
+    public static final int DRIVES_PTOSOLENOID =							0; //1
+    public static final int DRIVES_SHIFTINGSOLENOID =						1; //0
     public static final int DRIVES_UNSNAPPY = 								2;
     
-    public static final int ARMS_LIMITSWITCH_LEFT =							6;
-    public static final int ARMS_LIMITSWITCH_RIGHT = 						5;
+    public static final int ARMS_LIMITSWITCH_LEFT =							6; //6
+    public static final int ARMS_LIMITSWITCH_RIGHT = 						5; //5
     
     public static final int ROBOT_COMPRESSOR =								0;
     
     public static final int HATCH_SOLENOID_FLIPPER =						4;
     public static final int HATCH_SOLENOID_SHOOTER =						5;
+    public static final int HATCH_SOLENOID_HOLDER = 						3;
   
   //HAB
     public static final int HAB_LEADSCREWENCODER_CH1 =						24;
@@ -48,5 +49,5 @@ public class IO {
     public static final int VISION_CENTERRIGHTFOLLOWINGSENSOR =				16;
     public static final int VISION_RIGHTFOLLOWINGSENSOR =					17;
     
-    public static final int NOISEEEE_SOLENOID = 							3;
+//    public static final int NOISEEEE_SOLENOID = 							3;
 }

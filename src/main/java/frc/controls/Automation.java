@@ -97,6 +97,7 @@ public class Automation {
 		 * Switches drives to low gear.
 		 */
 		DRIVES_LOWGEAR(0),
+		DRIVES_RESETANGLE(0),
 		/**
 		 * Moves hab wheels forward (or backwards with -) at a given speed.
 		 * @param speed - the speed at which to move the HAB wheels forward.
@@ -118,6 +119,7 @@ public class Automation {
 		 * Moves the hab screw just enough so that the arms can go safely onto the HAB.
 		 */
 		HAB_PREARMS(0),
+		HAB_LEVELTWO(0),
 		/**
 		 * Waits until the hab screw has finished moving.
 		 */
@@ -294,6 +296,7 @@ public class Automation {
 
 	public void execute() {
 		if(firstRun) {
+//			drives.resetGyro();
 			startTime = Timer.getFPGATimestamp();
 			clearData();
 			firstRun = false;
@@ -331,7 +334,7 @@ public class Automation {
 				if(currentStepData.length == 2) {
 					drives.turn(currentStepData[0], -currentStepData[1]);
 				} else {
-					drives.turn(currentStepData[0], -currentStepData[1], currentStepData[2], currentStepData[3]);
+					drives.turn(currentStepData[0], -currentStepData[1], currentStepData[2]);
 				}
 				currentStep++;
 				break;
@@ -339,7 +342,7 @@ public class Automation {
 				if(currentStepData.length == 2) {
 					drives.turn(currentStepData[0], currentStepData[1]);
 				} else {
-					drives.turn(currentStepData[0], currentStepData[1], currentStepData[2], currentStepData[3]);
+					drives.turn(currentStepData[0], currentStepData[1], currentStepData[2]);
 				}
 				currentStep++;
 				break;
@@ -349,6 +352,10 @@ public class Automation {
 				} else {
 					drives.findLine(currentStepData[0]);
 				}
+				currentStep++;
+				break;
+			case DRIVES_RESETANGLE:
+				drives.resetGyroAngle();
 				currentStep++;
 				break;
 			case DRIVES_LOWGEAR:
@@ -398,6 +405,10 @@ public class Automation {
 				break;
 			case HAB_UP:
 				hab.ctrlUP();
+				currentStep++;
+				break;
+			case HAB_LEVELTWO:
+				hab.ctrlLevelTwo();
 				currentStep++;
 				break;
 			case HAB_WAIT:

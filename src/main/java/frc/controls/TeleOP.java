@@ -73,7 +73,7 @@ public class TeleOP implements Controls {
 		this.auto = new Automation(drives, hatch, hab);
 		joysticks = new Joystick[] {new Joystick(CtrlMap.XBOXCONTROLLER_MAIN), new Joystick(CtrlMap.XBOXCONTROLLER_CLIMBING)};
 		state = TeleState.TELEOP;
-		bzzzzzz = new Solenoid(IO.NOISEEEE_SOLENOID);
+//		bzzzzzz = new Solenoid(IO.NOISEEEE_SOLENOID);
 	}
 
 	public enum TeleState {
@@ -84,8 +84,8 @@ public class TeleOP implements Controls {
 	private void setAutomationClimbing() {
 		auto.reset();
 		auto.addStep(AutoMethod.HAB_PREARMS); //-
-		auto.addStep(AutoMethod.HAB_WAIT);
 		auto.addStep(AutoMethod.DRIVES_ARMS_DOWN);
+		auto.addStep(AutoMethod.HAB_WAIT);
 		auto.addStep(AutoMethod.DRIVES_WAIT);
 		auto.addStep(AutoMethod.HAB_DOWN);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0.4);
@@ -93,12 +93,38 @@ public class TeleOP implements Controls {
 		auto.addStep(AutoMethod.HAB_WAIT);	
 		//		auto.addStep(AutoMethod.DRIVES_STOP);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 1);
-		auto.addStep(AutoMethod.AUTO_DELAY, 2); 
+		auto.addStep(AutoMethod.AUTO_DELAY, 2.35); 
 		auto.addStep(AutoMethod.HAB_UP);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0);
 		auto.addStep(AutoMethod.HAB_WAIT);
-		auto.addStep(AutoMethod.DRIVES_FORWARD, 0.2, 5);
+		auto.addStep(AutoMethod.DRIVES_RESETANGLE);
+		auto.addStep(AutoMethod.DRIVES_FORWARD, 0.4, 7);
+		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0.5);
+		auto.addStep(AutoMethod.DRIVES_WAIT);
+		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0);
+		auto.addStep(AutoMethod.AUTO_STOP);
+		state = TeleState.AUTOMATION;
+	}
+	
+	private void setAutomationClimbingLow() {
+		auto.reset();
+		auto.addStep(AutoMethod.HAB_PREARMS); //-
+		auto.addStep(AutoMethod.DRIVES_ARMS_DOWN);
+		auto.addStep(AutoMethod.HAB_WAIT);
+		auto.addStep(AutoMethod.DRIVES_WAIT);
+		auto.addStep(AutoMethod.HAB_LEVELTWO);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0.4);
+		//		auto.addStep(AutoMethod.DRIVES_FORWARD, 0.2, 60);
+		auto.addStep(AutoMethod.HAB_WAIT);	
+		//		auto.addStep(AutoMethod.DRIVES_STOP);
+		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 1);
+		auto.addStep(AutoMethod.AUTO_DELAY, 2.35); 
+		auto.addStep(AutoMethod.HAB_UP);
+		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0);
+		auto.addStep(AutoMethod.HAB_WAIT);
+		auto.addStep(AutoMethod.DRIVES_RESETANGLE);
+		auto.addStep(AutoMethod.DRIVES_FORWARD, 0.4, 7);
+		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0.5);
 		auto.addStep(AutoMethod.DRIVES_WAIT);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0);
 		auto.addStep(AutoMethod.AUTO_STOP);
@@ -110,9 +136,9 @@ public class TeleOP implements Controls {
 		setJoystickStates();
 		switch(state) {
 		case TELEOP:
-			if(bzzzzzz.get()) {
-				bzzzzzz.set(false);
-			}
+//			if(bzzzzzz.get()) {
+//				bzzzzzz.set(false);
+//			}
 			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_LEFT_Y)) {
 				drives.joystickLeft(getAxis(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_LEFT_Y));
 			} else {
@@ -131,6 +157,7 @@ public class TeleOP implements Controls {
 				hatch.homeButton();
 			}
 			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_B)) {
+//				drives.togglePTO();
 				drives.toAmazingStraightness();
 			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_B)) {
 				drives.changeState(DriveState.TELEOP);
@@ -141,10 +168,25 @@ public class TeleOP implements Controls {
 				drives.toTeleop();
 			}
 			//CLIMBING
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_A) && isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_L1)) {
-				setAutomationClimbing();
+			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_LEFT_Y)) {
+				hab.setHabSpeedLeft(-getAxis(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_LEFT_Y));
+			} else {
+				hab.setHabSpeedLeft(0);
 			}
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_Y)) {
+			
+			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_RIGHT_Y)) {
+				hab.setHabSpeedRight(getAxis(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_RIGHT_Y));
+			} else {
+				hab.setHabSpeedRight(0);
+			}
+			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_L1)) {
+				if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_A)) {
+					setAutomationClimbing();
+				} else if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_Y)) {
+					setAutomationClimbingLow();
+				}
+			}
+			if (isPressedPOV(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.POV_DOWN)) {
 				drives.toArms();
 			}
 			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_START)) {
@@ -157,12 +199,11 @@ public class TeleOP implements Controls {
 				System.out.println("Button pressed");
 				hab.ctrlUP();
 			}
-
 			break;
 		case AUTOMATION:
-			if(!bzzzzzz.get()) {
-				bzzzzzz.set(true);
-			}
+//			if(!bzzzzzz.get()) {
+//				bzzzzzz.set(true);
+//			}
 			auto.execute();
 			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_B)) {
 				auto.setDone(true);

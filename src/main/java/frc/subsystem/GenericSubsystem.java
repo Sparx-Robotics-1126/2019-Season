@@ -21,11 +21,15 @@ public abstract class GenericSubsystem extends Thread {
 	private double timeToPrint;
 	private double lastPrinted;
 	
-	public GenericSubsystem(String name) {
+	public GenericSubsystem(String name, int priority) {
 		this.name = name;
 		timeToPrint = 1;
 		lastPrinted = Timer.getFPGATimestamp();
-		setPriority(Thread.NORM_PRIORITY);
+		setPriority(priority);
+	}
+	
+	public GenericSubsystem(String name) {
+		this(name, Thread.NORM_PRIORITY);
 	}
 	
 	public static void addToTables(Sendable sendable, String subsystem, String name) {
