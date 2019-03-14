@@ -19,8 +19,8 @@ public class Logger extends GenericSubsystem {
 
 	private String logName;
 	private final String COMPRESSION_MODE = "TAR.GZ";
-//	private final String LOGS_DIRECTORY_LOCATION = "/home/lvuser/logs/"; //starting from the home directory
-		private final String LOGS_DIRECTORY_LOCATION = "C:\\Sparx\\"; //starting from the home directory
+	private final String LOGS_DIRECTORY_LOCATION = "/home/lvuser/logs/"; //starting from the home directory
+//	private final String LOGS_DIRECTORY_LOCATION = "C:\\Sparx\\"; //starting from the home directory
 	private boolean logReady;
 	private final boolean LOG_TO_CONSOLE = true;
 	private final static int MAXSAVEDFILES = 10;
