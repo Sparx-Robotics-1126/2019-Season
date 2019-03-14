@@ -458,11 +458,10 @@ public class Logger extends GenericSubsystem {
 	}
 
 	@Override
-	public void run() {
+	public void execute() {
 		StringBuilder builder = new StringBuilder();
 		while(!isInterrupted()) {
 			try {
-				sleep(2000);
 				if(logReady) {
 					while(printToLog.size() > 0) {
 						builder.append(printToLog.remove());
@@ -478,14 +477,9 @@ public class Logger extends GenericSubsystem {
 	}
 
 	@Override
-	public void execute() {
-
-	}
-
-	@Override
 	public long sleepTime() {
 		// TODO Auto-generated method stub
-		return 0;
+		return 2000;
 	}
 
 }

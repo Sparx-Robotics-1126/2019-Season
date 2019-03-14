@@ -8,11 +8,14 @@
 package frc.controls;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.controls.Automation.AutoMethod;
 import frc.subsystem.Drives;
 import frc.subsystem.Drives.DriveState;
 import frc.subsystem.HAB;
 import frc.subsystem.Hatch;
+import frc.util.Debugger;
 
 /**
  * Add your docs here.
@@ -25,8 +28,13 @@ public class TeleOP implements Controls {
 	private HAB hab;
 	private Hatch hatch;
 	private Automation auto;
+	private Debugger debugger;
 
 	private TeleState state;
+	
+	private SendableChooser<DebugState> debug;
+	
+	private boolean inputPressed;
 	
 	private boolean[][] buttonStates = { { false, false }, // XBOX_A
 			{ false, false }, // XBOX_B
@@ -62,20 +70,45 @@ public class TeleOP implements Controls {
 			{ false, false }, // XBOX_DOWN
 			{ false, false } }; // XBOX_LEFT
 
-	public TeleOP(Drives drives, HAB hab, Hatch hatch) {
+	public TeleOP(Drives drives, HAB hab, Hatch hatch, Debugger debug) {
 		this.drives = drives;
 		this.hab = hab;
 		this.hatch = hatch;
+		this.debugger = debug;
 		this.auto = new Automation(drives, hatch, hab);
 		joysticks = new Joystick[] {new Joystick(CtrlMap.XBOXCONTROLLER_MAIN), new Joystick(CtrlMap.XBOXCONTROLLER_CLIMBING)};
 		state = TeleState.TELEOP;
+		inputPressed = false;
+		addSendableChooser();
+		
 //		bzzzzzz = new Solenoid(IO.NOISEEEE_SOLENOID);
+	}
+	
+	private void addSendableChooser() {
+		debug = new SendableChooser<DebugState>();
+		debug.setDefaultOption("Debug disabled", DebugState.DEBUG_OFF);
+		debug.addOption("Debug passive (encoders, sensors)", DebugState.DEBUG_PASSIVE);
+		debug.addOption("Debug active", DebugState.DEBUG_ACTIVE);
+		SmartDashboard.putData(debug);
+	}
+	
+	private DebugState getSelectedDebugMode() {
+		if(debug != null) {
+			return debug.getSelected();
+		}
+		return DebugState.DEBUG_OFF;
 	}
 
 	public enum TeleState {
 		TELEOP,
 		CLIMBING,
 		DEBUG;
+	}
+	
+	public enum DebugState {
+		DEBUG_OFF,
+		DEBUG_PASSIVE,
+		DEBUG_ACTIVE;
 	}
 
 	private void setAutomationClimbing() {
@@ -126,6 +159,10 @@ public class TeleOP implements Controls {
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0);
 		auto.addStep(AutoMethod.AUTO_STOP);
 		state = TeleState.CLIMBING;
+	}
+	
+	private void setDebugActive() {
+		
 	}
 
 	@Override
@@ -208,10 +245,11 @@ public class TeleOP implements Controls {
 			auto.execute();
 			if(isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
 				
+				inputPressed = false;
 			} else if(isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_B)) {
 				
-			}
-			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_B)) {
+				inputPressed = false;
+			} else if(inputPressed) {
 				auto.setDone(true);
 				auto.stopAll();
 			}
@@ -294,7 +332,11 @@ public class TeleOP implements Controls {
 	 * @return if the button is pressed.
 	 */
 	public boolean isPressedButton(int joy, int button) {
-		return joysticks[joy].getRawButton(button);
+		if(joysticks[joy].getRawButton(button)) {
+			inputPressed = true;
+			return true;
+		}
+		return false; 
 	}
 
 	/**
@@ -306,7 +348,11 @@ public class TeleOP implements Controls {
 	 * @return if the trigger is pressed.
 	 */
 	public boolean isPressedTrigger(int joy, int trigger) {
-		return joysticks[joy].getRawAxis(trigger) > CtrlMap.TRIGGER_DEADBAND;
+		if(joysticks[joy].getRawAxis(trigger) > CtrlMap.TRIGGER_DEADBAND) {
+			inputPressed = true;
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -319,7 +365,11 @@ public class TeleOP implements Controls {
 	 * @return whether or not the POV on the joystick is pressed.
 	 */
 	public boolean isPressedPOV(int joy, int pov) {
-		return joysticks[joy].getPOV() == pov * 90;
+		if(joysticks[joy].getPOV() == pov * 90) {
+			inputPressed = true;
+			return true;
+		}
+		return false;
 	}
 
 	/**

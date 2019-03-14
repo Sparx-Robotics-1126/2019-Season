@@ -19,8 +19,8 @@ public class IO {
     public static final int DRIVES_LEFTMOTOR_2 =							2;
     public static final int DRIVES_LEFTMOTOR_3 =							3;
     
-    public static final int DRIVES_RIGHTENCODER_CH1 =						11; //10
-    public static final int DRIVES_RIGHTENCODER_CH2 =						10; //11
+    public static final int DRIVES_RIGHTENCODER_CH1 =						10; //10
+    public static final int DRIVES_RIGHTENCODER_CH2 =						11; //11
     public static final int DRIVES_LEFTENCODER_CH1 =						12;
     public static final int DRIVES_LEFTENCODER_CH2 =						13;
     

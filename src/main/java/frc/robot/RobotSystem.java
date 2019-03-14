@@ -40,7 +40,8 @@ public class RobotSystem extends Thread{
 		drives = new Drives();
 		hab = new HAB();
 		hatch = new Hatch();
-		teleop = new TeleOP(drives, hab, hatch);
+		debugger = new Debugger();
+		teleop = new TeleOP(drives, hab, hatch, debugger);
 		autonomous = new Autonomous(drives, hatch, hab);
 		currentState = RobotState.STANDBY;
 		currentControl = teleop;
@@ -48,7 +49,7 @@ public class RobotSystem extends Thread{
 		compress.setClosedLoopControl(true);
 		logger = new Logger();
 		logger.start();
-		debugger = new Debugger();
+
 		debugger.start();
 //		CameraServer.getInstance().startAutomaticCapture();
 	}
