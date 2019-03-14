@@ -52,7 +52,7 @@ public class Autonomous implements Controls{
 		autoSelector.addOption("Hab 1 to front hatch and to pickup station (and actually picks up!)", Autos.HAB_ONE_TO_LEFT_HATCH_FRONT_AND_PICKUP);
 		autoSelector.addOption("haHAA (no touchy)", Autos.AUTO_TEST);
 		autoSelector.addOption("Hab 1 to left rocket", Autos.HAB_ONE_TO_LEFT_ROCKET);
-		SmartDashboard.putData(autoSelector);
+		SmartDashboard.putData("Auto selector", autoSelector);
 		
 		selectedAuto = Autos.DO_NOTHING;
 		firstRun = true;
@@ -170,7 +170,13 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case AUTO_TEST:
-				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 216);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 30);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.5, 180);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 //				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.6, 65);
 //				automation.addStep(AutoMethod.DRIVES_WAIT);

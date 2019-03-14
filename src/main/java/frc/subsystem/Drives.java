@@ -94,7 +94,7 @@ public class Drives extends GenericSubsystem {
 
 	// ----------------------------------------Constants----------------------------------------
 
-	private final double ANGLE_OFF_BY = 2;
+	private static final double ANGLE_OFF_BY = 2;
 
 	private final double SLOW_TURNING_DEADBAND = 0.15;
 
@@ -223,15 +223,15 @@ public class Drives extends GenericSubsystem {
 					System.out.println("2: " + rightMtrs.get() + ", " + leftMtrs.get());
 					currentRate = gyro.getRate();
 					System.out.println("currentRate: " + currentRate);
-					if(currentRate < -SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
-						if(currentRate < -2) {
+					
+					if(currentRate > SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
+						if(currentRate > 2) {
 							turnSpeed = 0;
 						} else {
 							turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
 						}
-						//						turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
 						System.out.println("greater than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
-					} else if(currentRate > -SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
+					} else if(currentRate < SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
 						turnSpeed = turnSpeed + 0.05 <= 1 ? turnSpeed + 0.05 : 1;
 						System.out.println("less than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
 					}
@@ -252,16 +252,17 @@ public class Drives extends GenericSubsystem {
 				if (turnAngle > getAngle() - 45) {
 					currentRate = gyro.getRate();
 					System.out.println("currentRate: " + currentRate);
-					if(currentRate > SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
-						if(currentRate > 2) {
+					if(currentRate < -SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
+						if(currentRate < -2) {
 							turnSpeed = 0;
 						} else {
 							turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
 						}
-						System.out.println("greater than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
-					} else if(currentRate < SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
+						//						turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
+						System.out.println("greater than, left: " + rightMtrs.get() + ", left: " + leftMtrs.get());
+					} else if(currentRate > -SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
 						turnSpeed = turnSpeed + 0.05 <= 1 ? turnSpeed + 0.05 : 1;
-						System.out.println("less than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
+						System.out.println("less than, left: " + rightMtrs.get() + ", left: " + leftMtrs.get());
 					}
 				}
 				rightMtrs.set(turnSpeed);
@@ -461,7 +462,7 @@ public class Drives extends GenericSubsystem {
 
 	/** straightens the robot */
 	private void straightenForward() {
-		double reducedPower = ((Math.abs(getAngle()/ANGLE_OFF_BY)) > 1 ? 0 : Math.abs(getAngle()/ANGLE_OFF_BY))*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
+		double reducedPower = (Math.abs(getAngle())/ANGLE_OFF_BY) > 1 ? 0 : (ANGLE_OFF_BY - Math.abs(getAngle())/ANGLE_OFF_BY)*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
 		if (getAngle() > ANGLE_OFF_BY) {
 			wantedSpeedLeft = reducedPower;
 			//			System.out.println("correcting rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
@@ -483,7 +484,7 @@ public class Drives extends GenericSubsystem {
 
 	/** gets the angle the robot has turned since the last time the gyro was reset */
 	private double getAngle() {
-		return lastAngle - gyro.getAngle();
+		return gyro.getAngle() - lastAngle;
 	}
 
 	/** resets the gyro's angle so the robot turns to the angle from where the robot */
@@ -494,7 +495,7 @@ public class Drives extends GenericSubsystem {
 
 	/** resets the gyro's angle so the robot turns to the angle from where the robot */
 	private void resetGyroAngle(double lastAngle) {
-		this.lastAngle -= lastAngle;
+		this.lastAngle += lastAngle;
 		System.out.println("Reset: " + lastAngle);
 	}
 
