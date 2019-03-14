@@ -9,7 +9,7 @@ package frc.subsystem;
 
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import frc.util.Debugger;
 
 /**
  * Add your docs here.
@@ -33,8 +33,8 @@ public abstract class GenericSubsystem extends Thread {
 	}
 	
 	public static void addToTables(Sendable sendable, String subsystem, String name) {
-		LiveWindow.add(sendable);
-		sendable.setName(subsystem, name);
+		//LiveWindow won't update names sometimes for some reason? (but it does sometimes ?????)
+		Debugger.addToTable(sendable, name, subsystem);
 	}
 	
 	public void addToTables(Sendable sendable, String name) {
@@ -45,13 +45,19 @@ public abstract class GenericSubsystem extends Thread {
 
 	public abstract void execute();
 
-	public abstract boolean isDone();
-
 	public abstract long sleepTime();
 	
-	public abstract void delayedPrints();
+	public boolean isDone() {
+		return false;
+	}
 	
-	public abstract void smartDashboardInit();
+	public void delayedPrints() {
+		
+	}
+	
+	public void smartDashboardInit() {
+		
+	}
 
 	protected void log(String message) {
 		print(message);

@@ -19,12 +19,11 @@ public class Logger extends GenericSubsystem {
 
 	private String logName;
 	private final String COMPRESSION_MODE = "TAR.GZ";
-	private final String COUNTER_FILE = "counter.txt";
 //	private final String LOGS_DIRECTORY_LOCATION = "/home/lvuser/logs/"; //starting from the home directory
 		private final String LOGS_DIRECTORY_LOCATION = "C:\\Sparx\\"; //starting from the home directory
 	private boolean logReady;
 	private final boolean LOG_TO_CONSOLE = true;
-	private final int maxSavedFiles = 10;
+	private final static int MAXSAVEDFILES = 10;
 	private String[] stackInfo;
 
 	private PrintStream systemOut;
@@ -404,7 +403,7 @@ public class Logger extends GenericSubsystem {
 				counter = Integer.parseInt(name.substring(0, name.indexOf('-')));
 				System.out.println(counter);
 				if(name.endsWith(".tar.gz") || name.endsWith(".log")) {
-					if(counter > 9) {
+					if(counter > MAXSAVEDFILES) {
 						file.delete();
 					} else {
 						file.renameTo(new File((counter + 1) + name.substring(name.indexOf('-'))));
@@ -484,25 +483,9 @@ public class Logger extends GenericSubsystem {
 	}
 
 	@Override
-	public boolean isDone() {
-		return false;
-	}
-
-	@Override
 	public long sleepTime() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
-	public void delayedPrints() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void smartDashboardInit() {
-		// TODO Auto-generated method stub
-
-	}
 }

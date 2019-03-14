@@ -9,7 +9,6 @@ package frc.subsystem;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
@@ -24,8 +23,6 @@ public class HAB extends GenericSubsystem {
 	private WPI_TalonSRX leadScrewMtr;
 
 	private Encoder leadScrewEncRaw;
-
-	private DigitalInput bottomSensor;
 
 	private WPI_TalonSRX habLeft;
 
@@ -65,7 +62,7 @@ public class HAB extends GenericSubsystem {
 	}
 
 	public enum LeadScrewState {
-		STANDBY, UP, DOWN, HOME, PRE_ARMS, LEVELTWO;
+		STANDBY, UP, DOWN, PRE_ARMS, LEVELTWO;
 	} 
 
 	@Override

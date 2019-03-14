@@ -8,9 +8,7 @@
 package frc.controls;
 
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Solenoid;
 import frc.controls.Automation.AutoMethod;
-import frc.robot.IO;
 import frc.subsystem.Drives;
 import frc.subsystem.Drives.DriveState;
 import frc.subsystem.HAB;
@@ -29,9 +27,7 @@ public class TeleOP implements Controls {
 	private Automation auto;
 
 	private TeleState state;
-
-	private Solenoid bzzzzzz;
-
+	
 	private boolean[][] buttonStates = { { false, false }, // XBOX_A
 			{ false, false }, // XBOX_B
 			{ false, false }, // XBOX_X
@@ -78,7 +74,8 @@ public class TeleOP implements Controls {
 
 	public enum TeleState {
 		TELEOP,
-		AUTOMATION;
+		CLIMBING,
+		DEBUG;
 	}
 
 	private void setAutomationClimbing() {
@@ -103,7 +100,7 @@ public class TeleOP implements Controls {
 		auto.addStep(AutoMethod.DRIVES_WAIT);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0);
 		auto.addStep(AutoMethod.AUTO_STOP);
-		state = TeleState.AUTOMATION;
+		state = TeleState.CLIMBING;
 	}
 	
 	private void setAutomationClimbingLow() {
@@ -128,7 +125,7 @@ public class TeleOP implements Controls {
 		auto.addStep(AutoMethod.DRIVES_WAIT);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0);
 		auto.addStep(AutoMethod.AUTO_STOP);
-		state = TeleState.AUTOMATION;
+		state = TeleState.CLIMBING;
 	}
 
 	@Override
@@ -196,17 +193,35 @@ public class TeleOP implements Controls {
 				hab.ctrlUP();
 			}
 			break;
-		case AUTOMATION:
+		case CLIMBING:
 			auto.execute();
 			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_B)) {
 				auto.setDone(true);
 				auto.stopAll();
 			}
 			if(auto.isDone()) {
+				drives.toTeleop();
+				state = TeleState.TELEOP; //needed?
+			}
+			break;
+		case DEBUG:
+			auto.execute();
+			if(isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
+				
+			} else if(isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_B)) {
+				
+			}
+			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_B)) {
+				auto.setDone(true);
+				auto.stopAll();
+			}
+			if(auto.isDone()) {
+				drives.toTeleop();
 				state = TeleState.TELEOP; //needed?
 			}
 			break;
 		}
+		
 
 	}
 

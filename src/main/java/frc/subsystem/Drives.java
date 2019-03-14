@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import frc.robot.IO;
 import frc.subsystem.Vision.directions;
 import frc.util.MotorGroup;
@@ -603,14 +602,14 @@ public class Drives extends GenericSubsystem {
 		//		LiveWindow.remove(leftMtr1);
 		//		LiveWindow.remove(leftMtr2);
 		//		LiveWindow.remove(leftMtr3);
-//		addToTables(rightMtrs, "Right drives");
-//		addToTables(leftMtrs, "Left drives");
+		addToTables(rightMtrs, "Right drives");
+		addToTables(leftMtrs, "Left drives");
 		addToTables(rightEnc, "Right drives encoder");
 		addToTables(leftEnc, "Left drives encoder");
 		addToTables(shifter, "Shifter");
 		addToTables(drivesPTOArms, "Arms", "Drives PTO (Arms)");
 		addToTables(unsnappy, "Arms", "Unsnappy");
-		//		addToTables(gyro, "Gyro");
+		addToTables(gyro, "Gyro");
 	}
 
 }
