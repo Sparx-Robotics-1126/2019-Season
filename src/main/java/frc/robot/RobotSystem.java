@@ -47,8 +47,8 @@ public class RobotSystem extends Thread{
 		compress = new Compressor(IO.ROBOT_COMPRESSOR);
 		compress.setClosedLoopControl(true);
 		logger = new Logger();
-		debugger = new Debugger();
 		logger.start();
+		debugger = new Debugger();
 		debugger.start();
 //		CameraServer.getInstance().startAutomaticCapture();
 	}
