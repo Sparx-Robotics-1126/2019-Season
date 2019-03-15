@@ -44,14 +44,14 @@ public class Autonomous implements Controls{
 		automation = new Automation(drives, hatch, hab);
 		
 		autoSelector = new SendableChooser<Autos>();
-		autoSelector.setDefaultOption("Do Nothing", Autos.DO_NOTHING);
-		autoSelector.addOption("Hab to front hatch", Autos.HAB_TO_HATCH_FRONT);
+		autoSelector.addOption("Do Nothing", Autos.DO_NOTHING);
+		autoSelector.setDefaultOption("Hab to front hatch", Autos.HAB_TO_HATCH_FRONT);
 		autoSelector.addOption("Hab to middle hatch", Autos.HAB_TO_HATCH_MIDDLE);
 		autoSelector.addOption("Hab to back hatch", Autos.HAB_TO_HATCH_BACK);
 		autoSelector.addOption("Hab to front hatch and to pickup station", Autos.LEFT_HAB_TO_HATCH_FRONT_TO_PICKUP);
 		autoSelector.addOption("Hab to front hatch and to pickup station (and actually picks up!)", Autos.LEFT_HAB_TO_HATCH_FRONT_AND_PICKUP);
+		autoSelector.addOption("Left hab to left rocket", Autos.HAB_TO_LEFT_ROCKET);
 		autoSelector.addOption("haHAA (no touchy)", Autos.AUTO_TEST);
-		autoSelector.addOption("Hab to left rocket", Autos.HAB_TO_LEFT_ROCKET);
 		SmartDashboard.putData("Auto selector", autoSelector);
 		
 		selectedAuto = Autos.DO_NOTHING;
@@ -67,7 +67,11 @@ public class Autonomous implements Controls{
 	public void setAuto(Autos auto) {
 		reset();
 		firstRun = false;
-		if(auto != selectedAuto) {
+		
+		if(auto != selectedAuto || auto == null) {
+			if(auto == null) {
+				auto = Autos.HAB_TO_HATCH_FRONT;
+			}
 			switch(auto) {
 			case HAB_TO_HATCH_FRONT:
 //				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_FRONT");
