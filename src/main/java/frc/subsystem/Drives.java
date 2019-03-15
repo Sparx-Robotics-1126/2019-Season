@@ -94,15 +94,15 @@ public class Drives extends GenericSubsystem {
 
 	// ----------------------------------------Constants----------------------------------------
 
-	private static final double ANGLE_OFF_BY = 2;
-
+	private static final double ANGLE_OFF_BY = 1;
+	
 	private final double SLOW_TURNING_DEADBAND = 0.15;
 
 	private final double SLOW_TURNING_RATE = 0.8;
 
 	private final double TURN_SLOW_DEFAULT_PERCENT = 0.5;
 
-	private final double STRAIGHTEN_MIN_SPEED_MULTIPLIER = 0.8;
+	private final double STRAIGHTEN_MIN_SPEED_MULTIPLIER = 0.7;
 
 	// ------------------------------------------Code-------------------------------------------
 
@@ -335,6 +335,11 @@ public class Drives extends GenericSubsystem {
 			rightMtrs.set(wantedSpeedRight);
 			break;
 		case FINDING_LINE:
+			if(getDistance() > 36) {
+				leftMtrs.stopMotors();
+				rightMtrs.stopMotors();
+				changeState(DriveState.TELEOP);
+			}
 			System.out.println("finding line");
 			vision.getDirection();
 			if(moveDist != -1 && moveDist < getDistance()) {
@@ -462,12 +467,12 @@ public class Drives extends GenericSubsystem {
 
 	/** straightens the robot */
 	private void straightenForward() {
-//		double reducedPower = (Math.abs(getAngle())/ANGLE_OFF_BY) > 1 ? 0 : (Math.abs(getAngle())/ANGLE_OFF_BY)*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
-		double reducedPower = (Math.abs(getAngle())/ANGLE_OFF_BY) > 1 ? 0 : (ANGLE_OFF_BY - Math.abs(getAngle())/ANGLE_OFF_BY)*wantedSpeedLeft*(1 - 0.4) + wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER);
-		if (getAngle() > ANGLE_OFF_BY) {
+		double reducedPower = (Math.abs(getAngle())/ANGLE_OFF_BY) > 1 ? 0 : ((ANGLE_OFF_BY - Math.abs(getAngle()))/ANGLE_OFF_BY)*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
+//		double reducedPower = (Math.abs(getAngle())/ANGLE_OFF_BY) > 1 ? 0 : (ANGLE_OFF_BY - Math.abs(getAngle())/ANGLE_OFF_BY)*wantedSpeedLeft*(1 - 0.4) + wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER);
+		if (getAngle() > 0) {
 			wantedSpeedLeft = reducedPower;
 			//			System.out.println("correcting rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
-		} else if (getAngle() < -ANGLE_OFF_BY) {
+		} else if (getAngle() < 0) {
 			//			System.out.println("correcting oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
 			wantedSpeedRight = reducedPower;
 		}
