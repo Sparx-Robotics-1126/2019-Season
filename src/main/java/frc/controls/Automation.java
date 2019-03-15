@@ -99,6 +99,11 @@ public class Automation {
 		DRIVES_LOWGEAR(0),
 		DRIVES_RESETANGLE(0),
 		/**
+		 * Sets drives to a gear
+		 * @param 1 = high gear, 0 = low gear
+		 */
+		DRIVES_SETGEAR(1),
+		/**
 		 * Moves hab wheels forward (or backwards with -) at a given speed.
 		 * @param speed - the speed at which to move the HAB wheels forward.
 		 */
@@ -364,6 +369,10 @@ public class Automation {
 				break;
 			case DRIVES_HIGHGEAR:
 				drives.highShift();
+				currentStep++;
+				break;
+			case DRIVES_SETGEAR:
+				drives.setShifting(currentStepData[0] == 1 ? true : false);
 				currentStep++;
 				break;
 			case DRIVES_WAIT:

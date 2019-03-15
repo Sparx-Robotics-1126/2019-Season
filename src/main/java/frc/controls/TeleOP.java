@@ -80,6 +80,7 @@ public class TeleOP implements Controls {
 
 	private void setAutomationClimbing() {
 		auto.reset();
+		auto.addStep(AutoMethod.DRIVES_SETGEAR, 0);
 		auto.addStep(AutoMethod.HAB_PREARMS); //-
 		auto.addStep(AutoMethod.DRIVES_ARMS_DOWN);
 		auto.addStep(AutoMethod.HAB_WAIT);
@@ -105,6 +106,7 @@ public class TeleOP implements Controls {
 	
 	private void setAutomationClimbingLow() {
 		auto.reset();
+		auto.addStep(AutoMethod.DRIVES_SETGEAR, 0);
 		auto.addStep(AutoMethod.HAB_PREARMS); //-
 		auto.addStep(AutoMethod.DRIVES_ARMS_DOWN);
 		auto.addStep(AutoMethod.HAB_WAIT);
@@ -154,6 +156,9 @@ public class TeleOP implements Controls {
 				drives.toAmazingStraightness();
 			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R2)) {
 				drives.changeState(DriveState.TELEOP);
+			}
+			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L2)) {
+				drives.toggleShifting();
 			}
 			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
 				drives.findLine();
@@ -368,7 +373,7 @@ public class TeleOP implements Controls {
 //		buttonStates[8][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L3);
 //		buttonStates[9][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R3);
 		
-//		buttonStates[10][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L2_AXIS);
+		buttonStates[10][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L2_AXIS);
 		buttonStates[11][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R2_AXIS);
 
 		buttonStates[12][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_A);

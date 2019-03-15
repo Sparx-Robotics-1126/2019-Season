@@ -528,6 +528,14 @@ public class Drives extends GenericSubsystem {
 		resetGyroAngle();
 		changeState(DriveState.AMAZING_STRAIGHTNESS);
 	}
+	
+	public void setShifting(boolean shiftingValue) {
+		shifter.set(shiftingValue);
+	}
+	
+	public void toggleShifting() {
+		shifter.set(!shifter.get());
+	}
 
 	public void togglePTO() {
 		drivesPTOArms.set(!drivesPTOArms.get());
