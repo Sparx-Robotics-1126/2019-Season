@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.subsystem.Vision.directions;
 import frc.util.MotorGroup;
@@ -158,6 +159,11 @@ public class Drives extends GenericSubsystem {
 
 	/* Runs all the code for drives */
 	public void execute() {
+		if(shifter.get()) {
+			SmartDashboard.putString("SHIFTER", "High gear");
+		} else {
+			SmartDashboard.putString("SHIFTER", "Low gear");
+		}
 		if (state != DriveState.ARMS && drivesPTOArms.get()) {
 			drivesPTOArms.set(false);
 		}
