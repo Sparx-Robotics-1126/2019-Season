@@ -20,16 +20,26 @@ public enum IO {
 	private final int port;
 	private final String name;
 	private final int uniqueID;
-	private static int uniqueIDCounter;
 	
+	
+	
+	private static final class IDCounter {
+		private static int uniqueIDCounter = 0;
+	}
 	
 
 	private IO(int port, String name) {
 		this.port = port;
 		this.name = name;
+		uniqueID = IDCounter.uniqueIDCounter++;
+//		uniqueIDCounter = 0;
 //		System.out.println(uniqueIDCounter);
 //		uniqueID = IO.uniqueIDCounter;
 //		uniqueIDCounter++;
+	}
+	
+	public String toString() {
+		return port + "";
 	}
 	
 //    public static final int DRIVES_RIGHTMOTOR_1 =							10;
