@@ -128,7 +128,7 @@ public class Debugger extends GenericSubsystem{
 		}
 		
 	}
-
+	
 	private static class Component {
 
 		private final Sendable sendable;
@@ -146,6 +146,14 @@ public class Debugger extends GenericSubsystem{
 		}
 
 	}
+	
+	public interface Debuggable {
+		
+		public int debug(Sendable sendable);
+		
+	}
+
 
 
 }
+

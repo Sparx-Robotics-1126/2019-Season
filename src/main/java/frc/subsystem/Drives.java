@@ -12,17 +12,19 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.IO;
 import frc.subsystem.Vision.directions;
+import frc.util.Debugger.Debuggable;
 import frc.util.MotorGroup;
 
 /**
  * Add your docs here.
  */
-public class Drives extends GenericSubsystem {
+public class Drives extends GenericSubsystem implements Debuggable {
 
 	// --------------------------------------Motors/Sensors-------------------------------------
 
@@ -610,6 +612,12 @@ public class Drives extends GenericSubsystem {
 		addToTables(drivesPTOArms, "Arms", "Drives PTO (Arms)");
 		addToTables(unsnappy, "Arms", "Unsnappy");
 		addToTables(gyro, "Gyro");
+	}
+
+	@Override
+	public int debug(Sendable sendable) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

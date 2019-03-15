@@ -119,7 +119,7 @@ public class Hatch extends GenericSubsystem {
 
 	@Override
 	public void smartDashboardInit() {
-		addToTables(flipper, "Flipper");
+		addToTables(flipper, "Flipper", IO.IOs.uniqueid);
 		addToTables(shooter, "Shooter");
 	}
 
