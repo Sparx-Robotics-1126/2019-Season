@@ -18,13 +18,13 @@ public class Vision {
 
 	private directions direction;
 
-	private DigitalInput leftIR;
+	public DigitalInput leftIR;
 
-	private DigitalInput centerLeftIR;
+	public DigitalInput centerLeftIR;
 
-	private DigitalInput centerRightIR;
+	public DigitalInput centerRightIR;
 
-	private DigitalInput rightIR;
+	public DigitalInput rightIR;
 
 	private boolean hitLine, centerHit, rightHitFirst;
 
@@ -45,6 +45,23 @@ public class Vision {
 
 	public enum directions {
 		LEFT, SLIGHTLEFT, STANDBY, FORWARD, RIGHT, SLIGHTRIGHT
+	}
+	
+	public boolean getleftIR()
+	{
+		return !leftIR.get();
+	}
+	public boolean getCenterleftIR()
+	{
+		return !centerLeftIR.get();
+	}
+	public boolean getrightIR()
+	{
+		return !rightIR.get();
+	}
+	public boolean getcenterRightIR()
+	{
+		return !centerRightIR.get();
 	}
 	
 	public directions getDirection() {

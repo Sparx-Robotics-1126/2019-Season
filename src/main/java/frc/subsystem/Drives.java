@@ -94,7 +94,7 @@ public class Drives extends GenericSubsystem {
 
 	// ----------------------------------------Constants----------------------------------------
 
-	private static final double ANGLE_OFF_BY = 1;
+	private static final double ANGLE_OFF_BY = 2;
 	
 	private final double SLOW_TURNING_DEADBAND = 0.15;
 
@@ -316,7 +316,7 @@ public class Drives extends GenericSubsystem {
 			}
 			break;
 		case ARMS:
-			if (timer + 0.8 < Timer.getFPGATimestamp()) {
+			if (timer + 2.5 < Timer.getFPGATimestamp()) {
 				drivesPTOArms.set(true);
 				arms.armsDown();
 				if (arms.isDone()) {
@@ -335,7 +335,7 @@ public class Drives extends GenericSubsystem {
 			rightMtrs.set(wantedSpeedRight);
 			break;
 		case FINDING_LINE:
-			if(getDistance() > 36) {
+			if(getDistance() > 48) {
 				leftMtrs.stopMotors();
 				rightMtrs.stopMotors();
 				changeState(DriveState.TELEOP);
@@ -467,7 +467,7 @@ public class Drives extends GenericSubsystem {
 
 	/** straightens the robot */
 	private void straightenForward() {
-		double reducedPower = (Math.abs(getAngle())/ANGLE_OFF_BY) > 1 ? 0 : ((ANGLE_OFF_BY - Math.abs(getAngle()))/ANGLE_OFF_BY)*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
+		double reducedPower = (Math.abs(getAngle())/ANGLE_OFF_BY) > 1 ? wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER : ((ANGLE_OFF_BY - Math.abs(getAngle()))/ANGLE_OFF_BY)*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
 //		double reducedPower = (Math.abs(getAngle())/ANGLE_OFF_BY) > 1 ? 0 : (ANGLE_OFF_BY - Math.abs(getAngle())/ANGLE_OFF_BY)*wantedSpeedLeft*(1 - 0.4) + wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER);
 		if (getAngle() > 0) {
 			wantedSpeedLeft = reducedPower;
@@ -617,6 +617,10 @@ public class Drives extends GenericSubsystem {
 		addToTables(drivesPTOArms, "Arms", "Drives PTO (Arms)");
 		addToTables(unsnappy, "Arms", "Unsnappy");
 		addToTables(gyro, "Gyro");
+		addToTables(vision.centerLeftIR, "Vision", "CLIR");
+		addToTables(vision.leftIR, "Vision",  "LIR");
+		addToTables(vision.centerRightIR, "Vision",  "CRIR");
+		addToTables(vision.rightIR, "Vision", "R IR");
 	}
 
 }

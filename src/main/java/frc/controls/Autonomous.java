@@ -78,6 +78,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_DELAY, 1);
 				automation.addStep(AutoMethod.HATCH_SHOOTFLIP);	
 				automation.addStep(AutoMethod.AUTO_DELAY, 0.25);
+				automation.addStep(AutoMethod.DRIVES_RESETANGLE);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.AUTO_STOP);
@@ -90,6 +91,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.HATCH_SHOOTFLIP);
 				automation.addStep(AutoMethod.AUTO_DELAY, 0.2);
+				automation.addStep(AutoMethod.DRIVES_RESETANGLE);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
@@ -101,6 +103,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.HATCH_SHOOTFLIP);
 				automation.addStep(AutoMethod.AUTO_DELAY, 0.2);
+				automation.addStep(AutoMethod.DRIVES_RESETANGLE);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
@@ -112,6 +115,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_DELAY, 1.35);
 				automation.addStep(AutoMethod.HATCH_SHOOTFLIP);	
 				automation.addStep(AutoMethod.AUTO_DELAY, 0.45);
+				automation.addStep(AutoMethod.DRIVES_RESETANGLE);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.65, 115);

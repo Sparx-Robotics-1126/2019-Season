@@ -365,10 +365,11 @@ public class TeleOP implements Controls {
 		buttonStates[5][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R1);
 //		buttonStates[6][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_BACK);
 //		buttonStates[7][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_START);
-//		buttonStates[8][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L2);
-		buttonStates[9][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R2);
-//		buttonStates[10][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L3);
-//		buttonStates[11][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R3);
+//		buttonStates[8][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L3);
+//		buttonStates[9][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R3);
+		
+//		buttonStates[10][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L2_AXIS);
+		buttonStates[11][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R2_AXIS);
 
 		buttonStates[12][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_A);
 		buttonStates[13][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_B);
@@ -379,10 +380,11 @@ public class TeleOP implements Controls {
 		buttonStates[17][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_R1);
 		buttonStates[18][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_BACK);
 		buttonStates[19][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_START);
-//		buttonStates[20][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_L2);
-//		buttonStates[21][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_R2);
-//		buttonStates[22][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_L3);
-//		buttonStates[23][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_R3);
+//		buttonStates[20][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_L3);
+//		buttonStates[21][0] = isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_R3);
+		
+//		buttonStates[22][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_L2_AXIS);
+//		buttonStates[23][0] = isPressedTrigger(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_R2_AXIS);
 		//
 		// povStates[0][0] = isPressedPOV(CtrlMap.RIGHTJOYSTICK, CtrlMap.POV_UP);
 		// povStates[1][0] = isPressedPOV(CtrlMap.RIGHTJOYSTICK, CtrlMap.POV_RIGHT);
