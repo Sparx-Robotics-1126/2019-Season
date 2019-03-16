@@ -171,9 +171,9 @@ public class Drives extends GenericSubsystem {
 		case STANDBY:
 			break;
 		case TELEOP:
-//			if(shifter.get()) {
-//				lowShift();
-//			}
+			if(shifter.get()) {
+				lowShift();
+			}
 			rightMtrs.set(speedRight);
 			leftMtrs.set(speedLeft);
 			break;

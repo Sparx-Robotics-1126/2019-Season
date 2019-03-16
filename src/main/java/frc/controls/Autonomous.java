@@ -11,7 +11,6 @@ import frc.subsystem.Hatch;
 public class Autonomous implements Controls{
 	
 	private Autos selectedAuto;
-
 	
 	@SuppressWarnings("unused")
 	private Drives drives;
@@ -74,7 +73,8 @@ public class Autonomous implements Controls{
 			}
 			switch(auto) {
 			case HAB_TO_HATCH_FRONT:
-//				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_FRONT");
+				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_FRONT");
+				automation.addStep(AutoMethod.AUTO_DELAY, 5);
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 186); //-
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
