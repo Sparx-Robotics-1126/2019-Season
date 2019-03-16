@@ -10,11 +10,13 @@ package frc.subsystem;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.IO;
+import frc.util.Logger.LogHolder;
+import frc.util.Logger.Loggable;
 
 /**
  * Add your docs here.
  */
-public class Hatch extends GenericSubsystem {
+public class Hatch extends GenericSubsystem implements Loggable{
 
 	private Solenoid flipper;
 
@@ -123,4 +125,11 @@ public class Hatch extends GenericSubsystem {
 		addToTables(shooter, "Shooter");
 	}
 
+	@Override
+	public void logPeriodic(LogHolder lh) {
+		lh.updateLogClass("Hatch_Periodic");
+		lh.logLine("Flipper: " + flipper.get());
+		lh.logLine("Shooter: " + shooter.get());
+	}
+	
 }

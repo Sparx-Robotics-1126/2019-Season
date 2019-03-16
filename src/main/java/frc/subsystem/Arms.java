@@ -55,10 +55,6 @@ public class Arms {
 	
 	private boolean isDone;
 	
-	private SendableBoolean leftStatus;
-	
-	private SendableBoolean rightStatus;
-
 	private boolean stopLeft;
 
 	private boolean stopRight;
@@ -80,11 +76,11 @@ public class Arms {
 		rightInput = new DigitalInput(IO.ARMS_LIMITSWITCH_RIGHT);
 		GenericSubsystem.addToTables(leftInput, "Arms", "Left Limit Switch");
 		GenericSubsystem.addToTables(rightInput, "Arms", "Right Limit Switch");
-		leftStatus = new SendableBoolean("Left arm locked");
-		rightStatus = new SendableBoolean("Right arm locked");
-		SmartDashboard.putData("Left Limit Switch Status", leftStatus);
-		SmartDashboard.putData("Right Limit Switch Status", rightStatus);
-		SmartDashboard.putBoolean("haHAA", false);
+//		leftStatus = new SendableBoolean("Left arm locked");
+//		rightStatus = new SendableBoolean("Right arm locked");
+//		SmartDashboard.putData("Left Limit Switch Status", leftStatus);
+//		SmartDashboard.putData("Right Limit Switch Status", rightStatus);
+//		SmartDashboard.putBoolean("haHAA", false);
 	}
 
 	public void reset() {
@@ -94,8 +90,6 @@ public class Arms {
 		leftArmEnc.reset();
 		actualDegreeLeft = 0;
 		actualDegreeRight = 0;
-		leftStatus.set(false);
-		rightStatus.set(false);
 	}
 
 	public void armsDown() {
@@ -115,7 +109,6 @@ public class Arms {
 			actualDegreeLeft = -leftArmEnc.getDistance();
 			leftMtrs.set(wantedLeftMtrPwr);
 		} else {
-			leftStatus.set(true);
 			leftMtrs.set(0);
 		}
 		if (wantedDegree > actualDegreeRight && (!stopRight || (stopRight && !rightInput.get()))) {
@@ -133,7 +126,6 @@ public class Arms {
 			actualDegreeRight = rightArmEnc.getDistance();
 			rightMtrs.set(wantedRightMtrPwr);
 		} else {
-			rightStatus.set(true);
 			rightMtrs.set(0);
 		}
 		if (isDone) {

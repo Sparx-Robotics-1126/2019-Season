@@ -46,7 +46,7 @@ public class RobotSystem extends Thread{
 		currentControl = teleop;
 		compress = new Compressor(IO.ROBOT_COMPRESSOR);
 		compress.setClosedLoopControl(true);
-		logger = new Logger();
+		logger = Logger.getInstance();
 		logger.start();
 		debugger = new Debugger();
 		debugger.start();
@@ -87,6 +87,9 @@ public class RobotSystem extends Thread{
 		drives.start();
 		hab.start();
 		hatch.start();
+//		logger.addPeriodicLog(drives::logPeriodic);
+//		logger.addPeriodicLog(hab::logPeriodic);
+//		logger.addPeriodicLog(hatch::logPeriodic);
 	}
 
 	@Override

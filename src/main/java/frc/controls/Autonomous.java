@@ -75,7 +75,7 @@ public class Autonomous implements Controls{
 			switch(auto) {
 			case HAB_TO_HATCH_FRONT:
 //				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_FRONT");
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 192); //-
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 186); //-
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);

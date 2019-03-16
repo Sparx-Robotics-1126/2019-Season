@@ -18,12 +18,14 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.subsystem.Vision.directions;
+import frc.util.Logger.LogHolder;
+import frc.util.Logger.Loggable;
 import frc.util.MotorGroup;
 
 /**
  * Add your docs here.
  */
-public class Drives extends GenericSubsystem {
+public class Drives extends GenericSubsystem implements Loggable {
 
 	// --------------------------------------Motors/Sensors-------------------------------------
 
@@ -636,5 +638,31 @@ public class Drives extends GenericSubsystem {
 		addToTables(vision.centerRightIR, "Vision",  "CRIR");
 		addToTables(vision.rightIR, "Vision", "R IR");
 	}
+	
+	@Override
+	public void logPeriodic(LogHolder lh) {
+		lh.updateLogClass("DRIVES_PERIODIC");
+		lh.logLine("Left drives motors: " + leftMtrs.get());
+		lh.logLine("Right drives motors: " + rightMtrs.get());
+		lh.logLine("Left drives encoder: " + leftEnc.getDistance());
+		lh.logLine("Right drives encoder: " + rightEnc.getDistance());
+		lh.logLine("Shifter: " + (shifter.get() ? "High Gear" : "Low Gear"));
+		if(gyro != null) {
+			lh.logLine("Gyro (virtual angle): " + getAngle());
+			lh.logLine("Gyro (real angle): " + gyro.getAngle());
+		}
+		if(vision != null) {
+			lh.updateLogClass("VISION_PERIODIC");
+			lh.logLine("Vision Left IR: " + vision.getLeftIR());
+			lh.logLine("Vision CenterLeft IR: " + vision.getCenterLeftIR());
+			lh.logLine("Vision CenterRight IR: " + vision.getCenterRightIR());
+			lh.logLine("Vision Right IR: " + vision.getRightIR());
+		}
+		lh.updateLogClass("ARMS_PERIODIC");
+		lh.logLine("Arms PTO: " + drivesPTOArms.get());
+		lh.logLine("Unsnappy: " + unsnappy.get());
+		
+	}
+
 
 }
