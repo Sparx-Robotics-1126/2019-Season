@@ -157,9 +157,9 @@ public class TeleOP implements Controls {
 			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R2)) {
 				drives.changeState(DriveState.TELEOP);
 			}
-			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L2)) {
-				drives.toggleShifting();
-			}
+//			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L2)) {
+//				drives.toggleShifting();
+//			}
 			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
 				drives.findLine();
 			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
@@ -186,11 +186,25 @@ public class TeleOP implements Controls {
 			}
 			if (isPressedPOV(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.POV_DOWN)) {
 				drives.toArms();
+				//				hab.ctrlUP();
+			} 
+//			else if (isPressedPOV(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.POV_DOWN)) {
+//				hab.ctrlDown();
+//			}
+//			if (isPressedPOV(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.POV_UP)) {
+//				hab.ctrlUP();
+//			} else if (isPressedPOV(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.POV_DOWN)) {
+//				hab.ctrlDown();
+//			} else {
+//				hab.setHabScrew(0);
+//			}
+			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_BACK)) {
+				hab.ctrlLevelTwo();
 			}
 			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_START)) {
 				hab.ctrlDown();
 			}
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_BACK)) {
+			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_R1)) {
 				hab.ctrlPreArms();
 			}
 			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_X)) {
