@@ -32,7 +32,7 @@ public class Autonomous implements Controls{
 		HAB_TO_HATCH_BACK,
 		LEFT_HAB_TO_HATCH_FRONT_TO_PICKUP,
 		LEFT_HAB_TO_HATCH_FRONT_AND_PICKUP,
-		HAB_TO_LEFT_ROCKET,
+		HAB_TO_LEFT_ROCKET, HAB_TO_GROUND,
 		AUTO_TEST;
 	}
 
@@ -50,6 +50,7 @@ public class Autonomous implements Controls{
 		autoSelector.addOption("Hab to front hatch and to pickup station", Autos.LEFT_HAB_TO_HATCH_FRONT_TO_PICKUP);
 		autoSelector.addOption("Hab to front hatch and to pickup station (and actually picks up!)", Autos.LEFT_HAB_TO_HATCH_FRONT_AND_PICKUP);
 		autoSelector.addOption("Left hab to left rocket", Autos.HAB_TO_LEFT_ROCKET);
+		autoSelector.addOption("Hab to ground", Autos.HAB_TO_GROUND);
 		autoSelector.addOption("haHAA (no touchy)", Autos.AUTO_TEST);
 		SmartDashboard.putData("Auto selector", autoSelector);
 		
@@ -74,7 +75,7 @@ public class Autonomous implements Controls{
 			case HAB_TO_HATCH_FRONT:
 				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_FRONT");
 				automation.addStep(AutoMethod.AUTO_DELAY, 5);
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 200); //186
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 186); //-
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
@@ -83,6 +84,13 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_DELAY, 0.25);
 				automation.addStep(AutoMethod.DRIVES_RESETANGLE);
 				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
+				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.AUTO_STOP);
+				break;
+			case HAB_TO_GROUND:
+				System.out.println("Auto set - HAB_TO_GROUND");
+				automation.addStep(AutoMethod.AUTO_DELAY, 5);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 200); 
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
