@@ -117,7 +117,7 @@ public class TeleOP implements Controls {
 		auto.addStep(AutoMethod.HAB_WAIT);	
 		//		auto.addStep(AutoMethod.DRIVES_STOP);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 1);
-		auto.addStep(AutoMethod.AUTO_DELAY, 2.85); 
+		auto.addStep(AutoMethod.AUTO_DELAY, 3.2); 
 		auto.addStep(AutoMethod.HAB_UP);
 		auto.addStep(AutoMethod.HAB_WHEELS_FORWARD, 0);
 		auto.addStep(AutoMethod.HAB_WAIT);
@@ -129,6 +129,16 @@ public class TeleOP implements Controls {
 		auto.addStep(AutoMethod.AUTO_STOP);
 		state = TeleState.CLIMBING;
 	}
+	
+	/**
+	 * CONTROLS
+	 * DRIVER CONTROLLER:
+	 * LEFT THUMBSTICK - left drives
+	 * RIGHT THUMBSTICK - right drives
+	 * RIGHT BUMPER - hatch pickup (hold)
+	 * LEFT BUMPER - hatch shooter (hold)
+	 * RIGHT TRIGGER - move forward fully until button is released
+	 */
 
 	@Override
 	public void execute() {
@@ -157,9 +167,9 @@ public class TeleOP implements Controls {
 			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R2)) {
 				drives.changeState(DriveState.TELEOP);
 			}
-			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L2)) {
-				drives.toggleShifting();
-			}
+//			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L2)) {
+//				drives.toggleShifting();
+//			}
 			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
 				drives.findLine();
 			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
@@ -186,11 +196,14 @@ public class TeleOP implements Controls {
 			}
 			if (isPressedPOV(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.POV_DOWN)) {
 				drives.toArms();
+			} 
+			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_BACK)) {
+				hab.ctrlLevelTwo();
 			}
 			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_START)) {
 				hab.ctrlDown();
 			}
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_BACK)) {
+			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_R1)) {
 				hab.ctrlPreArms();
 			}
 			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_X)) {

@@ -105,6 +105,10 @@ public class HAB extends GenericSubsystem implements Loggable{
 		habRight.set(wantedSpeedRight);
 	}
 	
+	public void setHabScrew(double value) {
+		leadScrewMtr.set(value);
+	}
+	
 	@Override
 	public void delayedPrints() {
 		System.out.println("Lead screw: " + leadScrewEncRaw.getDistance());
