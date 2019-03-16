@@ -75,17 +75,17 @@ public class Autonomous implements Controls{
 			case HAB_TO_HATCH_FRONT:
 				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_FRONT");
 				automation.addStep(AutoMethod.AUTO_DELAY, 5);
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 186); //-
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 200); //186
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.AUTO_DELAY, 1);
-				automation.addStep(AutoMethod.HATCH_SHOOTFLIP);	
-				automation.addStep(AutoMethod.AUTO_DELAY, 0.25);
-				automation.addStep(AutoMethod.DRIVES_RESETANGLE);
-				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.AUTO_STOP);
+//				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.AUTO_DELAY, 1);
+//				automation.addStep(AutoMethod.HATCH_SHOOTFLIP);	
+//				automation.addStep(AutoMethod.AUTO_DELAY, 0.25);
+//				automation.addStep(AutoMethod.DRIVES_RESETANGLE);
+//				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case HAB_TO_HATCH_MIDDLE:
 				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_MIDDLE");
