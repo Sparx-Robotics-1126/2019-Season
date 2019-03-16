@@ -403,11 +403,11 @@ public class Logger extends GenericSubsystem {
 				counter = Integer.parseInt(name.substring(0, name.indexOf('-')));
 				counter++;
 				System.out.println(counter);
-				if(name.endsWith(".tar.gz") || name.endsWith(".log")) {
+				if(name.endsWith(".tar.gz")) {
 					if(counter > MAXSAVEDFILES) {
 						file.delete();
 					} else {
-						file.renameTo(new File(counter + name.substring(name.indexOf('-'))));
+						file.renameTo(new File(LOGS_DIRECTORY_LOCATION + counter + name.substring(name.indexOf('-'))));
 					}
 				}
 				if(name.endsWith(".log")) {
