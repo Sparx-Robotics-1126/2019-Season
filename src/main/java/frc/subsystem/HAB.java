@@ -78,7 +78,7 @@ public class HAB extends GenericSubsystem {
 			}
 			break;
 		case DOWN:
-			if (leadScrewEncRaw.getDistance() > -19.4) {
+			if (leadScrewEncRaw.getDistance() > -21) {
 				leadScrewMtr.set(-1);
 			} else {
 				stopHab();
@@ -101,6 +101,10 @@ public class HAB extends GenericSubsystem {
 		}
 		habLeft.set(wantedSpeedLeft);
 		habRight.set(wantedSpeedRight);
+	}
+	
+	public void setHabScrew(double value) {
+		leadScrewMtr.set(value);
 	}
 	
 	@Override
