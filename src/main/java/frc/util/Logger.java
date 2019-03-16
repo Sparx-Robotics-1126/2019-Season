@@ -335,9 +335,8 @@ public class Logger extends GenericSubsystem {
 		ERROR,			//Used for errors
 		CRITICAL,		//Used for Important problems that are not yet errors
 		WARNING,		//Used for Lower level problems
-		START,			//Used at the start of commands
-		END,			//Used at the end of commands
 		PERIODICLOGSTATUS,			//Used for logging the state of hardware
+		INTERNALS,		//Used for EVERYTHING that doesn't already have a name 
 		INTERRUPTED;	//Used when commands have been interrupted
 	}
 
