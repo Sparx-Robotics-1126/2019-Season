@@ -45,7 +45,7 @@ public class RobotSystem extends Thread{
 		autonomous = new Autonomous(drives, hatch, hab);
 		currentState = RobotState.STANDBY;
 		currentControl = teleop;
-		compress = new Compressor(IO.ROBOT_COMPRESSOR);
+		compress = new Compressor(IO.ROBOT_COMPRESSOR.getPort());
 		compress.setClosedLoopControl(true);
 		logger = new Logger();
 		logger.start();

@@ -12,30 +12,66 @@ package frc.robot;
  */
 public enum IO {
 	
+	DRIVES_RIGHTMOTOR_1(10, "Drives right motor"),
+	DRIVES_RIGHTMOTOR_2(11, "Drives right motor"),
+	DRIVES_RIGHTMOTOR_3(12, "Drives right motor"),
+	DRIVES_LEFTMOTOR_1(1, "Drives left motor"),
+	DRIVES_LEFTMOTOR_2(2, "Drives left motor"),
+	DRIVES_LEFTMOTOR_3(3, "Drives left motor"),
 	
+	DRIVES_RIGHTENCODER_CH1(10, "Drives right encoder"), //11
+	DRIVES_RIGHTENCODER_CH2(11, "Drives right encoder"), //10
+	DRIVES_LEFTENCODER_CH1(12, "Drives left encoder"),
+	DRIVES_LEFTENCODER_CH2(13, "Drives left encoder"),
 	
-	DRIVES_RIGHTMOTOR_1(10, "Drives right motor");
+	DRIVES_PTOSOLENOID(1, "Arms PTO"),					//0
+	DRIVES_SHIFTINGSOLENOID(0, "Drives shifter"),		//1
+	DRIVES_UNSNAPPY(2, "Unsnappy"),
 	
+	ARMS_LIMITSWITCH_LEFT(6, "Arms left limit switch"),
+	ARMS_LIMITSWITCH_RIGHT(5, "Arms right limit switch"),
+	
+	ROBOT_COMPRESSOR(0, "Robot compressor"),
+	
+	HATCH_SOLENOID_FLIPPER(4, "Hatch flipper"),
+	HATCH_SOLENOID_SHOOTER(5, "Hatch shooter"),
+	HATCH_SOLENOID_HOLDER(3, "Hatch holder"),
+	
+	HAB_LEADSCREWENCODER_CH1(24, "HAB lead screw encoder"),
+	HAB_LEADSCREWENCODER_CH2(25, "HAB lead screw encoder"),
+	HAB_LEADSCREWMOTOR(4, "HAB lead screw motor"),
+	HAB_RIGHTMOTOR(6, "HAB right motor"),
+	HAB_LEFTMOTOR(7, "HAB left motor"),
+	
+	VISION_CENTERLEFTFOLLOWINGSENSOR(14, "Vision center left sensor"),
+	VISION_LEFTFOLLOWINGSENSOR(15, "Vision left sensor"),
+	VISION_RIGHTFOLLOWINGSENSOR(16, "Vision right sensor"),
+	VISION_CENTERRIGHTFOLLOWINGSENSOR(17, "Vision center right sensor");
 	
 	private final int port;
 	private final String name;
 	private final int uniqueID;
 	
-	
-	
 	private static final class IDCounter {
 		private static int uniqueIDCounter = 0;
 	}
-	
 
 	private IO(int port, String name) {
 		this.port = port;
 		this.name = name;
 		uniqueID = IDCounter.uniqueIDCounter++;
-//		uniqueIDCounter = 0;
-//		System.out.println(uniqueIDCounter);
-//		uniqueID = IO.uniqueIDCounter;
-//		uniqueIDCounter++;
+	}
+	
+	public int getPort() {
+		return port;
+	}
+	
+	public int getUniqueID() {
+		return uniqueID;
+	}
+	
+	public String getName() {
+		return name;
 	}
 	
 	public String toString() {

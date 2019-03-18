@@ -29,10 +29,10 @@ public class Vision {
 	private boolean hitLine, centerHit, rightHitFirst;
 
 	public Vision() {
-		leftIR = new DigitalInput(IO.VISION_LEFTFOLLOWINGSENSOR);
-		centerLeftIR = new DigitalInput(IO.VISION_CENTERLEFTFOLLOWINGSENSOR);
-		centerRightIR = new DigitalInput(IO.VISION_CENTERRIGHTFOLLOWINGSENSOR);
-		rightIR = new DigitalInput(IO.VISION_RIGHTFOLLOWINGSENSOR);
+		leftIR = new DigitalInput(IO.VISION_LEFTFOLLOWINGSENSOR.getPort());
+		centerLeftIR = new DigitalInput(IO.VISION_CENTERLEFTFOLLOWINGSENSOR.getPort());
+		centerRightIR = new DigitalInput(IO.VISION_CENTERRIGHTFOLLOWINGSENSOR.getPort());
+		rightIR = new DigitalInput(IO.VISION_RIGHTFOLLOWINGSENSOR.getPort());
 		direction = directions.STANDBY;
 	}
 

@@ -41,9 +41,9 @@ public class Hatch extends GenericSubsystem {
 	}
 
 	public void init() {
-		flipper = new Solenoid(IO.HATCH_SOLENOID_FLIPPER);
-		shooter = new Solenoid(IO.HATCH_SOLENOID_SHOOTER);
-		holder = new Solenoid(IO.HATCH_SOLENOID_HOLDER);
+		flipper = new Solenoid(IO.HATCH_SOLENOID_FLIPPER.getPort());
+		shooter = new Solenoid(IO.HATCH_SOLENOID_SHOOTER.getPort());
+		holder = new Solenoid(IO.HATCH_SOLENOID_HOLDER.getPort());
 		flipperValue = false;
 		shooterValue = false;
 		state = HatchState.STANDBY;
@@ -119,7 +119,7 @@ public class Hatch extends GenericSubsystem {
 
 	@Override
 	public void smartDashboardInit() {
-		addToTables(flipper, "Flipper", IO.IOs.uniqueid);
+		addToTables(flipper, "Flipper");
 		addToTables(shooter, "Shooter");
 	}
 

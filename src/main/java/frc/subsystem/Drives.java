@@ -116,14 +116,14 @@ public class Drives extends GenericSubsystem implements Debuggable {
 
 	/** Initializes all the variable in drives */
 	public void init() {
-		rightMtr1 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_1);
-		rightMtr2 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_2);
-		rightMtr3 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_3);
-		leftMtr1 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_1);
-		leftMtr2 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_2);
-		leftMtr3 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_3);
-		rightEnc = new Encoder(IO.DRIVES_RIGHTENCODER_CH1, IO.DRIVES_RIGHTENCODER_CH2);
-		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
+		rightMtr1 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_1.getPort());
+		rightMtr2 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_2.getPort());
+		rightMtr3 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_3.getPort());
+		leftMtr1 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_1.getPort());
+		leftMtr2 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_2.getPort());
+		leftMtr3 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_3.getPort());
+		rightEnc = new Encoder(IO.DRIVES_RIGHTENCODER_CH1.getPort(), IO.DRIVES_RIGHTENCODER_CH2.getPort());
+		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1.getPort(), IO.DRIVES_LEFTENCODER_CH2.getPort());
 		rightEnc.setDistancePerPulse(-0.02110013);// 0.07897476
 		leftEnc.setDistancePerPulse(0.02110013);
 		gyro = new AHRS(SerialPort.Port.kUSB);
@@ -132,10 +132,10 @@ public class Drives extends GenericSubsystem implements Debuggable {
 		rightMtrs = new MotorGroup(rightMtr1, rightMtr2, rightMtr3);
 		rightMtrs.setInverted(true);
 		leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
-		shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID);
-		drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID);
+		shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID.getPort());
+		drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID.getPort());
 		arms = new Arms(rightMtrs, leftMtrs, rightEnc, leftEnc);
-		unsnappy = new Solenoid(IO.DRIVES_UNSNAPPY);
+		unsnappy = new Solenoid(IO.DRIVES_UNSNAPPY.getPort());
 		vision = new Vision();
 		lastAngle = 0;
 		speedRight = 0;

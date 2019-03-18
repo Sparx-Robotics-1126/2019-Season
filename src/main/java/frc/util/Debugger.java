@@ -21,6 +21,7 @@ public class Debugger extends GenericSubsystem{
 
 	private static final Map<String, Component> components = new HashMap<>();
 	private static final NetworkTable DEBUG_TABLE = NetworkTableInstance.getDefault().getTable("DebugTable");
+	
 	//TODO: implement sensor checking
 	public Debugger() {
 		super("Debugger", Thread.MIN_PRIORITY);
@@ -78,35 +79,62 @@ public class Debugger extends GenericSubsystem{
 		}
 	}
 	
-	public class Debug {
+	
+	public class DebugBoolean extends Debug{
+		
+		private boolean valueToReach;
+		private boolean startingValue;
+		
+		public DebugBoolean(Sendable sendable, int comparison, int valueToCompare) {
+			super(sendable, comparison, valueToCompare);
+		}
+		
+		@Override
+		public int debug() {
+			return 0;
+		}
+		
+	}
+	
+	public class DebugDouble extends Debug{
+		
+		private double valueToTeach;
+		private double comparison;
+		private double startingValue;
+
+		public DebugDouble(Sendable sendable, int comparison, int valueToCompare) {
+			super(sendable, comparison, valueToCompare);
+		}
+
+		@Override
+		public int debug() {
+			return 0;
+		}
+		
+		public void reset() {
+			super.reset();
+			
+		}
+		
+	}
+	
+	public abstract class Debug {
 		private int debugStatus; //-1 = false, 0 = untested, 1 = true, -2 = sendable not found
 		private Sendable sendable;
-		private int comparison; //-1 = lessThan, 0 = equal to, 1 = greater than
-		private int valueToCompare;
-		private double startingValue;
-//		private int type; //0 = sensor, 1 = motor;
 		
 		public Debug(Sendable sendable, int comparison, int valueToCompare) {
 			this.sendable = sendable;
-			this.comparison = comparison;
-			this.valueToCompare = valueToCompare;
-			
 		}
 		
-		public void updateStatus() {
-			if(debugStatus == -2 || debugStatus == 1) {
-				return;
-			}
-			
+		public void setDebugStatus(int debugStatus) {
+			this.debugStatus = debugStatus;
 		}
 		
 		public int getDebugStatus() {
-			if(debugStatus == -2 || debugStatus == 1) {
-				return debugStatus;
-			}
-			
-			return 0;
+			return debugStatus;
 		}
+		
+		public abstract int debug();
 		
 		public double get() {
 			if(sendable instanceof AnalogInput) {
@@ -125,6 +153,10 @@ public class Debugger extends GenericSubsystem{
 				return ((WPI_TalonSRX)sendable).get();
 			}
 			return 0;
+		}
+		
+		public void reset() {
+			debugStatus = 0;
 		}
 		
 	}

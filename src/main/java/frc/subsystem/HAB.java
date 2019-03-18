@@ -48,13 +48,13 @@ public class HAB extends GenericSubsystem {
 
 	@Override
 	public void init() {
-		leadScrewMtr = new WPI_TalonSRX(IO.HAB_LEADSCREWMOTOR);
-		leadScrewEncRaw = new Encoder(IO.HAB_LEADSCREWENCODER_CH1, IO.HAB_LEADSCREWENCODER_CH2);
+		leadScrewMtr = new WPI_TalonSRX(IO.HAB_LEADSCREWMOTOR.getPort());
+		leadScrewEncRaw = new Encoder(IO.HAB_LEADSCREWENCODER_CH1.getPort(), IO.HAB_LEADSCREWENCODER_CH2.getPort());
 		leadScrewEncRaw.setDistancePerPulse(0.0002698035829915821);
 //		leadScrewEncRaw.setDistancePerPulse(0.0002278293558123873); //0.0002823311758 //0.0003366589558616
 		leadScrewEncRaw.reset();
-		habLeft = new WPI_TalonSRX(IO.HAB_LEFTMOTOR);
-		habRight = new WPI_TalonSRX(IO.HAB_RIGHTMOTOR);
+		habLeft = new WPI_TalonSRX(IO.HAB_LEFTMOTOR.getPort());
+		habRight = new WPI_TalonSRX(IO.HAB_RIGHTMOTOR.getPort());
 		wantedSpeedLeft = 0;
 		wantedSpeedRight = 0;
 		// bottomSensor = new DigitalInput(14);
