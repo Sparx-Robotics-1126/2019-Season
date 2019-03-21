@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.subsystem.Vision.directions;
 import frc.util.MotorGroup;
@@ -95,15 +95,15 @@ public class Drives extends GenericSubsystem {
 
 	// ----------------------------------------Constants----------------------------------------
 
-	private final double ANGLE_OFF_BY = 2;
-
+	private static final double ANGLE_OFF_BY = 2;
+	
 	private final double SLOW_TURNING_DEADBAND = 0.15;
 
 	private final double SLOW_TURNING_RATE = 0.8;
 
 	private final double TURN_SLOW_DEFAULT_PERCENT = 0.5;
 
-	private final double STRAIGHTEN_MIN_SPEED_MULTIPLIER = 0.8;
+	private final double STRAIGHTEN_MIN_SPEED_MULTIPLIER = 0.7;
 
 	// ------------------------------------------Code-------------------------------------------
 
@@ -159,6 +159,11 @@ public class Drives extends GenericSubsystem {
 
 	/* Runs all the code for drives */
 	public void execute() {
+		if(shifter.get()) {
+			SmartDashboard.putString("SHIFTER", "High gear");
+		} else {
+			SmartDashboard.putString("SHIFTER", "Low gear");
+		}
 		if (state != DriveState.ARMS && drivesPTOArms.get()) {
 			drivesPTOArms.set(false);
 		}
@@ -224,15 +229,15 @@ public class Drives extends GenericSubsystem {
 					System.out.println("2: " + rightMtrs.get() + ", " + leftMtrs.get());
 					currentRate = gyro.getRate();
 					System.out.println("currentRate: " + currentRate);
-					if(currentRate < -SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
-						if(currentRate < -2) {
+					
+					if(currentRate > SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
+						if(currentRate > 2) {
 							turnSpeed = 0;
 						} else {
 							turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
 						}
-						//						turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
 						System.out.println("greater than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
-					} else if(currentRate > -SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
+					} else if(currentRate < SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
 						turnSpeed = turnSpeed + 0.05 <= 1 ? turnSpeed + 0.05 : 1;
 						System.out.println("less than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
 					}
@@ -253,16 +258,17 @@ public class Drives extends GenericSubsystem {
 				if (turnAngle > getAngle() - 45) {
 					currentRate = gyro.getRate();
 					System.out.println("currentRate: " + currentRate);
-					if(currentRate > SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
-						if(currentRate > 2) {
+					if(currentRate < -SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
+						if(currentRate < -2) {
 							turnSpeed = 0;
 						} else {
 							turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
 						}
-						System.out.println("greater than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
-					} else if(currentRate < SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
+						//						turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
+						System.out.println("greater than, left: " + rightMtrs.get() + ", left: " + leftMtrs.get());
+					} else if(currentRate > -SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
 						turnSpeed = turnSpeed + 0.05 <= 1 ? turnSpeed + 0.05 : 1;
-						System.out.println("less than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
+						System.out.println("less than, left: " + rightMtrs.get() + ", left: " + leftMtrs.get());
 					}
 				}
 				rightMtrs.set(turnSpeed);
@@ -316,7 +322,7 @@ public class Drives extends GenericSubsystem {
 			}
 			break;
 		case ARMS:
-			if (timer + 0.8 < Timer.getFPGATimestamp()) {
+			if (timer + 2.5 < Timer.getFPGATimestamp()) {
 				drivesPTOArms.set(true);
 				arms.armsDown();
 				if (arms.isDone()) {
@@ -335,6 +341,11 @@ public class Drives extends GenericSubsystem {
 			rightMtrs.set(wantedSpeedRight);
 			break;
 		case FINDING_LINE:
+			if(getDistance() > 48) {
+				leftMtrs.stopMotors();
+				rightMtrs.stopMotors();
+				changeState(DriveState.TELEOP);
+			}
 			System.out.println("finding line");
 			vision.getDirection();
 			if(moveDist != -1 && moveDist < getDistance()) {
@@ -462,11 +473,12 @@ public class Drives extends GenericSubsystem {
 
 	/** straightens the robot */
 	private void straightenForward() {
-		double reducedPower = ((Math.abs(getAngle()/ANGLE_OFF_BY)) > 1 ? 0 : Math.abs(getAngle()/ANGLE_OFF_BY))*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
-		if (getAngle() > ANGLE_OFF_BY) {
+		double reducedPower = (Math.abs(getAngle())/ANGLE_OFF_BY) > 1 ? wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER : ((ANGLE_OFF_BY - Math.abs(getAngle()))/ANGLE_OFF_BY)*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
+//		double reducedPower = (Math.abs(getAngle())/ANGLE_OFF_BY) > 1 ? 0 : (ANGLE_OFF_BY - Math.abs(getAngle())/ANGLE_OFF_BY)*wantedSpeedLeft*(1 - 0.4) + wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER);
+		if (getAngle() > 0) {
 			wantedSpeedLeft = reducedPower;
 			//			System.out.println("correcting rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr");
-		} else if (getAngle() < -ANGLE_OFF_BY) {
+		} else if (getAngle() < 0) {
 			//			System.out.println("correcting oooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
 			wantedSpeedRight = reducedPower;
 		}
@@ -484,7 +496,7 @@ public class Drives extends GenericSubsystem {
 
 	/** gets the angle the robot has turned since the last time the gyro was reset */
 	private double getAngle() {
-		return lastAngle - gyro.getAngle();
+		return gyro.getAngle() - lastAngle;
 	}
 
 	/** resets the gyro's angle so the robot turns to the angle from where the robot */
@@ -495,7 +507,7 @@ public class Drives extends GenericSubsystem {
 
 	/** resets the gyro's angle so the robot turns to the angle from where the robot */
 	private void resetGyroAngle(double lastAngle) {
-		this.lastAngle -= lastAngle;
+		this.lastAngle += lastAngle;
 		System.out.println("Reset: " + lastAngle);
 	}
 
@@ -521,6 +533,14 @@ public class Drives extends GenericSubsystem {
 	public void toAmazingStraightness() {
 		resetGyroAngle();
 		changeState(DriveState.AMAZING_STRAIGHTNESS);
+	}
+	
+	public void setShifting(boolean shiftingValue) {
+		shifter.set(shiftingValue);
+	}
+	
+	public void toggleShifting() {
+		shifter.set(!shifter.get());
 	}
 
 	public void togglePTO() {
@@ -603,14 +623,18 @@ public class Drives extends GenericSubsystem {
 		//		LiveWindow.remove(leftMtr1);
 		//		LiveWindow.remove(leftMtr2);
 		//		LiveWindow.remove(leftMtr3);
-//		addToTables(rightMtrs, "Right drives");
-//		addToTables(leftMtrs, "Left drives");
+		addToTables(rightMtrs, "Right drives");
+		addToTables(leftMtrs, "Left drives");
 		addToTables(rightEnc, "Right drives encoder");
 		addToTables(leftEnc, "Left drives encoder");
 		addToTables(shifter, "Shifter");
 		addToTables(drivesPTOArms, "Arms", "Drives PTO (Arms)");
 		addToTables(unsnappy, "Arms", "Unsnappy");
-		//		addToTables(gyro, "Gyro");
+		addToTables(gyro, "Gyro");
+		addToTables(vision.centerLeftIR, "Vision", "CLIR");
+		addToTables(vision.leftIR, "Vision",  "LIR");
+		addToTables(vision.centerRightIR, "Vision",  "CRIR");
+		addToTables(vision.rightIR, "Vision", "R IR");
 	}
 
 }

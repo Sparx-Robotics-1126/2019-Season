@@ -18,13 +18,13 @@ public class Vision {
 
 	private directions direction;
 
-	private DigitalInput leftIR;
+	public DigitalInput leftIR;
 
-	private DigitalInput centerLeftIR;
+	public DigitalInput centerLeftIR;
 
-	private DigitalInput centerRightIR;
+	public DigitalInput centerRightIR;
 
-	private DigitalInput rightIR;
+	public DigitalInput rightIR;
 
 	private boolean hitLine, centerHit, rightHitFirst;
 
@@ -47,8 +47,25 @@ public class Vision {
 		LEFT, SLIGHTLEFT, STANDBY, FORWARD, RIGHT, SLIGHTRIGHT
 	}
 	
+	public boolean getleftIR()
+	{
+		return !leftIR.get();
+	}
+	public boolean getCenterleftIR()
+	{
+		return !centerLeftIR.get();
+	}
+	public boolean getrightIR()
+	{
+		return !rightIR.get();
+	}
+	public boolean getcenterRightIR()
+	{
+		return !centerRightIR.get();
+	}
+	
 	public directions getDirection() {
-//		boolean left = !leftIR.get();
+		boolean left = !leftIR.get();
 		boolean right = !rightIR.get();
 		boolean centerLeft = !centerLeftIR.get();
 		boolean centerRight = !centerRightIR.get();
@@ -60,11 +77,11 @@ public class Vision {
 
 			// If we've hit left turn left
 		} 
-//		else if (left) {
-//			direction = directions.LEFT;
-//			hitLine = true;
-//			rightHitFirst = false;
-//		}
+		else if (left) {
+			direction = directions.LEFT;
+			hitLine = true;
+			rightHitFirst = false;
+		}
 
 		// We'ver hit line on side now we turn until center line hit.
 		if (hitLine && !centerHit) {

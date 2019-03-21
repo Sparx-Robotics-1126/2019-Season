@@ -21,8 +21,8 @@ public class CtrlMap {
 	public static final int XBOX_LEFT_Y = 1;
 	public static final int XBOX_RIGHT_X = 4;
 	public static final int XBOX_RIGHT_Y = 5;
-	public static final int XBOX_L2 = 2;
-	public static final int XBOX_R2 = 3;
+	public static final int XBOX_L2_AXIS = 2;
+	public static final int XBOX_R2_AXIS = 3;
 	
 	public static final int XBOX_POV = 0;
 	public static final int XBOX_A = 1;
@@ -35,6 +35,8 @@ public class CtrlMap {
 	public static final int XBOX_START = 8;
 	public static final int XBOX_L3 = 9;
 	public static final int XBOX_R3 = 10;
+	public static final int XBOX_L2 = 11;
+	public static final int XBOX_R2 = 12;
 	public static final double TRIGGER_DEADBAND = 0.25;
 	
 	public static final int XBOXCONTROLLER_MAIN = 0;

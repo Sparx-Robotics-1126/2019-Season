@@ -18,13 +18,12 @@ public class Logger extends GenericSubsystem {
 	private MillisTimer timer;
 
 	private String logName;
-	private final String COMPRESSION_MODE = "TAR.GZ";
-	private final String COUNTER_FILE = "counter.txt";
-//	private final String LOGS_DIRECTORY_LOCATION = "/home/lvuser/logs/"; //starting from the home directory
-		private final String LOGS_DIRECTORY_LOCATION = "C:\\Sparx\\"; //starting from the home directory
+	private final static String COMPRESSION_MODE = "TAR.GZ";
+	private final static String LOGS_DIRECTORY_LOCATION = "/home/lvuser/logs/"; //starting from the home directory
+//	private final String LOGS_DIRECTORY_LOCATION = "C:\\Sparx\\"; //starting from the home directory
 	private boolean logReady;
-	private final boolean LOG_TO_CONSOLE = true;
-	private final int maxSavedFiles = 10;
+	private final static boolean LOG_TO_CONSOLE = true;
+	private final static int MAXSAVEDFILES = 10;
 	private String[] stackInfo;
 
 	private PrintStream systemOut;
@@ -314,7 +313,7 @@ public class Logger extends GenericSubsystem {
 	}
 
 	public void getStackInfo(boolean getClass){
-		getStackInfo(getClass, 2);
+		getStackInfo(getClass, 3);
 	}
 
 	public enum Tag{
@@ -402,16 +401,17 @@ public class Logger extends GenericSubsystem {
 			name = file.getName();
 			if(name.indexOf('-') != -1) {
 				counter = Integer.parseInt(name.substring(0, name.indexOf('-')));
+				counter++;
 				System.out.println(counter);
-				if(name.endsWith(".tar.gz") || name.endsWith(".log")) {
-					if(counter > 9) {
+				if(name.endsWith(".tar.gz")) {
+					if(counter > MAXSAVEDFILES) {
 						file.delete();
 					} else {
-						file.renameTo(new File((counter + 1) + name.substring(name.indexOf('-'))));
+						file.renameTo(new File(LOGS_DIRECTORY_LOCATION + counter + name.substring(name.indexOf('-'))));
 					}
 				}
 				if(name.endsWith(".log")) {
-					logs.add((counter + 1) + name.substring(name.indexOf('-'), name.lastIndexOf('.')));
+					logs.add(counter + name.substring(name.indexOf('-'), name.lastIndexOf('.')));
 				}
 			}
 
@@ -484,25 +484,9 @@ public class Logger extends GenericSubsystem {
 	}
 
 	@Override
-	public boolean isDone() {
-		return false;
-	}
-
-	@Override
 	public long sleepTime() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
-	public void delayedPrints() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void smartDashboardInit() {
-		// TODO Auto-generated method stub
-
-	}
 }
