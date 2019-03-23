@@ -314,10 +314,9 @@ public class Automation {
 			delayTime = -1;
 			currentStep++;
 		}
-		System.out.println(currentStep);
 		if(currentStep < currentAuto.size()) {
 			currentStepData = currentAutoParams.get(currentStep);
-			System.out.println(currentAuto.get(currentStep));
+			System.out.println("Current step: " + currentAuto.get(currentStep) + ", " + currentStep);
 			switch(currentAuto.get(currentStep)) {
 			case DRIVES_FORWARD:
 				if(currentStepData.length == 2) {

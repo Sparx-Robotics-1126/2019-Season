@@ -30,6 +30,8 @@ public class Logger extends GenericSubsystem {
 	private final static boolean LOG_TO_CONSOLE = true;
 	private final static int MAXSAVEDFILES = 10;
 	private int counter;
+	private static final int sleepTime = 100;
+	private static final int printCounter = 2000 / sleepTime;
 	private String[] stackInfo;
 
 	private PrintStream systemOut;
@@ -489,14 +491,14 @@ public class Logger extends GenericSubsystem {
 		LogHolder lh = new LogHolder(timerToHMS(), "PeriodicLogStatus", "Logger");
 		while(!isInterrupted()) {
 			try {
-				sleep(250);
+				sleep(sleepTime);
 				lh.updateTime(timerToHMS());
 				for(Consumer<LogHolder> stringSupplier: periodicLogConsumer) {
 					stringSupplier.accept(lh);
 					builder.append(lh.getData());
 					lh.reset();
 				}
-				if(counter > 8) {
+				if(counter > printCounter) {
 					if(logReady) {
 						while(printToLog.size() > 0) {
 							builder.append(printToLog.remove());

@@ -94,37 +94,41 @@ public class Arms {
 
 	public void armsDown() {
 		isDone = true;
-		if (wantedDegree > actualDegreeLeft && (!stopLeft || (stopLeft && !leftInput.get()))) {
+		if (wantedDegree > actualDegreeLeft && !stopLeft) {
 			isDone = false;
 			if (!leftInput.get()) {
 				stopLeft = true;
+				leftMtrs.set(0);
+			} else {
+				leftMtrSpeed = -leftArmEnc.getRate();
+				if (leftMtrSpeed < wantedSpeed) {
+					wantedLeftMtrPwr -= 0.02; // gav
+				} else if (leftMtrSpeed > wantedSpeed) {
+					wantedLeftMtrPwr += 0.01; // gav
+				}
+				wantedLeftMtrPwr = wantedLeftMtrPwr > 1 ? 1 : wantedLeftMtrPwr;
+				actualDegreeLeft = -leftArmEnc.getDistance();
+				leftMtrs.set(wantedLeftMtrPwr);
 			}
-			leftMtrSpeed = -leftArmEnc.getRate();
-			if (leftMtrSpeed < wantedSpeed) {
-				wantedLeftMtrPwr -= 0.02; // gav
-			} else if (leftMtrSpeed > wantedSpeed) {
-				wantedLeftMtrPwr += 0.01; // gav
-			}
-			wantedLeftMtrPwr = wantedLeftMtrPwr > 1 ? 1 : wantedLeftMtrPwr;
-			actualDegreeLeft = -leftArmEnc.getDistance();
-			leftMtrs.set(wantedLeftMtrPwr);
 		} else {
 			leftMtrs.set(0);
 		}
-		if (wantedDegree > actualDegreeRight && (!stopRight || (stopRight && !rightInput.get()))) {
+		if (wantedDegree > actualDegreeRight && !stopRight) {
 			isDone = false;
 			if (!rightInput.get()) {
 				stopRight = true;
+			} else {
+				rightMtrSpeed = -rightArmEnc.getRate();
+				if (rightMtrSpeed < wantedSpeed) {
+					wantedRightMtrPwr -= 0.02; // gav
+				} else if (rightMtrSpeed > wantedSpeed) {
+					wantedRightMtrPwr += 0.01; // gav
+				}
+				wantedRightMtrPwr = wantedRightMtrPwr > 1 ? 1 : wantedRightMtrPwr;
+				actualDegreeRight = rightArmEnc.getDistance();
+				rightMtrs.set(wantedRightMtrPwr);
 			}
-			rightMtrSpeed = -rightArmEnc.getRate();
-			if (rightMtrSpeed < wantedSpeed) {
-				wantedRightMtrPwr -= 0.02; // gav
-			} else if (rightMtrSpeed > wantedSpeed) {
-				wantedRightMtrPwr += 0.01; // gav
-			}
-			wantedRightMtrPwr = wantedRightMtrPwr > 1 ? 1 : wantedRightMtrPwr;
-			actualDegreeRight = rightArmEnc.getDistance();
-			rightMtrs.set(wantedRightMtrPwr);
+			
 		} else {
 			rightMtrs.set(0);
 		}

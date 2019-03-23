@@ -12,9 +12,11 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.subsystem.Vision.directions;
@@ -60,6 +62,8 @@ public class Drives extends GenericSubsystem implements Loggable {
 	private Solenoid unsnappy;
 
 	private Vision vision;
+	
+	private PowerDistributionPanel pdp;
 
 	// ----------------------------------------Variable-----------------------------------------
 
@@ -96,6 +100,10 @@ public class Drives extends GenericSubsystem implements Loggable {
 	private double currentRate;
 	
 	private boolean logReady;
+	
+	private double voltage;
+	
+	private double current;
 
 	// ----------------------------------------Constants----------------------------------------
 
@@ -153,6 +161,10 @@ public class Drives extends GenericSubsystem implements Loggable {
 		isMoving = false;
 		slowPercent = 1;
 		slowSpeed = 0;
+		pdp = new PowerDistributionPanel();
+		voltage = pdp.getVoltage();
+		current = pdp.getTotalCurrent();
+		LiveWindow.remove(pdp);
 		logReady = true;
 	}
 
@@ -642,6 +654,31 @@ public class Drives extends GenericSubsystem implements Loggable {
 		addToTables(vision.rightIR, "Vision", "R IR");
 	}
 	
+//	@Override
+//	public void logPeriodic(LogHolder lh) {
+//		lh.updateLogClass("DRIVES_PERIODIC");
+//		lh.logLine("Left drives motors: " + leftMtrs.get());
+//		lh.logLine("Right drives motors: " + rightMtrs.get());
+//		lh.logLine("Left drives encoder: " + leftEnc.getDistance());
+//		lh.logLine("Right drives encoder: " + rightEnc.getDistance());
+//		lh.logLine("Shifter: " + (shifter.get() ? "High Gear" : "Low Gear"));
+//		if(gyro != null) {
+//			lh.logLine("Gyro (virtual angle): " + getAngle());
+//			lh.logLine("Gyro (real angle): " + gyro.getAngle());
+//		}
+//		if(vision != null) {
+//			lh.updateLogClass("VISION_PERIODIC");
+//			lh.logLine("Vision Left IR: " + vision.getLeftIR());
+//			lh.logLine("Vision CenterLeft IR: " + vision.getCenterLeftIR());
+//			lh.logLine("Vision CenterRight IR: " + vision.getCenterRightIR());
+//			lh.logLine("Vision Right IR: " + vision.getRightIR());
+//		}
+//		lh.updateLogClass("ARMS_PERIODIC");
+//		lh.logLine("Arms PTO: " + drivesPTOArms.get());
+//		lh.logLine("Unsnappy: " + unsnappy.get());
+//		
+//	}
+	
 	@Override
 	public void logPeriodic(LogHolder lh) {
 		lh.updateLogClass("DRIVES_PERIODIC");
@@ -649,23 +686,39 @@ public class Drives extends GenericSubsystem implements Loggable {
 		lh.logLine("Right drives motors: " + rightMtrs.get());
 		lh.logLine("Left drives encoder: " + leftEnc.getDistance());
 		lh.logLine("Right drives encoder: " + rightEnc.getDistance());
-		lh.logLine("Shifter: " + (shifter.get() ? "High Gear" : "Low Gear"));
-		if(gyro != null) {
-			lh.logLine("Gyro (virtual angle): " + getAngle());
-			lh.logLine("Gyro (real angle): " + gyro.getAngle());
+		lh.logLine("Left drives motors (voltage): " + leftMtrs.getVoltage());
+		lh.logLine("Right drives motors (voltage): " + rightMtrs.getVoltage());
+		lh.logLine("Left drives motors (current): " + leftMtrs.getCurrent());
+		lh.logLine("Right drives motors (current): " + rightMtrs.getCurrent());
+		lh.logLine("PDP Voltage: " + pdp.getTotalCurrent());
+		lh.logLine("PDP Current: " + pdp.getVoltage());
+		if(pdp.getTotalCurrent() > current) {
+			current = pdp.getTotalCurrent();
 		}
-		if(vision != null) {
-			lh.updateLogClass("VISION_PERIODIC");
-			lh.logLine("Vision Left IR: " + vision.getLeftIR());
-			lh.logLine("Vision CenterLeft IR: " + vision.getCenterLeftIR());
-			lh.logLine("Vision CenterRight IR: " + vision.getCenterRightIR());
-			lh.logLine("Vision Right IR: " + vision.getRightIR());
+		if(pdp.getVoltage() < voltage) {
+			voltage = pdp.getVoltage();
 		}
-		lh.updateLogClass("ARMS_PERIODIC");
-		lh.logLine("Arms PTO: " + drivesPTOArms.get());
-		lh.logLine("Unsnappy: " + unsnappy.get());
-		
+		lh.logLine("Highest current: " + current);
+		lh.logLine("Lowest voltage: " + voltage);
+//		lh.logLine("Shifter: " + (shifter.get() ? "High Gear" : "Low Gear"));
+//		if(gyro != null) {
+//			lh.logLine("Gyro (virtual angle): " + getAngle());
+//			lh.logLine("Gyro (real angle): " + gyro.getAngle());
+//		}
+//		if(vision != null) {
+//			lh.updateLogClass("VISION_PERIODIC");
+//			lh.logLine("Vision Left IR: " + vision.getLeftIR());
+//			lh.logLine("Vision CenterLeft IR: " + vision.getCenterLeftIR());
+//			lh.logLine("Vision CenterRight IR: " + vision.getCenterRightIR());
+//			lh.logLine("Vision Right IR: " + vision.getRightIR());
+//		}
+//		lh.updateLogClass("ARMS_PERIODIC");
+//		lh.logLine("Arms PTO: " + drivesPTOArms.get());
+//		lh.logLine("Unsnappy: " + unsnappy.get());
+//		
 	}
+	
+	
 
 	@Override
 	public boolean logReady() {
