@@ -12,11 +12,13 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
+import frc.util.Logger.LogHolder;
+import frc.util.Logger.Loggable;
 
 /**
  * Add your docs here.
  */
-public class HAB extends GenericSubsystem {
+public class HAB extends GenericSubsystem implements Loggable{
 
 	// ----------------------------------------Motors/Sensors----------------------------------------
 
@@ -182,6 +184,13 @@ public class HAB extends GenericSubsystem {
 	public void stopAll() {
 		stopHab();
 		stopHabWheels();
+	}
+	
+	@Override
+	public void logPeriodic(LogHolder lh) {
+		lh.updateLogClass("HAB_Periodic");
+		lh.logLine("Lead Screw Motor: " + leadScrewMtr.get());
+		lh.logLine("Lead Screw Encoder: " + leadScrewEncRaw.getDistance());
 	}
 
 }

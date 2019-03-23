@@ -18,6 +18,7 @@ public abstract class GenericSubsystem extends Thread {
 
 	private String name;
 	
+	
 	private double timeToPrint;
 	private double lastPrinted;
 	

@@ -9,21 +9,27 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.function.Consumer;
 
 import frc.subsystem.GenericSubsystem;
 
 public class Logger extends GenericSubsystem {
 
 	private MillisTimer timer;
+	
+	private static Logger logger;
 
 	private String logName;
+	private Vector<Consumer<LogHolder>> periodicLogConsumer;
 	private final static String COMPRESSION_MODE = "TAR.GZ";
 	private final static String LOGS_DIRECTORY_LOCATION = "/home/lvuser/logs/"; //starting from the home directory
 //	private final String LOGS_DIRECTORY_LOCATION = "C:\\Sparx\\"; //starting from the home directory
 	private boolean logReady;
 	private final static boolean LOG_TO_CONSOLE = true;
 	private final static int MAXSAVEDFILES = 10;
+	private int counter;
 	private String[] stackInfo;
 
 	private PrintStream systemOut;
@@ -33,13 +39,14 @@ public class Logger extends GenericSubsystem {
 
 	private StackWalker stw;
 
-	public Logger() {
+	private Logger() {
 		super("Logger", Thread.MIN_PRIORITY);
+		periodicLogConsumer = new Vector<Consumer<LogHolder>>();
 		logReady = false;
 		if(!makeLogsDir()) { 
 			return;			  
 		}					
-
+		counter = 0;
 		stackInfo = new String[3];
 		stw = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
 		updateFiles();
@@ -55,8 +62,15 @@ public class Logger extends GenericSubsystem {
 		} catch (Exception e) {
 			return;
 		}
-		logReady = true;
 		printOverride();
+		logReady = true;
+	}
+	
+	public static Logger getInstance() {
+		if(logger == null) {
+			logger = new Logger();
+		}
+		return logger;
 	}
 
 	public void printOverride() {
@@ -321,9 +335,8 @@ public class Logger extends GenericSubsystem {
 		ERROR,			//Used for errors
 		CRITICAL,		//Used for Important problems that are not yet errors
 		WARNING,		//Used for Lower level problems
-		START,			//Used at the start of commands
-		END,			//Used at the end of commands
-		STATUS,			//Used for logging the state of hardware
+		PERIODICLOGSTATUS,			//Used for logging the state of hardware
+		INTERNALS,		//Used for EVERYTHING that doesn't already have a name 
 		INTERRUPTED;	//Used when commands have been interrupted
 	}
 
@@ -378,7 +391,11 @@ public class Logger extends GenericSubsystem {
 		log(stackInfo[0], stackInfo[1], Tag.INFO, message);
 	}
 
-	private String timerToHMS() {
+	/**
+	 * Returns the time since Logger has finished its init.
+	 * @return the time since Logger finished its init.
+	 */
+	public String timerToHMS() {
 		return timer.getHMS();
 	}
 
@@ -409,8 +426,7 @@ public class Logger extends GenericSubsystem {
 					} else {
 						file.renameTo(new File(LOGS_DIRECTORY_LOCATION + counter + name.substring(name.indexOf('-'))));
 					}
-				}
-				if(name.endsWith(".log")) {
+				} else if(name.endsWith(".log")) {
 					logs.add(counter + name.substring(name.indexOf('-'), name.lastIndexOf('.')));
 				}
 			}
@@ -452,6 +468,12 @@ public class Logger extends GenericSubsystem {
 		}
 
 	}
+	
+	public void addPeriodicLog(Consumer<LogHolder> cons) {
+		if(cons != null && !periodicLogConsumer.contains(cons)) {
+			periodicLogConsumer.add(cons);
+		}
+	}
 
 
 	@Override
@@ -461,15 +483,27 @@ public class Logger extends GenericSubsystem {
 	@Override
 	public void run() {
 		StringBuilder builder = new StringBuilder();
+		LogHolder lh = new LogHolder(timerToHMS(), "PeriodicLogStatus", "Logger");
 		while(!isInterrupted()) {
 			try {
-				sleep(2000);
-				if(logReady) {
-					while(printToLog.size() > 0) {
-						builder.append(printToLog.remove());
+				sleep(100);
+				lh.updateTime(timerToHMS());
+				for(Consumer<LogHolder> stringSupplier: periodicLogConsumer) {
+					stringSupplier.accept(lh);
+					builder.append(lh.getData());
+					lh.reset();
+				}
+				if(counter > 20) {
+					if(logReady) {
+						while(printToLog.size() > 0) {
+							builder.append(printToLog.remove());
+						}
+						Files.write(logFile.toPath(), builder.toString().getBytes(), StandardOpenOption.APPEND, StandardOpenOption.DSYNC, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+						builder.setLength(0);
 					}
-					Files.write(logFile.toPath(), builder.toString().getBytes(), StandardOpenOption.APPEND, StandardOpenOption.DSYNC, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-					builder.setLength(0);
+					counter = 0;
+				} else {
+					counter++;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -488,5 +522,61 @@ public class Logger extends GenericSubsystem {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
+	public class LogHolder {
+		
+		private String time;
+		private String type;
+		private String logClass;
+		private String header;
+		private StringBuilder sb;
+		
+		public LogHolder(String time, String type, String logClass) {
+			this.time = time;
+			this.type = type;
+			this.logClass = logClass;
+			sb = new StringBuilder();
+			updateHeader();
+		}
+		
+		public void logLine(String text) {
+			sb.append(header + text + "\n");
+		}
+		
+		public String getData() {
+			return sb.toString();
+		}
+		
+		public void reset() {
+			sb.setLength(0);
+		}
+		
+		public void updateTime(String time) {
+			this.time = time;
+			updateHeader();
+		}
+		
+		public void updateType(String type) {
+			this.type = type;
+			updateHeader();
+		}
+		
+		public void updateLogClass(String logClass) {
+			this.logClass = logClass;
+			updateHeader();
+		}
+		
+		private void updateHeader() {
+			header = "[" + time + "][" + type + "][" + logClass + "] ";
+		}
+		
+		
+	}
 
+	public interface Loggable {
+		
+		public abstract void logPeriodic(LogHolder lh);
+		
+	}
+	
 }

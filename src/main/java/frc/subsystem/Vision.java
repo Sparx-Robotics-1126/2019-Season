@@ -47,19 +47,19 @@ public class Vision {
 		LEFT, SLIGHTLEFT, STANDBY, FORWARD, RIGHT, SLIGHTRIGHT
 	}
 	
-	public boolean getleftIR()
+	public boolean getLeftIR()
 	{
 		return !leftIR.get();
 	}
-	public boolean getCenterleftIR()
+	public boolean getCenterLeftIR()
 	{
 		return !centerLeftIR.get();
 	}
-	public boolean getrightIR()
+	public boolean getRightIR()
 	{
 		return !rightIR.get();
 	}
-	public boolean getcenterRightIR()
+	public boolean getCenterRightIR()
 	{
 		return !centerRightIR.get();
 	}
