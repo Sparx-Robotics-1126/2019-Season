@@ -94,6 +94,8 @@ public class Drives extends GenericSubsystem implements Loggable {
 	private double slowSpeed;
 
 	private double currentRate;
+	
+	private boolean logReady;
 
 	// ----------------------------------------Constants----------------------------------------
 
@@ -151,6 +153,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 		isMoving = false;
 		slowPercent = 1;
 		slowSpeed = 0;
+		logReady = true;
 	}
 
 	/** All the states drives can be in */
@@ -662,6 +665,11 @@ public class Drives extends GenericSubsystem implements Loggable {
 		lh.logLine("Arms PTO: " + drivesPTOArms.get());
 		lh.logLine("Unsnappy: " + unsnappy.get());
 		
+	}
+
+	@Override
+	public boolean logReady() {
+		return logReady;
 	}
 
 

@@ -62,8 +62,8 @@ public class Logger extends GenericSubsystem {
 		} catch (Exception e) {
 			return;
 		}
-		printOverride();
 		logReady = true;
+		printOverride();
 	}
 	
 	public static Logger getInstance() {
@@ -419,14 +419,16 @@ public class Logger extends GenericSubsystem {
 			if(name.indexOf('-') != -1) {
 				counter = Integer.parseInt(name.substring(0, name.indexOf('-')));
 				counter++;
-				System.out.println(counter);
-				if(name.endsWith(".tar.gz")) {
+				System.out.println(name);
+				if(name.endsWith(".tar.gz") || name.endsWith(".log")) {
 					if(counter > MAXSAVEDFILES) {
 						file.delete();
 					} else {
 						file.renameTo(new File(LOGS_DIRECTORY_LOCATION + counter + name.substring(name.indexOf('-'))));
 					}
-				} else if(name.endsWith(".log")) {
+				}
+				if(name.endsWith(".log")) {
+					System.out.println(counter + name.substring(name.indexOf('-'), name.lastIndexOf('.')));
 					logs.add(counter + name.substring(name.indexOf('-'), name.lastIndexOf('.')));
 				}
 			}
@@ -438,7 +440,8 @@ public class Logger extends GenericSubsystem {
 				File originalFile = new File(LOGS_DIRECTORY_LOCATION + str + ".log");
 				compressedFile.delete();
 				try {
-					Process ps = Runtime.getRuntime().exec("tar -zcf " + str + ".tar.gz " + str + ".log", null, compressedFile.getParentFile());
+					System.out.println("tar -zcf " + str + ".tar.gz " + str + ".log");
+					Process ps = Runtime.getRuntime().exec("tar -zcf " + str + ".tar.gz " + str + ".log", null, originalFile.getParentFile());
 					ps.waitFor();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -486,14 +489,14 @@ public class Logger extends GenericSubsystem {
 		LogHolder lh = new LogHolder(timerToHMS(), "PeriodicLogStatus", "Logger");
 		while(!isInterrupted()) {
 			try {
-				sleep(100);
+				sleep(250);
 				lh.updateTime(timerToHMS());
 				for(Consumer<LogHolder> stringSupplier: periodicLogConsumer) {
 					stringSupplier.accept(lh);
 					builder.append(lh.getData());
 					lh.reset();
 				}
-				if(counter > 20) {
+				if(counter > 8) {
 					if(logReady) {
 						while(printToLog.size() > 0) {
 							builder.append(printToLog.remove());
@@ -574,6 +577,8 @@ public class Logger extends GenericSubsystem {
 	}
 
 	public interface Loggable {
+		
+		public abstract boolean logReady();
 		
 		public abstract void logPeriodic(LogHolder lh);
 		

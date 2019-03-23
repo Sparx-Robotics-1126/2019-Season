@@ -33,6 +33,8 @@ public class Hatch extends GenericSubsystem implements Loggable{
 	private HatchState state;
 
 	private double time;
+	
+	private boolean logReady;
 
 	public Hatch() {
 		super("Hatch");
@@ -51,6 +53,7 @@ public class Hatch extends GenericSubsystem implements Loggable{
 		state = HatchState.STANDBY;
 		time = 0;
 		holderValue = false;
+		logReady = true;
 	}
 
 	public void execute() {
@@ -130,6 +133,11 @@ public class Hatch extends GenericSubsystem implements Loggable{
 		lh.updateLogClass("Hatch_Periodic");
 		lh.logLine("Flipper: " + flipper.get());
 		lh.logLine("Shooter: " + shooter.get());
+	}
+
+	@Override
+	public boolean logReady() {
+		return logReady;
 	}
 	
 }

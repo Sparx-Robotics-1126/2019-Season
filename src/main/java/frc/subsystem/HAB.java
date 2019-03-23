@@ -41,6 +41,8 @@ public class HAB extends GenericSubsystem implements Loggable{
 	// ----------------------------------------Constants---------------------------------------------
 
 	private boolean isDone = false;
+	
+	private boolean logReady;
 
 	// ------------------------------------------Code-------------------------------------------
 	
@@ -61,6 +63,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 		wantedSpeedRight = 0;
 		// bottomSensor = new DigitalInput(14);
 		state = LeadScrewState.STANDBY;
+		logReady = true;
 	}
 
 	public enum LeadScrewState {
@@ -191,6 +194,11 @@ public class HAB extends GenericSubsystem implements Loggable{
 		lh.updateLogClass("HAB_Periodic");
 		lh.logLine("Lead Screw Motor: " + leadScrewMtr.get());
 		lh.logLine("Lead Screw Encoder: " + leadScrewEncRaw.getDistance());
+	}
+
+	@Override
+	public boolean logReady() {
+		return logReady;
 	}
 
 }
