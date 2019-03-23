@@ -20,6 +20,15 @@ public class Robot extends TimedRobot {
 	private RobotSystem system;
 
 	/**
+	 * Changes:
+	 * Swapped IO
+	 * -Drives encoders (right encoder, channels swapped (10/11)
+	 * -Drives PTO, Shifting (0/1)
+	 * Gyro - not swapped, but first priority should be testing it when swapping during competition!
+	 * 
+	 */
+	
+	/**
 	 * This function is run when the robot is first started up and should be used
 	 * for any initialization code.
 	 */
