@@ -9,7 +9,7 @@ package frc.subsystem;
 
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Timer;
-import frc.util.Debugger;
+import frc.util.DebugTable;
 
 /**
  * Add your docs here.
@@ -35,7 +35,7 @@ public abstract class GenericSubsystem extends Thread {
 	
 	public static void addToTables(Sendable sendable, String subsystem, String name) {
 		//LiveWindow won't update names sometimes for some reason? (but it does sometimes ?????)
-		Debugger.addToTable(sendable, name, subsystem);
+		DebugTable.addToTable(sendable, name, subsystem);
 	}
 	
 	public void addToTables(Sendable sendable, String name) {

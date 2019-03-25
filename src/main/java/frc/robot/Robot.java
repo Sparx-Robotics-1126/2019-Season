@@ -8,6 +8,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -25,7 +27,11 @@ public class Robot extends TimedRobot {
 	 * -Drives encoders (right encoder, channels swapped (10/11)
 	 * -Drives PTO, Shifting (0/1)
 	 * Gyro - not swapped, but first priority should be testing it when swapping during competition!
-	 * 
+	 * Updated HAB level 2 height (-7.25 -> -7.75)
+	 * Change level 2 method in TeleOP (do arms and hab at same time, dont do prearms)
+	 * Changed level 2 delay time (3.2 -> 2)
+	 * Changed level 3 delay time (2.35 -> 1.35)
+	 * Changed pre-arms height (-2.5 -> -7.75)
 	 */
 	
 	/**
@@ -34,6 +40,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
+		LiveWindow.disableAllTelemetry();
 		system = new RobotSystem();
 		system.init();
 		system.start();
@@ -76,6 +83,12 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotPeriodic() {
 
+	}
+	
+	@Override
+	public void testInit() {
+		LiveWindow.setEnabled(false);
+		Shuffleboard.disableActuatorWidgets();
 	}
 
 	/**

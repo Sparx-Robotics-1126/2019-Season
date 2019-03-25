@@ -9,12 +9,13 @@ import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
 import frc.subsystem.GenericSubsystem;
 
-public class Debugger extends GenericSubsystem{
+public class DebugTable extends GenericSubsystem{
 
 	private static final Map<Object, Component> components = new HashMap<>();
 	private static final NetworkTable DEBUG_TABLE = NetworkTableInstance.getDefault().getTable("DebugTable");
+	
 	//TODO: implement sensor checking
-	public Debugger() {
+	public DebugTable() {
 		super("Debugger", Thread.MIN_PRIORITY);
 	}
 
@@ -37,10 +38,6 @@ public class Debugger extends GenericSubsystem{
 	@Override
 	public long sleepTime() {
 		return 20;
-	}
-	
-	public void startDebug(String debugMode) {
-		
 	}
 	
 	public static synchronized void addToTable(Sendable sendable, String name, String subsystem) {

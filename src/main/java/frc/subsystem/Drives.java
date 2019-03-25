@@ -63,8 +63,6 @@ public class Drives extends GenericSubsystem implements Loggable {
 
 	private Vision vision;
 	
-	private PowerDistributionPanel pdp;
-
 	// ----------------------------------------Variable-----------------------------------------
 
 	private double lastAngle;
@@ -113,9 +111,9 @@ public class Drives extends GenericSubsystem implements Loggable {
 
 	private final double SLOW_TURNING_RATE = 0.8;
 
-	private final double TURN_SLOW_DEFAULT_PERCENT = 0.5;
+	private static final double TURN_SLOW_DEFAULT_PERCENT = 0.5;
 
-	private final double STRAIGHTEN_MIN_SPEED_MULTIPLIER = 0.7;
+	private static final double STRAIGHTEN_MIN_SPEED_MULTIPLIER = 0.7;
 
 	// ------------------------------------------Code-------------------------------------------
 
@@ -161,10 +159,6 @@ public class Drives extends GenericSubsystem implements Loggable {
 		isMoving = false;
 		slowPercent = 1;
 		slowSpeed = 0;
-		pdp = new PowerDistributionPanel();
-		voltage = pdp.getVoltage();
-		current = pdp.getTotalCurrent();
-		LiveWindow.remove(pdp);
 		logReady = true;
 	}
 
@@ -690,16 +684,6 @@ public class Drives extends GenericSubsystem implements Loggable {
 		lh.logLine("Right drives motors (voltage): " + rightMtrs.getVoltage());
 		lh.logLine("Left drives motors (current): " + leftMtrs.getCurrent());
 		lh.logLine("Right drives motors (current): " + rightMtrs.getCurrent());
-		lh.logLine("PDP Voltage: " + pdp.getTotalCurrent());
-		lh.logLine("PDP Current: " + pdp.getVoltage());
-		if(pdp.getTotalCurrent() > current) {
-			current = pdp.getTotalCurrent();
-		}
-		if(pdp.getVoltage() < voltage) {
-			voltage = pdp.getVoltage();
-		}
-		lh.logLine("Highest current: " + current);
-		lh.logLine("Lowest voltage: " + voltage);
 //		lh.logLine("Shifter: " + (shifter.get() ? "High Gear" : "Low Gear"));
 //		if(gyro != null) {
 //			lh.logLine("Gyro (virtual angle): " + getAngle());
@@ -718,8 +702,6 @@ public class Drives extends GenericSubsystem implements Loggable {
 //		
 	}
 	
-	
-
 	@Override
 	public boolean logReady() {
 		return logReady;

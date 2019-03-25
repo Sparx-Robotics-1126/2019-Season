@@ -14,7 +14,7 @@ import frc.controls.TeleOP;
 import frc.subsystem.Drives;
 import frc.subsystem.HAB;
 import frc.subsystem.Hatch;
-import frc.util.Debugger;
+import frc.util.DebugTable;
 import frc.util.Logger;
 
 /**
@@ -32,7 +32,7 @@ public class RobotSystem extends Thread{
 	private Hatch hatch;
 	
 	private Logger logger;
-	private Debugger debugger;
+	private DebugTable debugger;
 
 	private Compressor compress;
 	
@@ -48,7 +48,7 @@ public class RobotSystem extends Thread{
 		compress.setClosedLoopControl(true);
 		logger = Logger.getInstance();
 		logger.start();
-		debugger = new Debugger();
+		debugger = new DebugTable();
 		debugger.start();
 //		CameraServer.getInstance().startAutomaticCapture();
 	}

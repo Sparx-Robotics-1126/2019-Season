@@ -41,6 +41,7 @@ public class IO {
     public static final int HAB_LEADSCREWENCODER_CH1 =						24;
     public static final int HAB_LEADSCREWENCODER_CH2 =						25;
     public static final int HAB_LEADSCREWMOTOR =							4;
+    public static final int HAB_LEADSCREWSECONDMOTOR = 						9;
     public static final int HAB_RIGHTMOTOR =								6;
     public static final int HAB_LEFTMOTOR =									7;
    

@@ -9,10 +9,14 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Consumer;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.subsystem.GenericSubsystem;
 
 public class Logger extends GenericSubsystem {
@@ -29,7 +33,8 @@ public class Logger extends GenericSubsystem {
 	private boolean logReady;
 	private final static boolean LOG_TO_CONSOLE = true;
 	private final static int MAXSAVEDFILES = 10;
-	private int counter;
+	private int periodicCounter;
+	private long logCounter;
 	private static final int sleepTime = 100;
 	private static final int printCounter = 2000 / sleepTime;
 	private String[] stackInfo;
@@ -40,6 +45,9 @@ public class Logger extends GenericSubsystem {
 	private File logFile;
 
 	private StackWalker stw;
+	
+	private static final NetworkTable LOG_TABLE = NetworkTableInstance.getDefault().getTable("LogTable");
+	private NetworkTable logTable;
 
 	private Logger() {
 		super("Logger", Thread.MIN_PRIORITY);
@@ -48,7 +56,10 @@ public class Logger extends GenericSubsystem {
 		if(!makeLogsDir()) { 
 			return;			  
 		}					
-		counter = 0;
+		LOG_TABLE.getSubTable("logs");
+		//		NetworkTable nt;
+//		nt.
+		periodicCounter = 0;
 		stackInfo = new String[3];
 		stw = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
 		updateFiles();
@@ -66,6 +77,14 @@ public class Logger extends GenericSubsystem {
 		}
 		logReady = true;
 		printOverride();
+		initNetworkTable(logFile.getName());
+	}
+	
+	private void initNetworkTable(String name) {
+		LOG_TABLE.getEntry(".name").setString(name);
+		LOG_TABLE.getEntry(".inServerUse").setBoolean(true);
+		logTable = LOG_TABLE.getSubTable("logs");
+		logCounter = 0;
 	}
 	
 	public static Logger getInstance() {
@@ -498,7 +517,7 @@ public class Logger extends GenericSubsystem {
 					builder.append(lh.getData());
 					lh.reset();
 				}
-				if(counter > printCounter) {
+				if(periodicCounter > printCounter) {
 					if(logReady) {
 						while(printToLog.size() > 0) {
 							builder.append(printToLog.remove());
@@ -506,9 +525,9 @@ public class Logger extends GenericSubsystem {
 						Files.write(logFile.toPath(), builder.toString().getBytes(), StandardOpenOption.APPEND, StandardOpenOption.DSYNC, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
 						builder.setLength(0);
 					}
-					counter = 0;
+					periodicCounter = 0;
 				} else {
-					counter++;
+					periodicCounter++;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

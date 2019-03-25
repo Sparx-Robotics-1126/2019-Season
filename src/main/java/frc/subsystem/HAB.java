@@ -72,6 +72,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 
 	@Override
 	public void execute() {
+		System.out.println("LeadScrewRate: " + leadScrewEncRaw.getRate());
 		switch (state) {
 		case STANDBY:
 			break;
@@ -90,14 +91,14 @@ public class HAB extends GenericSubsystem implements Loggable{
 			}
 			break;
 		case PRE_ARMS:
-			if(leadScrewEncRaw.getDistance() > -2.5) {
+			if(leadScrewEncRaw.getDistance() > -7.75) {
 				leadScrewMtr.set(-1);
 			} else {
 				stopHab();
 			}
 			break;
 		case LEVELTWO:
-			if(leadScrewEncRaw.getDistance() > -7.25) {
+			if(leadScrewEncRaw.getDistance() > -7.75) {
 				leadScrewMtr.set(-1);
 			} else {
 				stopHab();
