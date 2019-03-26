@@ -12,14 +12,13 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.subsystem.Vision.directions;
+import frc.util.Limelight;
 import frc.util.Logger.LogHolder;
 import frc.util.Logger.Loggable;
 import frc.util.MotorGroup;
@@ -63,6 +62,8 @@ public class Drives extends GenericSubsystem implements Loggable {
 
 	private Vision vision;
 	
+	private Limelight limelightSensor;
+	
 	// ----------------------------------------Variable-----------------------------------------
 
 	private double lastAngle;
@@ -103,6 +104,8 @@ public class Drives extends GenericSubsystem implements Loggable {
 	
 	private double current;
 
+	private boolean limelightInCloseRange;
+	
 	// ----------------------------------------Constants----------------------------------------
 
 	private static final double ANGLE_OFF_BY = 2;
@@ -132,6 +135,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 		leftMtr3 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_3);
 		rightEnc = new Encoder(IO.DRIVES_RIGHTENCODER_CH1, IO.DRIVES_RIGHTENCODER_CH2);
 		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
+		limelightSensor = new Limelight();
 		rightEnc.setDistancePerPulse(-0.02110013);// 0.07897476
 		leftEnc.setDistancePerPulse(0.02110013);
 		gyro = new AHRS(SerialPort.Port.kUSB);
@@ -160,12 +164,13 @@ public class Drives extends GenericSubsystem implements Loggable {
 		slowPercent = 1;
 		slowSpeed = 0;
 		logReady = true;
+		limelightInCloseRange = false;
 	}
 
 	/** All the states drives can be in */
 	public enum DriveState {
 		STANDBY, TELEOP, MOVE_FORWARD, MOVE_BACKWARD, TURN_RIGHT, TURN_LEFT, SHIFT_LOW, SHIFT_HIGH, ARMS, FINDING_LINE,
-		LINE_FOLLOWER, AMAZING_STRAIGHTNESS;
+		LINE_FOLLOWER, AMAZING_STRAIGHTNESS, LOOK_FOR_TARGET_LIME;
 	}
 
 	/* Runs all the code for drives */
@@ -372,6 +377,27 @@ public class Drives extends GenericSubsystem implements Loggable {
 				leftMtrs.set(wantedSpeedLeft);
 			}
 			break;
+		case LOOK_FOR_TARGET_LIME:
+			double angleOff = limelightSensor.getAngle();
+			double area = limelightSensor.getAreaOfImage();
+			if(area > 5 && !limelightInCloseRange) {
+//				limelightSensor.blink(); Disables vision on alternating frames, shouldn't use
+				limelightInCloseRange = true; //Locked like this so that when we lose vision by getting too close the slowdown remains enabled
+			}
+
+			if(limelightInCloseRange){
+				wantedSpeedLeft = .4;
+				wantedSpeedRight = .4;
+			} else {
+				wantedSpeedLeft = 1;
+				wantedSpeedRight = 1;	
+			}
+			amazingLimeness(angleOff);
+			rightMtrs.set(wantedSpeedRight);
+			leftMtrs.set(wantedSpeedLeft);
+			break;
+		default:
+			break;
 
 		}
 //		if(gyro != null) {
@@ -494,6 +520,16 @@ public class Drives extends GenericSubsystem implements Loggable {
 			wantedSpeedRight = reducedPower;
 		}
 	}
+	
+	/** straightens the robot */
+	private void amazingLimeness(double angle) {
+		double reducedPower = (Math.abs(angle)/ANGLE_OFF_BY) > 1 ? wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER : ((ANGLE_OFF_BY - Math.abs(angle))/ANGLE_OFF_BY)*wantedSpeedLeft*(1 - STRAIGHTEN_MIN_SPEED_MULTIPLIER) + wantedSpeedLeft*STRAIGHTEN_MIN_SPEED_MULTIPLIER;
+		if (angle > 0) {
+			wantedSpeedRight = reducedPower;
+		} else if (angle < 0) {
+			wantedSpeedLeft = reducedPower;
+		}
+	}
 
 	/** gets the distance the robot has travelled since the last time the encoders */
 	private double getDistance() {
@@ -568,6 +604,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 
 	/** used by RobotSystem to put the robot in the teleop state */
 	public void toTeleop() {
+		limelightSensor.setEnable(false);
 		isMoving = false;
 		rightMtrs.setNeutralMode(NeutralMode.Brake);
 		leftMtrs.setNeutralMode(NeutralMode.Brake);
@@ -593,6 +630,11 @@ public class Drives extends GenericSubsystem implements Loggable {
 		findLine(-1);
 	}
 
+	public void startLimelightFollow() {
+		limelightSensor.setEnable(true);
+		limelightInCloseRange = false;
+		changeState(DriveState.LOOK_FOR_TARGET_LIME);
+	}
 
 	public void findLine(double maxDistance) {
 		moveDist = maxDistance;
