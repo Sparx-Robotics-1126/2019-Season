@@ -23,6 +23,8 @@ public class HAB extends GenericSubsystem implements Loggable{
 	// ----------------------------------------Motors/Sensors----------------------------------------
 
 	private WPI_TalonSRX leadScrewMtr;
+	
+	private WPI_TalonSRX leadScrewMtr2;
 
 	private Encoder leadScrewEncRaw;
 
@@ -53,6 +55,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 	@Override
 	public void init() {
 		leadScrewMtr = new WPI_TalonSRX(IO.HAB_LEADSCREWMOTOR);
+		leadScrewMtr2 = new WPI_TalonSRX(IO.HAB_LEADSCREWSECONDMOTOR);
 		leadScrewEncRaw = new Encoder(IO.HAB_LEADSCREWENCODER_CH1, IO.HAB_LEADSCREWENCODER_CH2);
 		leadScrewEncRaw.setDistancePerPulse(0.0002698035829915821);
 //		leadScrewEncRaw.setDistancePerPulse(0.0002278293558123873); //0.0002823311758 //0.0003366589558616
@@ -79,6 +82,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 		case UP:
 			if (leadScrewEncRaw.getDistance() < -1) {
 				leadScrewMtr.set(1);
+				leadScrewMtr2.set(1);
 			} else {
 				stopHab();
 			}
@@ -86,6 +90,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 		case DOWN:
 			if (leadScrewEncRaw.getDistance() > -21) {
 				leadScrewMtr.set(-1);
+				leadScrewMtr2.set(-1);
 			} else {
 				stopHab();
 			}
@@ -93,6 +98,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 		case PRE_ARMS:
 			if(leadScrewEncRaw.getDistance() > -7.75) {
 				leadScrewMtr.set(-1);
+				leadScrewMtr2.set(-1);
 			} else {
 				stopHab();
 			}
@@ -100,6 +106,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 		case LEVELTWO:
 			if(leadScrewEncRaw.getDistance() > -7.75) {
 				leadScrewMtr.set(-1);
+				leadScrewMtr2.set(-1);
 			} else {
 				stopHab();
 			}
@@ -111,6 +118,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 	
 	public void setHabScrew(double value) {
 		leadScrewMtr.set(value);
+		leadScrewMtr2.set(value);
 	}
 	
 	@Override
@@ -120,6 +128,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 	
 	public void stopHab() {
 		leadScrewMtr.set(0);
+		leadScrewMtr2.set(0);
 		isDone = true;
 		state = LeadScrewState.STANDBY;
 	}
