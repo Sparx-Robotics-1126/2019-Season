@@ -136,33 +136,25 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case LEFT_HAB_TO_HATCH_FRONT_AND_PICKUP:
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.85, 230); //- 195
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 230); //- 180
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.AUTO_DELAY, 1);
+				automation.addStep(AutoMethod.AUTO_DELAY, 1.35);
 				automation.addStep(AutoMethod.HATCH_SHOOTFLIP);	
+				automation.addStep(AutoMethod.AUTO_DELAY, 0.45);
 				automation.addStep(AutoMethod.DRIVES_RESETANGLE);
-				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.75, 30);
+				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.5, 30);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.80, 75);
+				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.65, 105);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_BACKWARD, 1, 215);
 				automation.addStep(AutoMethod.HATCH_HOME);
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 154);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_TURNRIGHT, 0.75, 65);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.75, 50);
 				automation.addStep(AutoMethod.HATCH_FLIP);
-				automation.addStep(AutoMethod.AUTO_DELAY, 0.5);
-				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
-				automation.addStep(AutoMethod.DRIVES_WAIT);
-				automation.addStep(AutoMethod.AUTO_DELAY, 0.75);
+				automation.addStep(AutoMethod.LIMENESS, 1.5);
 				automation.addStep(AutoMethod.HATCH_HOME);
-				automation.addStep(AutoMethod.AUTO_RECORD);
-				automation.addStep(AutoMethod.AUTO_DELAY, 0.25);
-				automation.addStep(AutoMethod.DRIVES_RESETANGLE);
-				automation.addStep(AutoMethod.DRIVES_BACKWARD, 1, 30);
+				automation.addStep(AutoMethod.DRIVES_BACKWARD, 0.4, 40);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;

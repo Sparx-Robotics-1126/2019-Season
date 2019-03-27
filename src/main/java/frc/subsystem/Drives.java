@@ -633,6 +633,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 	public void startLimelightFollow() {
 		limelightSensor.setEnable(true);
 		limelightInCloseRange = false;
+		isMoving = true;
 		changeState(DriveState.LOOK_FOR_TARGET_LIME);
 	}
 

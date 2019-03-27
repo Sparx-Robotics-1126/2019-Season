@@ -142,7 +142,12 @@ public class Automation {
 		/**
 		 * Kills the auto.
 		 */
-		AUTO_STOP(0);
+		AUTO_STOP(0),
+		/**
+		 * Looks for the reflective tape and lines up the robit
+		 * @param seconds = the number of seconds he limelight will run for
+		 */
+		LIMENESS(1);
 		
 		private final int[] parameterCount;
 
@@ -357,6 +362,11 @@ public class Automation {
 					drives.findLine(currentStepData[0]);
 				}
 				currentStep++;
+				break;
+			case LIMENESS:
+				drives.startLimelightFollow();
+				delayTimeStart = Timer.getFPGATimestamp();
+				delayTime = currentStepData[0];
 				break;
 			case DRIVES_RESETANGLE:
 				drives.resetGyroAngle();
