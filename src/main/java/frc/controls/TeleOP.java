@@ -74,8 +74,7 @@ public class TeleOP implements Controls {
 
 	public enum TeleState {
 		TELEOP,
-		CLIMBING,
-		DEBUG;
+		CLIMBING;
 	}
 
 	private void setAutomationClimbing() {
@@ -214,22 +213,6 @@ public class TeleOP implements Controls {
 			break;
 		case CLIMBING:
 			auto.execute();
-			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_B)) {
-				auto.setDone(true);
-				auto.stopAll();
-			}
-			if(auto.isDone()) {
-				drives.toTeleop();
-				state = TeleState.TELEOP; //needed?
-			}
-			break;
-		case DEBUG:
-			auto.execute();
-			if(isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
-				
-			} else if(isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_B)) {
-				
-			}
 			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_B)) {
 				auto.setDone(true);
 				auto.stopAll();
