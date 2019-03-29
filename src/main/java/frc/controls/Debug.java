@@ -8,6 +8,7 @@ public class Debug implements Controls{
 	
 	private Automation automation;
 	
+	
 	public Debug(Drives drives, Hatch hatch, HAB hab, TeleOP teleop) {
 		automation = new Automation(drives, hatch, hab);
 		

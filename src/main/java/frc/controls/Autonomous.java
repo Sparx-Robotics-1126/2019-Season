@@ -12,7 +12,6 @@ public class Autonomous implements Controls{
 	
 	private Autos selectedAuto;
 	
-	@SuppressWarnings("unused")
 	private Drives drives;
 	@SuppressWarnings("unused")
 	private HAB hab;

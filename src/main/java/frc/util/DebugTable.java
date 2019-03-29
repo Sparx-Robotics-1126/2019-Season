@@ -7,6 +7,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilderImpl;
+import frc.robot.IO;
 import frc.subsystem.GenericSubsystem;
 
 public class DebugTable extends GenericSubsystem{
@@ -54,6 +55,26 @@ public class DebugTable extends GenericSubsystem{
 		}
 		
 		NetworkTable subTable = table.getSubTable(name);
+		subTable.getEntry(".name").setString(sendable.getName());
+		comp.sendableBuilder.setTable(subTable);
+		comp.sendable.initSendable(comp.sendableBuilder);
+		comp.sendableBuilder.startListeners();
+	}
+	
+	public static synchronized void addToTable(Sendable sendable, IO io, String subsystem) {
+		if(sendable == null || io.name == null || io.name.isEmpty()) {
+			return;
+		}
+		if(subsystem == null || subsystem.isEmpty()) {
+			subsystem = "Undefined";
+		}
+		Component comp = new Component(sendable, io.name, subsystem);
+		NetworkTable table = DEBUG_TABLE.getSubTable(subsystem);
+		if(DEBUG_TABLE.containsSubTable(io.name) || components.putIfAbsent(sendable, comp) != null) {
+			return;
+		}
+		
+		NetworkTable subTable = table.getSubTable(io.name);
 		subTable.getEntry(".name").setString(sendable.getName());
 		comp.sendableBuilder.setTable(subTable);
 		comp.sendable.initSendable(comp.sendableBuilder);

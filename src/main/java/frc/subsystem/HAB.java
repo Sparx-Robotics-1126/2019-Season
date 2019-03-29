@@ -54,14 +54,14 @@ public class HAB extends GenericSubsystem implements Loggable{
 
 	@Override
 	public void init() {
-		leadScrewMtr = new WPI_TalonSRX(IO.HAB_LEADSCREWMOTOR);
-		leadScrewMtr2 = new WPI_TalonSRX(IO.HAB_LEADSCREWSECONDMOTOR);
-		leadScrewEncRaw = new Encoder(IO.HAB_LEADSCREWENCODER_CH1, IO.HAB_LEADSCREWENCODER_CH2);
+		leadScrewMtr = new WPI_TalonSRX(IO.HAB_LEADSCREWMOTOR.port);
+		leadScrewMtr2 = new WPI_TalonSRX(IO.HAB_LEADSCREWSECONDMOTOR.port);
+		leadScrewEncRaw = new Encoder(IO.HAB_LEADSCREWENCODER_CH1.port, IO.HAB_LEADSCREWENCODER_CH2.port);
 		leadScrewEncRaw.setDistancePerPulse(0.0002698035829915821);
 //		leadScrewEncRaw.setDistancePerPulse(0.0002278293558123873); //0.0002823311758 //0.0003366589558616
 		leadScrewEncRaw.reset();
-		habLeft = new WPI_TalonSRX(IO.HAB_LEFTMOTOR);
-		habRight = new WPI_TalonSRX(IO.HAB_RIGHTMOTOR);
+		habLeft = new WPI_TalonSRX(IO.HAB_LEFTMOTOR.port);
+		habRight = new WPI_TalonSRX(IO.HAB_RIGHTMOTOR.port);
 		wantedSpeedLeft = 0;
 		wantedSpeedRight = 0;
 		// bottomSensor = new DigitalInput(14);

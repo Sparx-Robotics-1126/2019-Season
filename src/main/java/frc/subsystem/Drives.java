@@ -144,10 +144,10 @@ public class Drives extends GenericSubsystem implements Loggable {
 		rightMtrs = new MotorGroup(rightMtr1, rightMtr2); //rightMtr3
 		rightMtrs.setInverted(true);
 		leftMtrs = new MotorGroup(leftMtr1, leftMtr2); //
-		shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID);
-		drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID);
+		shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID.port);
+		drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID.port);
 		arms = new Arms(rightMtrs, leftMtrs, rightEnc, leftEnc);
-		unsnappy = new Solenoid(IO.DRIVES_UNSNAPPY);
+		unsnappy = new Solenoid(IO.DRIVES_UNSNAPPY.port);
 		vision = new Vision();
 		lastAngle = 0;
 		speedRight = 0;

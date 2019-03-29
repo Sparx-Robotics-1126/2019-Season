@@ -72,8 +72,8 @@ public class Arms {
 		this.leftMtrs = leftMtrs;
 		rightArmEnc = rightEnc;
 		leftArmEnc = leftEnc;
-		leftInput = new DigitalInput(IO.ARMS_LIMITSWITCH_LEFT);
-		rightInput = new DigitalInput(IO.ARMS_LIMITSWITCH_RIGHT);
+		leftInput = new DigitalInput(IO.ARMS_LIMITSWITCH_LEFT.port);
+		rightInput = new DigitalInput(IO.ARMS_LIMITSWITCH_RIGHT.port);
 		GenericSubsystem.addToTables(leftInput, "Arms", "Left Limit Switch");
 		GenericSubsystem.addToTables(rightInput, "Arms", "Right Limit Switch");
 //		leftStatus = new SendableBoolean("Left arm locked");

@@ -45,9 +45,9 @@ public class Hatch extends GenericSubsystem implements Loggable{
 	}
 
 	public void init() {
-		flipper = new Solenoid(IO.HATCH_SOLENOID_FLIPPER);
-		shooter = new Solenoid(IO.HATCH_SOLENOID_SHOOTER);
-		holder = new Solenoid(IO.HATCH_SOLENOID_HOLDER);
+		flipper = new Solenoid(IO.HATCH_SOLENOID_FLIPPER.port);
+		shooter = new Solenoid(IO.HATCH_SOLENOID_SHOOTER.port);
+		holder = new Solenoid(IO.HATCH_SOLENOID_HOLDER.port);
 		flipperValue = false;
 		shooterValue = false;
 		state = HatchState.STANDBY;
