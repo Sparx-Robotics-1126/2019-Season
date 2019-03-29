@@ -129,10 +129,10 @@ public class Drives extends GenericSubsystem implements Loggable {
 	public void init() {
 		rightMtr1 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_1);
 		rightMtr2 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_2);
-		rightMtr3 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_3);
+//		rightMtr3 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_3);
 		leftMtr1 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_1);
 		leftMtr2 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_2);
-		leftMtr3 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_3);
+//		leftMtr3 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_3);
 		rightEnc = new Encoder(IO.DRIVES_RIGHTENCODER_CH1, IO.DRIVES_RIGHTENCODER_CH2);
 		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
 		limelightSensor = new Limelight();
@@ -141,9 +141,9 @@ public class Drives extends GenericSubsystem implements Loggable {
 		gyro = new AHRS(SerialPort.Port.kUSB);
 		gyro.reset();
 		resetGyroAngle();
-		rightMtrs = new MotorGroup(rightMtr1, rightMtr2, rightMtr3);
+		rightMtrs = new MotorGroup(rightMtr1, rightMtr2); //rightMtr3
 		rightMtrs.setInverted(true);
-		leftMtrs = new MotorGroup(leftMtr1, leftMtr2, leftMtr3);
+		leftMtrs = new MotorGroup(leftMtr1, leftMtr2); //
 		shifter = new Solenoid(IO.DRIVES_SHIFTINGSOLENOID);
 		drivesPTOArms = new Solenoid(IO.DRIVES_PTOSOLENOID);
 		arms = new Arms(rightMtrs, leftMtrs, rightEnc, leftEnc);

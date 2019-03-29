@@ -96,7 +96,7 @@ public class Arms {
 		isDone = true;
 		if (wantedDegree > actualDegreeLeft && !stopLeft) {
 			isDone = false;
-			if (!leftInput.get()) {
+			if (leftInput.get()) {
 				stopLeft = true;
 				leftMtrs.set(0);
 			} else {
@@ -115,8 +115,9 @@ public class Arms {
 		}
 		if (wantedDegree > actualDegreeRight && !stopRight) {
 			isDone = false;
-			if (!rightInput.get()) {
+			if (rightInput.get()) {
 				stopRight = true;
+				rightMtrs.set(0);
 			} else {
 				rightMtrSpeed = -rightArmEnc.getRate();
 				if (rightMtrSpeed < wantedSpeed) {

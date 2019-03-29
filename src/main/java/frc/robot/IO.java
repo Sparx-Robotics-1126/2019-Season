@@ -14,10 +14,10 @@ public class IO {
 
     public static final int DRIVES_RIGHTMOTOR_1 =							10;
     public static final int DRIVES_RIGHTMOTOR_2 =							11;
-    public static final int DRIVES_RIGHTMOTOR_3 =							12;
+//    public static final int DRIVES_RIGHTMOTOR_3 =							12;
     public static final int DRIVES_LEFTMOTOR_1 =							1;
     public static final int DRIVES_LEFTMOTOR_2 =							2;
-    public static final int DRIVES_LEFTMOTOR_3 =							3;
+//    public static final int DRIVES_LEFTMOTOR_3 =							3;
     
     public static final int DRIVES_RIGHTENCODER_CH1 =						10; //10
     public static final int DRIVES_RIGHTENCODER_CH2 =						11; //11

@@ -75,7 +75,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 
 	@Override
 	public void execute() {
-		System.out.println("LeadScrewRate: " + leadScrewEncRaw.getRate());
+//		System.out.println("LeadScrewRate: " + leadScrewEncRaw.getRate());
 		switch (state) {
 		case STANDBY:
 			break;
@@ -96,7 +96,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 			}
 			break;
 		case PRE_ARMS:
-			if(leadScrewEncRaw.getDistance() > -7.75) {
+			if(leadScrewEncRaw.getDistance() > -2.25) {
 				leadScrewMtr.set(-1);
 				leadScrewMtr2.set(-1);
 			} else {
@@ -104,7 +104,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 			}
 			break;
 		case LEVELTWO:
-			if(leadScrewEncRaw.getDistance() > -7.75) {
+			if(leadScrewEncRaw.getDistance( ) > -7.75) {
 				leadScrewMtr.set(-1);
 				leadScrewMtr2.set(-1);
 			} else {
@@ -133,6 +133,13 @@ public class HAB extends GenericSubsystem implements Loggable{
 		state = LeadScrewState.STANDBY;
 	}
 
+	public void setHabPower(double dbl) {
+		if(state == LeadScrewState.STANDBY) {
+			leadScrewMtr.set(dbl);
+			leadScrewMtr2.set(dbl);
+		}
+	}
+	
 	public void ctrlDown() {
 		state = LeadScrewState.DOWN;
 		isDone = false;

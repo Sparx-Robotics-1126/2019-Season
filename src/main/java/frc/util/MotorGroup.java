@@ -119,7 +119,7 @@ public class MotorGroup extends SpeedControllerGroup{
             speedControllers[i].set(arg0);
         }
 	}
-
+	
 	public void stopMotors(){
 		for(int i = 0; i < speedControllers.length; i++){
             speedControllers[i].set(0);
