@@ -10,6 +10,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Compressor;
 import frc.controls.Autonomous;
 import frc.controls.Controls;
+import frc.controls.CtrlMap;
 import frc.controls.TeleOP;
 import frc.subsystem.Drives;
 import frc.subsystem.HAB;
@@ -99,13 +100,15 @@ public class RobotSystem extends Thread{
 			case STANDBY:
 				break;
 			case AUTO:
+				if(teleop.isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_B)) {
+					autonomous.stopAuto();
+				}
 				if(autonomous.isDone()) {
 					teleop();
 				}
 			case TELE:
 				currentControl.execute();
 			}
-
 			try {
 				Thread.sleep(50);
 			} catch (InterruptedException e) {

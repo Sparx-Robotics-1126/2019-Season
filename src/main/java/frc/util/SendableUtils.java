@@ -8,6 +8,12 @@ import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class SendableUtils {
+	
+	public interface SendableItem {
+		
+		public abstract void getName();
+		
+	}
 
 	public static class SendableBoolean extends SendableBase {
 		
@@ -16,9 +22,11 @@ public class SendableUtils {
 		
 		private BooleanSupplier bool;
 		private boolean unique;
+		private String name;
 		
 		public SendableBoolean(String name, BooleanSupplier bool) {
 			this.bool = bool;
+			this.name = name;
 			unique = true;
 		}
 		
@@ -62,6 +70,7 @@ public class SendableUtils {
 		
 		private DoubleSupplier ds;
 		private boolean unique;
+		private String name;
 		
 		public SendableDouble(String name) {
 			this(name, 0);
@@ -70,11 +79,13 @@ public class SendableUtils {
 		public SendableDouble(String name, double dbl) {
 			this.ds = new BetterDoubleSupplier(dbl);
 			unique = false;
+			this.name = name;
 		}
 		
 		public SendableDouble(String name, DoubleSupplier ds) {
 			this.ds = ds;
 			unique = true;
+			this.name = name;
 		}
 		
 		public double get() {
@@ -82,7 +93,7 @@ public class SendableUtils {
 		}
 		
 		public void set(double dbl) {
-			if(unique) { //could use instanceof instead of having a bool but thats a big yikers from me for performance
+			if(!unique) { //could use instanceof instead of having a bool but thats a big yikers from me for performance
 				((BetterDoubleSupplier)ds).setDouble(dbl);
 			}
 		}

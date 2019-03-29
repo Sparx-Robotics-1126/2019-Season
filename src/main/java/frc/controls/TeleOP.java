@@ -175,7 +175,6 @@ public class TeleOP implements Controls {
 			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
 				drives.toTeleop();
 			}
-			//Y BUTTON IS BEING USED!!!!
 			//CLIMBING
 			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_LEFT_Y)) {
 				hab.setHabSpeedLeft(-getAxis(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_LEFT_Y));

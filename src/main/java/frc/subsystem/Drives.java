@@ -127,14 +127,14 @@ public class Drives extends GenericSubsystem implements Loggable {
 
 	/** Initializes all the variable in drives */
 	public void init() {
-		rightMtr1 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_1);
-		rightMtr2 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_2);
+		rightMtr1 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_1.port);
+		rightMtr2 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_2.port);
 //		rightMtr3 = new WPI_TalonSRX(IO.DRIVES_RIGHTMOTOR_3);
-		leftMtr1 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_1);
-		leftMtr2 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_2);
+		leftMtr1 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_1.port);
+		leftMtr2 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_2.port);
 //		leftMtr3 = new WPI_TalonSRX(IO.DRIVES_LEFTMOTOR_3);
-		rightEnc = new Encoder(IO.DRIVES_RIGHTENCODER_CH1, IO.DRIVES_RIGHTENCODER_CH2);
-		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1, IO.DRIVES_LEFTENCODER_CH2);
+		rightEnc = new Encoder(IO.DRIVES_RIGHTENCODER_CH1.port, IO.DRIVES_RIGHTENCODER_CH2.port);
+		leftEnc = new Encoder(IO.DRIVES_LEFTENCODER_CH1.port, IO.DRIVES_LEFTENCODER_CH2.port);
 		limelightSensor = new Limelight();
 		rightEnc.setDistancePerPulse(-0.02110013);// 0.07897476
 		leftEnc.setDistancePerPulse(0.02110013);

@@ -41,6 +41,7 @@ public class CtrlMap {
 	
 	public static final int XBOXCONTROLLER_MAIN = 0;
 	public static final int XBOXCONTROLLER_CLIMBING = 1;
+	public static final int XBOXCONTROLLER_DEBUG = 2;
 	
 	public static final double DEADBAND = 0.15;
 	
@@ -52,9 +53,11 @@ public class CtrlMap {
 	//
 	public static final int XBOXMAINBUTTONOFFSET = -1;
 	public static final int XBOXCLIMBINGBUTTONOFFSET = 11;
+	public static final int XBOXDEBUGBUTTONOFFSET = 23; //verify
 	
 	public static final int XBOXMAINPOVOFFSET = 0;
 	public static final int XBOXCLIMBINGPOVOFFSET = 4;
+	public static final int XBOXDEBUGPOVOFFSET = 8;
 
 
 	
