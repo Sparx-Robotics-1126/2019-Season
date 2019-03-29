@@ -32,7 +32,7 @@ public class Logger extends GenericSubsystem {
 //	private final String LOGS_DIRECTORY_LOCATION = "C:\\Sparx\\"; //starting from the home directory
 	private boolean logReady;
 	private final static boolean LOG_TO_CONSOLE = true;
-	private final static int MAXSAVEDFILES = 10;
+	private final static int MAXSAVEDFILES = 5;
 	private int periodicCounter;
 	private long logCounter;
 	private static final int sleepTime = 100;
@@ -46,8 +46,8 @@ public class Logger extends GenericSubsystem {
 
 	private StackWalker stw;
 	
-	private static final NetworkTable LOG_TABLE = NetworkTableInstance.getDefault().getTable("LogTable");
-	private NetworkTable logTable;
+//	private static final NetworkTable LOG_TABLE = NetworkTableInstance.getDefault().getTable("LogTable");
+//	private NetworkTable logTable;
 
 	private Logger() {
 		super("Logger", Thread.MIN_PRIORITY);
@@ -56,7 +56,7 @@ public class Logger extends GenericSubsystem {
 		if(!makeLogsDir()) { 
 			return;			  
 		}					
-		LOG_TABLE.getSubTable("logs");
+//		LOG_TABLE.getSubTable("logs");
 		//		NetworkTable nt;
 //		nt.
 		periodicCounter = 0;
@@ -77,15 +77,15 @@ public class Logger extends GenericSubsystem {
 		}
 		logReady = true;
 		printOverride();
-		initNetworkTable(logFile.getName());
+//		initNetworkTable(logFile.getName());
 	}
 	
-	private void initNetworkTable(String name) {
-		LOG_TABLE.getEntry(".name").setString(name);
-		LOG_TABLE.getEntry(".inServerUse").setBoolean(true);
-		logTable = LOG_TABLE.getSubTable("logs");
-		logCounter = 0;
-	}
+//	private void initNetworkTable(String name) {
+//		LOG_TABLE.getEntry(".name").setString(name);
+//		LOG_TABLE.getEntry(".inServerUse").setBoolean(true);
+//		logTable = LOG_TABLE.getSubTable("logs");
+//		logCounter = 0;
+//	}
 	
 	public static Logger getInstance() {
 		if(logger == null) {
