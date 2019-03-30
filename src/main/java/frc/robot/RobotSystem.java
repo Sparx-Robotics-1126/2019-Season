@@ -69,6 +69,7 @@ public class RobotSystem extends Thread{
 	}
 
 	public void teleop() {
+		System.out.println("Starting TeleOP");
 		currentControl = teleop;
 		currentState = RobotState.TELE;
 		drives.toTeleop();
@@ -88,9 +89,9 @@ public class RobotSystem extends Thread{
 		drives.start();
 		hab.start();
 		hatch.start();
-//		logger.addPeriodicLog(drives::logPeriodic);
-//		logger.addPeriodicLog(hab::logPeriodic);
-//		logger.addPeriodicLog(hatch::logPeriodic);
+		logger.addPeriodicLog(drives::logPeriodicReady);
+		logger.addPeriodicLog(hab::logPeriodicReady);
+		logger.addPeriodicLog(hatch::logPeriodicReady);
 	}
 
 	@Override
@@ -102,8 +103,10 @@ public class RobotSystem extends Thread{
 			case AUTO:
 				if(teleop.isPressedButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_B)) {
 					autonomous.stopAuto();
+					System.out.println("Autonomous stopped");
 				}
 				if(autonomous.isDone()) {
+					System.out.println("Autonomous finished, moving to TeleOP");
 					teleop();
 				}
 			case TELE:

@@ -64,11 +64,13 @@ public class Robot extends TimedRobot {
 	public void autonomousInit() {
 		system.resetVision();
 		system.autonomous();
+		System.out.println("Mode changed - Autonomous");
 	}
 
 	public void teleopInit() {
 		system.resetVision();
 		system.teleop();
+		System.out.println("Mode changed - TeleOP");
 	}
 
 	/**
@@ -89,6 +91,7 @@ public class Robot extends TimedRobot {
 	public void testInit() {
 		LiveWindow.setEnabled(false);
 		Shuffleboard.disableActuatorWidgets();
+		System.out.println("Mode changed - Test");
 	}
 
 	/**

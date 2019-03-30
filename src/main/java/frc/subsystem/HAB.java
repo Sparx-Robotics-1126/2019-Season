@@ -86,6 +86,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 				leadScrewMtr.set(1);
 				leadScrewMtr2.set(1);
 			} else {
+				System.out.println("HAB up finished");
 				stopHab();
 			}
 			break;
@@ -94,6 +95,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 				leadScrewMtr.set(-1);
 				leadScrewMtr2.set(-1);
 			} else {
+				System.out.println("HAB down finished");
 				stopHab();
 			}
 			break;
@@ -102,6 +104,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 				leadScrewMtr.set(-1);
 				leadScrewMtr2.set(-1);
 			} else {
+				System.out.println("HAB prearms finished");
 				stopHab();
 			}
 			break;
@@ -110,6 +113,7 @@ public class HAB extends GenericSubsystem implements Loggable{
 				leadScrewMtr.set(-1);
 				leadScrewMtr2.set(-1);
 			} else {
+				System.out.println("HAB level two finished");
 				stopHab();
 			}
 			break;
@@ -143,21 +147,25 @@ public class HAB extends GenericSubsystem implements Loggable{
 	}
 	
 	public void ctrlDown() {
+		System.out.println("Moving HAB down");
 		state = LeadScrewState.DOWN;
 		isDone = false;
 	}
 
 	public void ctrlUP() {
+		System.out.println("Moving HAB to home");
 		state = LeadScrewState.UP;
 		isDone = false;
 	}
 	
 	public void ctrlLevelTwo() {
+		System.out.println("Moving HAB to level two");
 		state = LeadScrewState.LEVELTWO;
 		isDone = false;
 	}
 	
 	public void ctrlPreArms() {
+		System.out.println("Moving HAB to prearms");
 		state = LeadScrewState.PRE_ARMS;
 		isDone = false;
 	}

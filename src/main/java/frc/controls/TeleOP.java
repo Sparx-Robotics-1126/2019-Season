@@ -154,25 +154,37 @@ public class TeleOP implements Controls {
 				drives.joystickRight(0);
 			}
 			if (isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R1)) {
+				System.out.println("R1 button pressed (driver) - Hatch flipper pressed");
 				hatch.flipperButton();
 			} else if (isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L1)) {
+				System.out.println("L1 button pressed (driver) - Hatch shooter pressed");
 				hatch.shooterButton();
-			} else if (isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R1) || isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L1)) {
+			} else if (isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R1)) {
+				System.out.println("R1 button released (driver) - Hatch home");
+				hatch.homeButton();
+			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L1)) {
+				System.out.println("L1 button released (driver) - Hatch home");
 				hatch.homeButton();
 			}
 			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R2)) {
+				System.out.println("R2 button pressed (driver) - Starting drives straightening");
 				drives.toAmazingStraightness();
 			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_R2)) {
+				System.out.println("R2 button released (driver) - Exiting drives straightening");
 				drives.changeState(DriveState.TELEOP);
 			}
 			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L2)) {
+				System.out.println("L2 button pressed (driver) - Starting limelight following");
 				drives.startLimelightFollow();
 			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_L2)) {
+				System.out.println("L2 button released (driver) - Exiting limelight following");
 				drives.toTeleop();
 			}
 			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
+				System.out.println("A button pressed (driver) - Starting line following");
 				drives.findLine();
 			} else if(isFallingEdgeButton(CtrlMap.XBOXCONTROLLER_MAIN, CtrlMap.XBOX_A)) {
+				System.out.println("A button released (driver) - Ending line following");
 				drives.toTeleop();
 			}
 			//CLIMBING
@@ -181,7 +193,6 @@ public class TeleOP implements Controls {
 			} else {
 				hab.setHabSpeedLeft(0);
 			}
-			
 			if (isOffZeroAxis(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_RIGHT_Y)) {
 				hab.setHabSpeedRight(getAxis(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_RIGHT_Y));
 			} else {
@@ -189,31 +200,38 @@ public class TeleOP implements Controls {
 			}
 			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_L1)) {
 				if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_A)) {
+					System.out.println("L1 + A buttons pressed (operator) - Entering HAB 3 climb");
 					setAutomationClimbing();
 				} else if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_Y)) {
+					System.out.println("L1 + Y buttons pressed (operator) - Entering HAB 2 climb");
 					setAutomationClimbingLow();
 				}
 			}
-			if (isPressedPOV(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.POV_DOWN)) {
+			if (isRisingEdgePOV(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.POV_DOWN)) {
+				System.out.println("POV Down pressed (operator) - starting Drives Arms procedure");
 				drives.toArms();
 			} 
-			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_BACK)) {
+			if(isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_BACK)) {
+				System.out.println("Back button pressed (operator) - moving HAB to level two");
 				hab.ctrlLevelTwo();
 			}
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_START)) {
+			if (isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_START)) {
+				System.out.println("Start button pressed (operator) - moving HAB to level three");
 				hab.ctrlDown();
 			}
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_R1)) {
+			if (isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_R1)) {
+				System.out.println("R1 button pressed (operator) - moving HAB to prearms");
 				hab.ctrlPreArms();
 			}
-			if (isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_X)) {
-				System.out.println("Button pressed");
+			if (isRisingEdgeButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_X)) {
+				System.out.println("X button pressed (operator) - moving HAB up");
 				hab.ctrlUP();
 			}
 			break;
 		case CLIMBING:
 			auto.execute();
 			if(isPressedButton(CtrlMap.XBOXCONTROLLER_CLIMBING, CtrlMap.XBOX_B)) {
+				System.out.println("B button pressed - TeleOP killing Auto");
 				auto.setDone(true);
 				auto.stopAll();
 			}

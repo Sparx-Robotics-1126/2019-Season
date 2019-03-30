@@ -22,6 +22,7 @@ import frc.util.Limelight;
 import frc.util.Logger.LogHolder;
 import frc.util.Logger.Loggable;
 import frc.util.MotorGroup;
+import frc.util.SendableUtils.SendableDouble;
 
 /**
  * Add your docs here.
@@ -34,13 +35,13 @@ public class Drives extends GenericSubsystem implements Loggable {
 
 	private WPI_TalonSRX rightMtr2;
 
-	private WPI_TalonSRX rightMtr3;
+//	private WPI_TalonSRX rightMtr3;
 
 	private WPI_TalonSRX leftMtr1;
 
 	private WPI_TalonSRX leftMtr2;
 
-	private WPI_TalonSRX leftMtr3;
+//	private WPI_TalonSRX leftMtr3;
 
 	private Encoder rightEnc;
 
@@ -100,10 +101,6 @@ public class Drives extends GenericSubsystem implements Loggable {
 	
 	private boolean logReady;
 	
-	private double voltage;
-	
-	private double current;
-
 	private boolean limelightInCloseRange;
 	
 	// ----------------------------------------Constants----------------------------------------
@@ -163,8 +160,8 @@ public class Drives extends GenericSubsystem implements Loggable {
 		isMoving = false;
 		slowPercent = 1;
 		slowSpeed = 0;
-		logReady = true;
 		limelightInCloseRange = false;
+		logReady = true;
 	}
 
 	/** All the states drives can be in */
@@ -181,6 +178,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 			SmartDashboard.putString("SHIFTER", "Low gear");
 		}
 		if (state != DriveState.ARMS && drivesPTOArms.get()) {
+			System.out.println("Disabling drives PTO");
 			drivesPTOArms.set(false);
 		}
 		switch (state) {
@@ -188,6 +186,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 			break;
 		case TELEOP:
 			if(shifter.get()) {
+				System.out.println("Shifter high in TeleOP, setting to low");
 				lowShift();
 			}
 			rightMtrs.set(speedRight);
@@ -195,6 +194,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 			break;
 		case MOVE_FORWARD:
 			if (getDistance() > moveDist) {
+				System.out.println("Drives move forward completed");
 				rightMtrs.stopMotors();
 				leftMtrs.stopMotors();
 				isMoving = false;
@@ -214,6 +214,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 			break;
 		case MOVE_BACKWARD:
 			if (getDistance() < moveDist) {
+				System.out.println("Drives move backward completed");
 				rightMtrs.stopMotors();
 				leftMtrs.stopMotors();
 				isMoving = false;
@@ -234,37 +235,32 @@ public class Drives extends GenericSubsystem implements Loggable {
 		case TURN_RIGHT:
 			System.out.println("0: " + rightMtrs.get() + ", " + leftMtrs.get());
 			if (getAngle() > turnAngle) {
+				System.out.println("Drives turn right completed");
 				rightMtrs.stopMotors();
 				leftMtrs.stopMotors();
 				resetGyroAngle(turnAngle);
 				isMoving = false;
 				changeState(DriveState.STANDBY);
-				System.out.println("1: " + rightMtrs.get() + ", " + leftMtrs.get());
 			} else {
 				if (turnAngle < getAngle() + 45) {
-					System.out.println("2: " + rightMtrs.get() + ", " + leftMtrs.get());
 					currentRate = gyro.getRate();
-					System.out.println("currentRate: " + currentRate);
-					
 					if(currentRate > SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
 						if(currentRate > 2) {
 							turnSpeed = 0;
 						} else {
 							turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
 						}
-						System.out.println("greater than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
 					} else if(currentRate < SLOW_TURNING_RATE - SLOW_TURNING_DEADBAND) {
 						turnSpeed = turnSpeed + 0.05 <= 1 ? turnSpeed + 0.05 : 1;
-						System.out.println("less than, right: " + rightMtrs.get() + ", left: " + leftMtrs.get());
 					}
 				} 
 				rightMtrs.set(-turnSpeed);
 				leftMtrs.set(turnSpeed);
-				System.out.println("3: " + rightMtrs.get() + ", " + leftMtrs.get());
 			}
 			break;
 		case TURN_LEFT:
 			if (getAngle() < turnAngle) {
+				System.out.println("Drives turn left completed");
 				rightMtrs.stopMotors();
 				leftMtrs.stopMotors();
 				resetGyroAngle(turnAngle);
@@ -280,38 +276,40 @@ public class Drives extends GenericSubsystem implements Loggable {
 						} else {
 							turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
 						}
-						//						turnSpeed = turnSpeed - 0.05 > 0.3 ? turnSpeed - 0.05 : 0.3;
-						System.out.println("greater than, left: " + rightMtrs.get() + ", left: " + leftMtrs.get());
 					} else if(currentRate > -SLOW_TURNING_RATE + SLOW_TURNING_DEADBAND) {
 						turnSpeed = turnSpeed + 0.05 <= 1 ? turnSpeed + 0.05 : 1;
-						System.out.println("less than, left: " + rightMtrs.get() + ", left: " + leftMtrs.get());
 					}
 				}
 				rightMtrs.set(turnSpeed);
 				leftMtrs.set(-turnSpeed);
 			}
-			System.out.println("Gyro angle (turn): " + getAngle());
 			break;
 		case LINE_FOLLOWER:
 			directions st = vision.getDirection();
 			if (st == directions.LEFT) {
+				System.out.println("Line follower going left");
 				leftMtrs.set(-0.4);
 				rightMtrs.set(0.5);
 			} else if (st == directions.RIGHT) {
+				System.out.println("Line follower going right");
 				leftMtrs.set(0.4);
 				rightMtrs.set(-0.5);
 			} else if (st == directions.FORWARD) {
+				System.out.println("Line follower going forward");
 				leftMtrs.set(0.2);
 				rightMtrs.set(0.2);
 			} else if (st == directions.SLIGHTLEFT) {
+				System.out.println("Line follower going slightly left; finished for Auto");
 				isMoving = false;
 				leftMtrs.set(0.00);
 				rightMtrs.set(0.40);
 			} else if (st == directions.SLIGHTRIGHT) {
+				System.out.println("Line follower going slightly right; finished for Auto");
 				isMoving = false;
 				leftMtrs.set(0.40);
 				rightMtrs.set(0.00);
 			} else if (st == directions.STANDBY) {
+				System.out.println("Line follower - standby?");
 				leftMtrs.set(0);
 				rightMtrs.set(0);
 			}
@@ -321,6 +319,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 			rightMtrs.set(0.2);
 			shifter.set(false);
 			if (timer + 0.1 < Timer.getFPGATimestamp()) {
+				System.out.println("Low shift completed");
 				leftMtrs.set(speedLeft);
 				rightMtrs.set(speedRight);
 				isMoving = false;
@@ -332,6 +331,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 			rightMtrs.set(0.2);
 			shifter.set(true);
 			if (timer + 0.1 < Timer.getFPGATimestamp()) {
+				System.out.println("High shift completed");
 				leftMtrs.set(speedLeft);
 				rightMtrs.set(speedRight);
 				changeState(prevState);
@@ -342,12 +342,14 @@ public class Drives extends GenericSubsystem implements Loggable {
 				drivesPTOArms.set(true);
 				arms.armsDown();
 				if (arms.isDone()) {
+					System.out.println("Arms complete");
 					toStandby();
 				}
 			}
 			break;
 		case AMAZING_STRAIGHTNESS:
 			if (!shifter.get() && (getAverageRate() > 65)) {
+				System.out.println("Rate reached, shifting up!");
 				highShift();
 			}
 			wantedSpeedLeft = 1;
@@ -360,14 +362,15 @@ public class Drives extends GenericSubsystem implements Loggable {
 			if(getDistance() > 48) {
 				leftMtrs.stopMotors();
 				rightMtrs.stopMotors();
+				System.out.println("Failed to find line");
 				changeState(DriveState.TELEOP);
 			}
-			System.out.println("finding line");
 			vision.getDirection();
 			if(moveDist != -1 && moveDist < getDistance()) {
 				toStandby();
 			}
 			if (vision.triggered()) {
+				System.out.println("Line found, following");
 				changeState(DriveState.LINE_FOLLOWER);
 			} else {
 				wantedSpeedLeft = 0.3;
@@ -382,6 +385,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 			double area = limelightSensor.getAreaOfImage();
 			if(area > 10 && !limelightInCloseRange) {
 //				limelightSensor.blink(); Disables vision on alternating frames, shouldn't use
+				System.out.println("Limelight close, slowing down");
 				limelightInCloseRange = true; //Locked like this so that when we lose vision by getting too close the slowdown remains enabled
 			}
 
@@ -431,6 +435,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 	}
 
 	public void move(double speed, double dist, double slowPercent, double slowSpeed) {
+		System.out.println("Starting drives move foward");
 		resetEncoders();
 		moveSpeed = speed;
 		moveDist = dist;
@@ -438,35 +443,38 @@ public class Drives extends GenericSubsystem implements Loggable {
 		this.slowSpeed = slowSpeed;
 		isMoving = true;
 		if (moveDist > 0) {
+			System.out.println("Starting drives move forward");
 			changeState(DriveState.MOVE_FORWARD);
 		} else {
+			System.out.println("Starting drives move backward");
 			changeState(DriveState.MOVE_BACKWARD);
-
 		}
 	}
 
 	public void resetEncoders() {
+		System.out.println("Drives encoders reset");
 		leftEnc.reset();
 		rightEnc.reset();
 	}
 
 	public void toStandby() {
+		System.out.println("Drives going to standby");
 		stopMotors();
 		changeState(DriveState.STANDBY);
 	}
 
 	/** Stops all the motors in drives */
 	public void stopMotors() {
+		System.out.println("Stopping drives motors");
 		isMoving = false;
 		leftMtrs.stopMotors();
 		rightMtrs.stopMotors();
 	}
 
 	public void stopAll() {
-		isMoving = false;
+		System.out.println("Stopping all drives");
 		drivesPTOArms.set(false);
-		leftMtrs.stopMotors();
-		rightMtrs.stopMotors();
+		stopMotors();
 	}
 
 	/** Finds the value that left joystick is reading */
@@ -578,11 +586,13 @@ public class Drives extends GenericSubsystem implements Loggable {
 	}
 
 	public void toAmazingStraightness() {
+		System.out.println("Starting Drives straightening");
 		resetGyroAngle();
 		changeState(DriveState.AMAZING_STRAIGHTNESS);
 	}
 	
 	public void setShifting(boolean shiftingValue) {
+		System.out.println("Setting shifting to " + shiftingValue);
 		shifter.set(shiftingValue);
 	}
 	
@@ -597,8 +607,10 @@ public class Drives extends GenericSubsystem implements Loggable {
 	/** changes the state of the robot to what is given as a parameter */
 	public void changeState(DriveState st) {
 		if (state == DriveState.ARMS && st != DriveState.ARMS) {
+			System.out.println("Disengaging Drives PTO");
 			drivesPTOArms.set(false);
 		}
+		System.out.println("Drives state set to " + state);
 		state = st;
 	}
 
@@ -609,6 +621,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 		rightMtrs.setNeutralMode(NeutralMode.Brake);
 		leftMtrs.setNeutralMode(NeutralMode.Brake);
 		changeState(DriveState.TELEOP);
+		System.out.println("Switching to Drives TeleOP");
 		// turn(0.5, 90);
 		// move(0.5, 240);
 	}
@@ -618,11 +631,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 		resetGyroAngle();
 		rightMtrs.setNeutralMode(NeutralMode.Brake);
 		leftMtrs.setNeutralMode(NeutralMode.Brake);
-	}
-
-	/** moves the robot forward, used to call move once for drives */
-	public void moveForward() {
-		move(1, 120);
+		System.out.println("Switching to Drives Auto mode");
 	}
 
 	// hi
@@ -634,6 +643,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 		limelightSensor.setEnable(true);
 		limelightInCloseRange = false;
 		isMoving = true;
+		System.out.println("Starting Drives Limelight vision tracking");
 		changeState(DriveState.LOOK_FOR_TARGET_LIME);
 	}
 
@@ -644,6 +654,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 		isMoving = true;
 		vision.reset();
 		changeState(DriveState.FINDING_LINE);
+		System.out.println("Starting Drives line following");
 	}
 
 	/** retruns the Arms object */
@@ -654,6 +665,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 	/** resets vision */
 	public void resetVision() {
 		if(vision != null) {
+			System.out.println("Drives resetting vision");
 			vision.reset();
 		}
 	}
@@ -684,7 +696,8 @@ public class Drives extends GenericSubsystem implements Loggable {
 		addToTables(shifter, "Shifter");
 		addToTables(drivesPTOArms, "Arms", "Drives PTO (Arms)");
 		addToTables(unsnappy, "Arms", "Unsnappy");
-		addToTables(gyro, "Gyro");
+		addToTables(gyro, "Gyro (Real)");
+		addToTables(new SendableDouble("Virtual Gyro", this::getAngle), "Gyro (virtual)");
 		addToTables(vision.centerLeftIR, "Vision", "CLIR");
 		addToTables(vision.leftIR, "Vision",  "LIR");
 		addToTables(vision.centerRightIR, "Vision",  "CRIR");
@@ -727,22 +740,23 @@ public class Drives extends GenericSubsystem implements Loggable {
 		lh.logLine("Right drives motors (voltage): " + rightMtrs.getVoltage());
 		lh.logLine("Left drives motors (current): " + leftMtrs.getCurrent());
 		lh.logLine("Right drives motors (current): " + rightMtrs.getCurrent());
-//		lh.logLine("Shifter: " + (shifter.get() ? "High Gear" : "Low Gear"));
-//		if(gyro != null) {
-//			lh.logLine("Gyro (virtual angle): " + getAngle());
-//			lh.logLine("Gyro (real angle): " + gyro.getAngle());
-//		}
-//		if(vision != null) {
-//			lh.updateLogClass("VISION_PERIODIC");
-//			lh.logLine("Vision Left IR: " + vision.getLeftIR());
-//			lh.logLine("Vision CenterLeft IR: " + vision.getCenterLeftIR());
-//			lh.logLine("Vision CenterRight IR: " + vision.getCenterRightIR());
-//			lh.logLine("Vision Right IR: " + vision.getRightIR());
-//		}
-//		lh.updateLogClass("ARMS_PERIODIC");
-//		lh.logLine("Arms PTO: " + drivesPTOArms.get());
-//		lh.logLine("Unsnappy: " + unsnappy.get());
-//		
+		lh.logLine("Shifter: " + (shifter.get() ? "High Gear" : "Low Gear"));
+		if(gyro != null) {
+			lh.logLine("Gyro (virtual angle): " + getAngle());
+			lh.logLine("Gyro (real angle): " + gyro.getAngle());
+		}
+		if(vision != null) {
+			lh.updateLogClass("VISION_PERIODIC");
+			lh.logLine("Vision Left IR: " + vision.getLeftIR());
+			lh.logLine("Vision CenterLeft IR: " + vision.getCenterLeftIR());
+			lh.logLine("Vision CenterRight IR: " + vision.getCenterRightIR());
+			lh.logLine("Vision Right IR: " + vision.getRightIR());
+			lh.logLine("Limelight angle data: " + limelightSensor.getAngle());
+			lh.logLine("Limelight area data: " + limelightSensor.getAreaOfImage());
+		}
+		lh.updateLogClass("ARMS_PERIODIC");
+		lh.logLine("Arms PTO: " + drivesPTOArms.get());
+		lh.logLine("Unsnappy: " + unsnappy.get());
 	}
 	
 	@Override

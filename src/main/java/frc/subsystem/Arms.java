@@ -11,10 +11,8 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 import frc.util.MotorGroup;
-import frc.util.SendableUtils.SendableBoolean;
 
 /**
  * Add your docs here.
@@ -99,6 +97,7 @@ public class Arms {
 			if (leftInput.get()) {
 				stopLeft = true;
 				leftMtrs.set(0);
+				System.out.println("Left side arm latched");
 			} else {
 				leftMtrSpeed = -leftArmEnc.getRate();
 				if (leftMtrSpeed < wantedSpeed) {
@@ -118,6 +117,7 @@ public class Arms {
 			if (rightInput.get()) {
 				stopRight = true;
 				rightMtrs.set(0);
+				System.out.println("Right side arm latched");
 			} else {
 				rightMtrSpeed = -rightArmEnc.getRate();
 				if (rightMtrSpeed < wantedSpeed) {

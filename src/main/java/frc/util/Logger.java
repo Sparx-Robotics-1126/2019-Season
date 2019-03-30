@@ -21,7 +21,7 @@ import frc.subsystem.GenericSubsystem;
 public class Logger extends GenericSubsystem {
 
 	private MillisTimer timer;
-	
+
 	private static Logger logger;
 
 	private String logName;
@@ -29,13 +29,12 @@ public class Logger extends GenericSubsystem {
 	private final static String COMPRESSION_MODE = "TAR.GZ";
 	private final static String LOGS_DIRECTORY_LOCATION = "/media/sda1/logs/"; //starting from the home directory
 	private final static String LOGS_COUNTER_LOCATION = "/media/sda1/logs/counter.txt";
-//	private final String LOGS_DIRECTORY_LOCATION = "C:\\Sparx\\"; //starting from the home directory
+	//	private final String LOGS_DIRECTORY_LOCATION = "C:\\Sparx\\"; //starting from the home directory
 	private boolean logReady;
 	private final static boolean LOG_TO_CONSOLE = true;
-	private final static int MAXSAVEDFILES = 100;
 	private int periodicCounter;
 	private long logCounter;
-	private static final int sleepTime = 100;
+	private static final int sleepTime = 250;
 	private static final int printCounter = 2000 / sleepTime;
 	private String[] stackInfo;
 
@@ -46,9 +45,6 @@ public class Logger extends GenericSubsystem {
 	private File counterFile;
 
 	private StackWalker stw;
-	
-//	private static final NetworkTable LOG_TABLE = NetworkTableInstance.getDefault().getTable("LogTable");
-//	private NetworkTable logTable;
 
 	private Logger() {
 		super("Logger", Thread.MIN_PRIORITY);
@@ -57,10 +53,6 @@ public class Logger extends GenericSubsystem {
 		if(!makeLogsDir()) { 
 			return;			  
 		}				
-		
-//		LOG_TABLE.getSubTable("logs");
-		//		NetworkTable nt;
-//		nt.
 		periodicCounter = 0;
 		stackInfo = new String[3];
 		stw = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
@@ -80,16 +72,8 @@ public class Logger extends GenericSubsystem {
 		}
 		logReady = true;
 		printOverride();
-//		initNetworkTable(logFile.getName());
 	}
-	
-//	private void initNetworkTable(String name) {
-//		LOG_TABLE.getEntry(".name").setString(name);
-//		LOG_TABLE.getEntry(".inServerUse").setBoolean(true);
-//		logTable = LOG_TABLE.getSubTable("logs");
-//		logCounter = 0;
-//	}
-	
+
 	public static Logger getInstance() {
 		if(logger == null) {
 			logger = new Logger();
@@ -364,11 +348,11 @@ public class Logger extends GenericSubsystem {
 			} else {
 				logCounter = 0;
 			}
-			
+
 		}
-		
+
 	}
-	
+
 	public void getStackInfo(boolean getClass, int stack){
 		StackWalker.StackFrame frame = stw.walk(stream1 -> stream1.skip(stack).findFirst().orElse(null));
 		if(getClass) {
@@ -404,10 +388,6 @@ public class Logger extends GenericSubsystem {
 		}
 		String log = "[" + timerToHMS() + "][" + stackInfo[0] + "][" + stackInfo[1] + "][" + stackInfo[2] + "][" + type.toString() + "] " + message;
 		printToLog.add(log);
-		//		synchronized(printThread) {
-		//			printThread.notify();
-		//		}
-
 	}
 
 	public void logOut(String message, Tag type) {
@@ -417,9 +397,7 @@ public class Logger extends GenericSubsystem {
 	public void log(String subsystem, String method, Tag type, String message) {
 		String log = "[" + timerToHMS() + "][" + subsystem.toUpperCase() + "][" + method.toUpperCase() + "][" + type.toString().toUpperCase() + "] " + message;
 		if(logReady && LOG_TO_CONSOLE) {
-			//			synchronized(dataToPrint) {
 			printToLog.add(log);
-			//			}
 		} else {
 			if(!logReady) {
 				System.out.println(log);
@@ -459,7 +437,6 @@ public class Logger extends GenericSubsystem {
 
 	private boolean makeLogsDir() {
 		File logsDirectory = new File(LOGS_DIRECTORY_LOCATION);
-//		logsDirectory.mkdirs();
 		if(!logsDirectory.exists()) {
 			return false;
 		}
@@ -471,25 +448,10 @@ public class Logger extends GenericSubsystem {
 		File[] files = logsDirectory.listFiles();
 		ArrayList<String> logs = new ArrayList<String>();
 		String name;
-		int counter;
-		
 		for(File file: files) {
 			name = file.getName();
-			if(name.indexOf('-') != -1) {
-//				counter = Integer.parseInt(name.substring(0, name.indexOf('-')));
-//				counter++;
-//				System.out.println(name);
-//				if(name.endsWith(".tar.gz") || name.endsWith(".log")) {
-//					if(counter > MAXSAVEDFILES) {
-//						file.delete();
-//					} else {
-//						file.renameTo(new File(LOGS_DIRECTORY_LOCATION + counter + name.substring(name.indexOf('-'))));
-//					}
-//				}
-				if(name.endsWith(".log")) {
-					System.out.println(name.substring(0, name.lastIndexOf('.')));
-					logs.add(name.substring(0, name.lastIndexOf('.')));
-				}
+			if(name.indexOf('-') != -1 && name.endsWith(".log")) {
+				logs.add(name.substring(0, name.lastIndexOf('.')));
 			}
 
 		}
@@ -530,7 +492,7 @@ public class Logger extends GenericSubsystem {
 		}
 
 	}
-	
+
 	public void addPeriodicLog(Consumer<LogHolder> cons) {
 		if(cons != null && !periodicLogConsumer.contains(cons)) {
 			periodicLogConsumer.add(cons);
@@ -584,15 +546,15 @@ public class Logger extends GenericSubsystem {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
+
 	public class LogHolder {
-		
+
 		private String time;
 		private String type;
 		private String logClass;
 		private String header;
 		private StringBuilder sb;
-		
+
 		public LogHolder(String time, String type, String logClass) {
 			this.time = time;
 			this.type = type;
@@ -600,47 +562,53 @@ public class Logger extends GenericSubsystem {
 			sb = new StringBuilder();
 			updateHeader();
 		}
-		
+
 		public void logLine(String text) {
 			sb.append(header + text + "\n");
 		}
-		
+
 		public String getData() {
 			return sb.toString();
 		}
-		
+
 		public void reset() {
 			sb.setLength(0);
 		}
-		
+
 		public void updateTime(String time) {
 			this.time = time;
 			updateHeader();
 		}
-		
+
 		public void updateType(String type) {
 			this.type = type;
 			updateHeader();
 		}
-		
+
 		public void updateLogClass(String logClass) {
 			this.logClass = logClass;
 			updateHeader();
 		}
-		
+
 		private void updateHeader() {
 			header = "[" + time + "][" + type + "][" + logClass + "] ";
 		}
-		
-		
+
+
 	}
 
 	public interface Loggable {
-		
+
 		public abstract boolean logReady();
-		
+
 		public abstract void logPeriodic(LogHolder lh);
 		
+		public default void logPeriodicReady(LogHolder lh) {
+			if(logReady()) {
+				logPeriodic(lh);
+			}
+		}
+
 	}
-	
+
 }

@@ -64,11 +64,13 @@ public class Hatch extends GenericSubsystem implements Loggable{
 			holderValue = true;
 			flipperValue = true;
 			state = HatchState.STANDBY;
+			System.out.println("Hatch flipper active");
 			break;
 		case SHOOT_AND_FLIPPER:
 			holderValue = true;
 			shooterValue = true;
 			if (Timer.getFPGATimestamp() > time + 0) {
+				System.out.println("Shooting; moving to hatch flipper");
 				state = HatchState.FLIPPER;
 			}
 			break;
@@ -76,6 +78,7 @@ public class Hatch extends GenericSubsystem implements Loggable{
 			holderValue = true;
 			flipperValue = false;
 			shooterValue = false;
+			System.out.println("Going to home");
 			state = HatchState.STANDBY;
 		}
 		flipper.set(flipperValue);

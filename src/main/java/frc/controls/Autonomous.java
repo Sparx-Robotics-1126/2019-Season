@@ -60,6 +60,7 @@ public class Autonomous implements Controls{
 	}
 
 	public void reset() {
+		System.out.println("Autonomous reset");
 		firstRun = true;
 		isDone = false;
 		automation.reset();
@@ -74,7 +75,7 @@ public class Autonomous implements Controls{
 			}
 			switch(auto) {
 			case HAB_TO_HATCH_FRONT:
-				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_FRONT");
+				System.out.println("Auto set - HAB_TO_HATCH_FRONT");
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 220); //186-
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
@@ -95,7 +96,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case HAB_TO_HATCH_MIDDLE:
-				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_MIDDLE");
+				System.out.println("Auto set - HAB_TO_HATCH_MIDDLE");
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 230); //216
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
@@ -107,7 +108,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case HAB_TO_HATCH_BACK:
-				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_BACK");
+				System.out.println("Auto set - HAB_TO_HATCH_BACK");
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.5, 230); //252
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
@@ -119,6 +120,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case LEFT_HAB_TO_HATCH_FRONT_TO_PICKUP:
+				System.out.println("Auto set - LEFT_HAB_TO_HATCH_FRONT_TO_PICKUP");
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 220); //- 180
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
@@ -137,6 +139,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case LEFT_HAB_TO_HATCH_FRONT_AND_PICKUP:
+				System.out.println("Auto set - LEFT_HAB_TO_HATCH_FRONT_AND_PICKUP");
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 220); //- 180
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
@@ -160,6 +163,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case RIGHT_HAB_TO_HATCH_FRONT_TO_PICKUP:
+				System.out.println("RIGHT_HAB_TO_HATCH_FRONT_TO_PICKUP");
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 220); //- 180
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
@@ -178,6 +182,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case RIGHT_HAB_TO_HATCH_FRONT_AND_PICKUP:
+				System.out.println("RIGHT_HAB_TO_HATCH_FRONT_AND_PICKUP");
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 220); //- 180
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
@@ -201,6 +206,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case HAB_TO_LEFT_ROCKET:
+				System.out.println("Auto set - HAB_TO_LEFT_ROCKET");
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.75, 192);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_TURNLEFT, 0.5, 60);
@@ -218,6 +224,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case AUTO_TEST:
+				System.out.println("Auto set - AUTO_TEST");
 				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 120);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.AUTO_RECORD);
@@ -269,11 +276,13 @@ public class Autonomous implements Controls{
 	public void execute() {
 		if(DriverStation.getInstance().isEnabled() && DriverStation.getInstance().isAutonomous()) {
 			if(firstRun) {
+				System.out.println("First run, setting auto and resetting gyro");
 				setAuto(autoSelector.getSelected());
 				drives.resetGyroAngle();
 			} else {
 				automation.execute();
 				if(automation.isDone()) {
+					System.out.println("Auto completed");
 					isDone = true;
 				}
 			}
@@ -285,6 +294,7 @@ public class Autonomous implements Controls{
 	}
 	
 	public void stopAuto() {
+		System.out.println("Auto forcefully stopped");
 		isDone = true;
 		automation.setDone(true);
 		automation.stopAll();

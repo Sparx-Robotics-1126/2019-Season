@@ -3,7 +3,6 @@ package frc.util;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SendableBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
@@ -22,11 +21,10 @@ public class SendableUtils {
 		
 		private BooleanSupplier bool;
 		private boolean unique;
-		private String name;
 		
 		public SendableBoolean(String name, BooleanSupplier bool) {
+			super.setName(name);
 			this.bool = bool;
-			this.name = name;
 			unique = true;
 		}
 		
@@ -35,6 +33,7 @@ public class SendableUtils {
 		}
 		
 		public SendableBoolean(String name, boolean bool) {
+			super.setName(name);
 			if(bool) {
 				this.bool = trueBool;
 			} else {
@@ -70,22 +69,21 @@ public class SendableUtils {
 		
 		private DoubleSupplier ds;
 		private boolean unique;
-		private String name;
 		
 		public SendableDouble(String name) {
 			this(name, 0);
 		}
 		
 		public SendableDouble(String name, double dbl) {
+			super.setName(name);
 			this.ds = new BetterDoubleSupplier(dbl);
 			unique = false;
-			this.name = name;
 		}
 		
 		public SendableDouble(String name, DoubleSupplier ds) {
+			super.setName(name);
 			this.ds = ds;
 			unique = true;
-			this.name = name;
 		}
 		
 		public double get() {

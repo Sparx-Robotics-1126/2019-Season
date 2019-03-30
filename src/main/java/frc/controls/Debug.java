@@ -11,8 +11,10 @@ import frc.util.SendableUtils.SendableBoolean;
 
 public class Debug implements Controls{
 	
+	@SuppressWarnings("unused")
 	private Automation auto;
 	private Joystick debugJoystick;
+	@SuppressWarnings("unused")
 	private boolean debugPassive;
 	private ArrayList<SendableBoolean> passiveDebug;
 	
@@ -40,10 +42,12 @@ public class Debug implements Controls{
 			{ false, false },  // XBOX_LEFT
 	};
 	
+	@SuppressWarnings("unused")
 	private void setDebugActive() {
 		
 	}
 	
+	@SuppressWarnings("unused")
 	private void setDebugPassive(boolean passive) {
 		debugPassive = passive;
 	}
