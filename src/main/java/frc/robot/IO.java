@@ -48,10 +48,10 @@ public enum IO {
 	HAB_LEADSCREWENCODER_CH2(25, "HAB encoder (CH 2)"),
 	HAB_LEADSCREWENCODER_GROUP(-1, "HAB encoder"),
 	HAB_LEADSCREWMOTOR(4, "HAB lead screw (T1)"),
-	HAB_LEADSCREWSECONDMOTOR(5, "HAB lead screw (T2)"),
+	HAB_LEADSCREWSECONDMOTOR(9, "HAB lead screw (T2)"),
 	HAB_LEADSCREWMOTOR_GROUP(-1, "HAB lead screw"),
-	HAB_RIGHTMOTOR(6, "Right arm wheel"),
-	HAB_LEFTMOTOR(7, "Left arm wheel"),
+	HAB_RIGHTMOTOR(7, "Right arm wheel"),
+	HAB_LEFTMOTOR(6, "Left arm wheel"),
 	
 	VISION_LEFTFOLLOWINGSENSOR(14, "Vision left sensor"),
 	VISION_CENTERLEFTFOLLOWINGSENSOR(15, "Vision center left sensor"),

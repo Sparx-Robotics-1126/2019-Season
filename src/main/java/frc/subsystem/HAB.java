@@ -62,6 +62,8 @@ public class HAB extends GenericSubsystem implements Loggable{
 		leadScrewEncRaw.reset();
 		habLeft = new WPI_TalonSRX(IO.HAB_LEFTMOTOR.port);
 		habRight = new WPI_TalonSRX(IO.HAB_RIGHTMOTOR.port);
+		habLeft.setInverted(true);
+		habRight.setInverted(true);
 		wantedSpeedLeft = 0;
 		wantedSpeedRight = 0;
 		// bottomSensor = new DigitalInput(14);

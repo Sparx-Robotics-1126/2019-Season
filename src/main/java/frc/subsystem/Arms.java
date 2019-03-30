@@ -63,7 +63,7 @@ public class Arms {
 
 	private final double wantedDegree = 17; //17
 
-	private final double wantedSpeed = 10;  //10
+	private final double wantedSpeed = 7;  //10
 
 	// ------------------------------------------Code-------------------------------------------
 

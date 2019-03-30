@@ -1,6 +1,8 @@
 package frc.util;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -9,14 +11,11 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Scanner;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.function.Consumer;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.subsystem.GenericSubsystem;
 
 public class Logger extends GenericSubsystem {
@@ -28,11 +27,12 @@ public class Logger extends GenericSubsystem {
 	private String logName;
 	private Vector<Consumer<LogHolder>> periodicLogConsumer;
 	private final static String COMPRESSION_MODE = "TAR.GZ";
-	private final static String LOGS_DIRECTORY_LOCATION = "/home/lvuser/logs/"; //starting from the home directory
+	private final static String LOGS_DIRECTORY_LOCATION = "/media/sda1/logs/"; //starting from the home directory
+	private final static String LOGS_COUNTER_LOCATION = "/media/sda1/logs/counter.txt";
 //	private final String LOGS_DIRECTORY_LOCATION = "C:\\Sparx\\"; //starting from the home directory
 	private boolean logReady;
 	private final static boolean LOG_TO_CONSOLE = true;
-	private final static int MAXSAVEDFILES = 5;
+	private final static int MAXSAVEDFILES = 100;
 	private int periodicCounter;
 	private long logCounter;
 	private static final int sleepTime = 100;
@@ -43,6 +43,7 @@ public class Logger extends GenericSubsystem {
 
 	private ConcurrentLinkedDeque<String> printToLog;
 	private File logFile;
+	private File counterFile;
 
 	private StackWalker stw;
 	
@@ -55,20 +56,22 @@ public class Logger extends GenericSubsystem {
 		logReady = false;
 		if(!makeLogsDir()) { 
 			return;			  
-		}					
+		}				
+		
 //		LOG_TABLE.getSubTable("logs");
 		//		NetworkTable nt;
 //		nt.
 		periodicCounter = 0;
 		stackInfo = new String[3];
 		stw = StackWalker.getInstance(Option.RETAIN_CLASS_REFERENCE);
+		setupCounter();
 		updateFiles();
 		logName = LocalDateTime.now().getDayOfMonth() + "_" + LocalDateTime.now().getMonth() + "_" + LocalDateTime.now().getYear() + 
 				"-" + LocalDateTime.now().getHour() + "_" + LocalDateTime.now().getMinute() + "_" + LocalDateTime.now().getSecond() + ".log";
 		timer = new MillisTimer();
 		timer.start();
 		try {
-			logFile = new File(LOGS_DIRECTORY_LOCATION + "0-" + logName);
+			logFile = new File(LOGS_DIRECTORY_LOCATION + logCounter +"-" + logName);
 			logFile.createNewFile();
 			printToLog = new ConcurrentLinkedDeque<String>();
 			log("LOGGER", "INFO", "Log created at " + logFile.getAbsolutePath());
@@ -332,6 +335,40 @@ public class Logger extends GenericSubsystem {
 		this.notify();
 	}
 
+	public void setupCounter() {
+		counterFile = new File(LOGS_COUNTER_LOCATION);
+		if(!counterFile.exists()) {
+			logCounter = 0;
+			try {
+				Files.write(counterFile.toPath(), "0".getBytes(), StandardOpenOption.WRITE, StandardOpenOption.DSYNC, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			Scanner sc = null;
+			try {
+				sc = new Scanner(new FileInputStream(counterFile));
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(sc != null && sc.hasNextLong()) {
+				logCounter = sc.nextLong();
+				try {
+					Files.write(counterFile.toPath(), ((logCounter + 1) + "").getBytes(), StandardOpenOption.WRITE, StandardOpenOption.DSYNC, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				logCounter = 0;
+			}
+			
+		}
+		
+	}
+	
 	public void getStackInfo(boolean getClass, int stack){
 		StackWalker.StackFrame frame = stw.walk(stream1 -> stream1.skip(stack).findFirst().orElse(null));
 		if(getClass) {
@@ -422,7 +459,7 @@ public class Logger extends GenericSubsystem {
 
 	private boolean makeLogsDir() {
 		File logsDirectory = new File(LOGS_DIRECTORY_LOCATION);
-		logsDirectory.mkdirs();
+//		logsDirectory.mkdirs();
 		if(!logsDirectory.exists()) {
 			return false;
 		}
@@ -435,22 +472,23 @@ public class Logger extends GenericSubsystem {
 		ArrayList<String> logs = new ArrayList<String>();
 		String name;
 		int counter;
+		
 		for(File file: files) {
 			name = file.getName();
 			if(name.indexOf('-') != -1) {
-				counter = Integer.parseInt(name.substring(0, name.indexOf('-')));
-				counter++;
-				System.out.println(name);
-				if(name.endsWith(".tar.gz") || name.endsWith(".log")) {
-					if(counter > MAXSAVEDFILES) {
-						file.delete();
-					} else {
-						file.renameTo(new File(LOGS_DIRECTORY_LOCATION + counter + name.substring(name.indexOf('-'))));
-					}
-				}
+//				counter = Integer.parseInt(name.substring(0, name.indexOf('-')));
+//				counter++;
+//				System.out.println(name);
+//				if(name.endsWith(".tar.gz") || name.endsWith(".log")) {
+//					if(counter > MAXSAVEDFILES) {
+//						file.delete();
+//					} else {
+//						file.renameTo(new File(LOGS_DIRECTORY_LOCATION + counter + name.substring(name.indexOf('-'))));
+//					}
+//				}
 				if(name.endsWith(".log")) {
-					System.out.println(counter + name.substring(name.indexOf('-'), name.lastIndexOf('.')));
-					logs.add(counter + name.substring(name.indexOf('-'), name.lastIndexOf('.')));
+					System.out.println(name.substring(0, name.lastIndexOf('.')));
+					logs.add(name.substring(0, name.lastIndexOf('.')));
 				}
 			}
 

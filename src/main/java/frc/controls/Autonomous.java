@@ -75,7 +75,7 @@ public class Autonomous implements Controls{
 			switch(auto) {
 			case HAB_TO_HATCH_FRONT:
 				System.out.println("Auto set - HAB_ONE_TO_LEFT_HATCH_FRONT");
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 230); //186-
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 220); //186-
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
@@ -90,7 +90,7 @@ public class Autonomous implements Controls{
 			case HAB_TO_GROUND:
 				System.out.println("Auto set - HAB_TO_GROUND");
 				automation.addStep(AutoMethod.AUTO_DELAY, 5);
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 200); 
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 195); 
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
@@ -119,7 +119,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case LEFT_HAB_TO_HATCH_FRONT_TO_PICKUP:
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 230); //- 180
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 220); //- 180
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
@@ -137,7 +137,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case LEFT_HAB_TO_HATCH_FRONT_AND_PICKUP:
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 230); //- 180
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 220); //- 180
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
@@ -160,7 +160,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case RIGHT_HAB_TO_HATCH_FRONT_TO_PICKUP:
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 230); //- 180
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 220); //- 180
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);
@@ -178,7 +178,7 @@ public class Autonomous implements Controls{
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case RIGHT_HAB_TO_HATCH_FRONT_AND_PICKUP:
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 230); //- 180
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 1, 220); //- 180
 				automation.addStep(AutoMethod.DRIVES_WAIT);
 				automation.addStep(AutoMethod.DRIVES_FOLLOWLINE);
 				automation.addStep(AutoMethod.DRIVES_WAIT);

@@ -380,14 +380,14 @@ public class Drives extends GenericSubsystem implements Loggable {
 		case LOOK_FOR_TARGET_LIME:
 			double angleOff = limelightSensor.getAngle();
 			double area = limelightSensor.getAreaOfImage();
-			if(area > 5 && !limelightInCloseRange) {
+			if(area > 10 && !limelightInCloseRange) {
 //				limelightSensor.blink(); Disables vision on alternating frames, shouldn't use
 				limelightInCloseRange = true; //Locked like this so that when we lose vision by getting too close the slowdown remains enabled
 			}
 
 			if(limelightInCloseRange){
-				wantedSpeedLeft = .4;
-				wantedSpeedRight = .4;
+				wantedSpeedLeft = .5;
+				wantedSpeedRight = .5;
 			} else {
 				wantedSpeedLeft = 1;
 				wantedSpeedRight = 1;	
