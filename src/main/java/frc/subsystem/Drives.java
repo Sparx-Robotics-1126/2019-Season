@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -103,6 +104,8 @@ public class Drives extends GenericSubsystem implements Loggable {
 	
 	private boolean limelightInCloseRange;
 	
+	private Compressor compress;
+	
 	// ----------------------------------------Constants----------------------------------------
 
 	private static final double ANGLE_OFF_BY = 2;
@@ -161,6 +164,8 @@ public class Drives extends GenericSubsystem implements Loggable {
 		slowPercent = 1;
 		slowSpeed = 0;
 		limelightInCloseRange = false;
+		compress = new Compressor(IO.ROBOT_COMPRESSOR.port);
+		compress.setClosedLoopControl(true);
 		logReady = true;
 	}
 
@@ -343,7 +348,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 				arms.armsDown();
 				if (arms.isDone()) {
 					System.out.println("Arms complete");
-					toStandby();
+					toTeleop();
 				}
 			}
 			break;
@@ -490,6 +495,7 @@ public class Drives extends GenericSubsystem implements Loggable {
 	/** Releases the arms from the robot */
 	public void toArms() {
 		isMoving = true;
+		compress.setClosedLoopControl(false);
 		arms.reset();
 		unsnappy.set(true);
 		timer = Timer.getFPGATimestamp();
@@ -570,6 +576,20 @@ public class Drives extends GenericSubsystem implements Loggable {
 	public void turn(double speed, double angle) {
 		turn(speed, angle, TURN_SLOW_DEFAULT_PERCENT);
 	}
+	
+	public boolean getArmsLeftLimitSwitch() {
+		if(arms != null) {
+			return arms.leftLimit();
+		}
+		return false;
+	}
+	
+	public boolean getArmsRightLimitSwitch() {
+		if(arms != null) {
+			return arms.rightLimit();
+		}
+		return false;
+	}
 
 	public void turn(double speed, double angle, double slowPercent) {
 		turnAngle = angle;
@@ -610,8 +630,8 @@ public class Drives extends GenericSubsystem implements Loggable {
 			System.out.println("Disengaging Drives PTO");
 			drivesPTOArms.set(false);
 		}
-		System.out.println("Drives state set to " + state);
 		state = st;
+		System.out.println("Drives state set to " + state);
 	}
 
 	/** used by RobotSystem to put the robot in the teleop state */
@@ -757,6 +777,8 @@ public class Drives extends GenericSubsystem implements Loggable {
 		lh.updateLogClass("ARMS_PERIODIC");
 		lh.logLine("Arms PTO: " + drivesPTOArms.get());
 		lh.logLine("Unsnappy: " + unsnappy.get());
+		lh.logLine("Left Arms Limit Switch: " + getArmsLeftLimitSwitch());
+		lh.logLine("Right Arms Limit Switch: " + getArmsRightLimitSwitch());
 	}
 	
 	@Override

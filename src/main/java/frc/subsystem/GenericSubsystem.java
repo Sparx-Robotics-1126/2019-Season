@@ -77,10 +77,10 @@ public abstract class GenericSubsystem extends Thread {
 		log("Starting " + name + "...");
 		while (true) {
 			execute();
-			if(timeToPrint + lastPrinted < Timer.getFPGATimestamp()) {
-				delayedPrints();
-				lastPrinted = Timer.getFPGATimestamp();
-			}
+//			if(timeToPrint + lastPrinted < Timer.getFPGATimestamp()) {
+//				delayedPrints();
+//				lastPrinted = Timer.getFPGATimestamp();
+//			}
 			try {
 				Thread.sleep(timeWait);
 			} catch (InterruptedException e) {

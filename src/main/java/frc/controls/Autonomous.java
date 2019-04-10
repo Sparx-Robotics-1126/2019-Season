@@ -90,9 +90,15 @@ public class Autonomous implements Controls{
 				break;
 			case HAB_TO_GROUND:
 				System.out.println("Auto set - HAB_TO_GROUND");
+//				automation.addStep(AutoMethod.AUTO_DELAY, 5);
+//				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 195); 
+//				automation.addStep(AutoMethod.DRIVES_WAIT);
+//				automation.addStep(AutoMethod.AUTO_STOP);
 				automation.addStep(AutoMethod.AUTO_DELAY, 5);
-				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 195); 
+				automation.addStep(AutoMethod.DRIVES_FORWARD, 0.7, 50); 
 				automation.addStep(AutoMethod.DRIVES_WAIT);
+				automation.addStep(AutoMethod.LIMENESS, 3);
+				automation.addStep(AutoMethod.DRIVES_STOP);
 				automation.addStep(AutoMethod.AUTO_STOP);
 				break;
 			case HAB_TO_HATCH_MIDDLE:

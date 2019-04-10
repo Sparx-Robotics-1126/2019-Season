@@ -453,7 +453,6 @@ public class Logger extends GenericSubsystem {
 			if(name.indexOf('-') != -1 && name.endsWith(".log")) {
 				logs.add(name.substring(0, name.lastIndexOf('.')));
 			}
-
 		}
 		if(COMPRESSION_MODE.equals("TAR.GZ")) {
 			for(String str: logs) {

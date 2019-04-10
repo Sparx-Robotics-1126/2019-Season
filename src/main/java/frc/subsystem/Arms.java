@@ -12,12 +12,14 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
 import frc.robot.IO;
+import frc.util.Logger.LogHolder;
+import frc.util.Logger.Loggable;
 import frc.util.MotorGroup;
 
 /**
  * Add your docs here.
  */
-public class Arms {
+public class Arms implements Loggable {
 
 	// --------------------------------------Motors/Sensors-------------------------------------
 
@@ -57,6 +59,8 @@ public class Arms {
 
 	private boolean stopRight;
 
+	private boolean logReady;
+	
 	// ----------------------------------------Constants----------------------------------------
 
 	private final double wantedDegree = 17; //17
@@ -79,6 +83,7 @@ public class Arms {
 //		SmartDashboard.putData("Left Limit Switch Status", leftStatus);
 //		SmartDashboard.putData("Right Limit Switch Status", rightStatus);
 //		SmartDashboard.putBoolean("haHAA", false);
+		logReady = true;
 	}
 
 	public void reset() {
@@ -144,6 +149,14 @@ public class Arms {
 		System.out.println("Right switch: " + rightInput.get());
 	}
 	
+	public boolean leftLimit() {
+		return leftInput.get();
+	}
+	
+	public boolean rightLimit() {
+		return rightInput.get();
+	}
+	
 	public boolean isDone() {
 		return isDone;
 	}
@@ -151,6 +164,18 @@ public class Arms {
 	public void armMtrs() {
 		leftArmMtr.set(0.5);
 		rightArmMtr.set(0.5);
+	}
+
+	@Override
+	public boolean logReady() {
+		return logReady;
+	}
+
+	@Override
+	public void logPeriodic(LogHolder lh) {
+		lh.updateLogClass("ARMS_PERIODIC");
+		lh.logLine("Left arms limit switch: " + leftInput.get());
+		lh.logLine("Right arms limit switch: " + rightInput.get());
 	}
 
 }

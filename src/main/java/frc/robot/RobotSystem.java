@@ -35,7 +35,7 @@ public class RobotSystem extends Thread{
 	private Logger logger;
 	private DebugTable debugger;
 
-	private Compressor compress;
+
 	
 	public RobotSystem(){
 		drives = new Drives();
@@ -45,8 +45,6 @@ public class RobotSystem extends Thread{
 		autonomous = new Autonomous(drives, hatch, hab);
 		currentState = RobotState.STANDBY;
 		currentControl = teleop;
-		compress = new Compressor(IO.ROBOT_COMPRESSOR.port);
-		compress.setClosedLoopControl(true);
 		logger = Logger.getInstance();
 		logger.start();
 		debugger = new DebugTable();
